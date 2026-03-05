@@ -34,6 +34,7 @@ import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.BooleanSubscriber;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.networktables.IntegerEntry;
 import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.IntegerSubscriber;
@@ -53,6 +54,7 @@ import java.util.Optional;
 import org.opencv.core.Core;
 import org.photonvision.common.hardware.VisionLEDMode;
 import org.photonvision.common.networktables.PacketSubscriber;
+import org.photonvision.common.networktables.PacketPublisher;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.timesync.TimeSyncSingleton;
 
@@ -65,6 +67,7 @@ public class PhotonCamera implements AutoCloseable {
     private final NetworkTable cameraTable;
     PacketSubscriber<PhotonPipelineResult> resultSubscriber;
     Optional<Transform3d> robotToCamera;
+    StructPublisher<Transform3d> robotToCameraPublisher;
     BooleanPublisher driverModePublisher;
     BooleanSubscriber driverModeSubscriber;
     IntegerPublisher fpsLimitPublisher;
@@ -84,6 +87,7 @@ public class PhotonCamera implements AutoCloseable {
         resultSubscriber.close();
         driverModePublisher.close();
         driverModeSubscriber.close();
+        robotToCameraPublisher.close();
         fpsLimitPublisher.close();
         fpsLimitSubscriber.close();
         versionEntry.close();
@@ -173,7 +177,7 @@ public class PhotonCamera implements AutoCloseable {
         rootPhotonTable = instance.getTable(kTableName);
         this.cameraTable = rootPhotonTable.getSubTable(cameraName);
         path = cameraTable.getPath();
-        var rawBytesEntry =
+        var rawBytesEntry_pipelineResult =
                 cameraTable
                         .getRawTopic("rawBytes")
                         .subscribe(
@@ -182,7 +186,8 @@ public class PhotonCamera implements AutoCloseable {
                                 PubSubOption.periodic(0.01),
                                 PubSubOption.sendAll(true),
                                 PubSubOption.pollStorage(20));
-        resultSubscriber = new PacketSubscriber<>(rawBytesEntry, PhotonPipelineResult.photonStruct);
+        resultSubscriber = new PacketSubscriber<>(rawBytesEntry_pipelineResult, PhotonPipelineResult.photonStruct);
+        robotToCameraPublisher = cameraTable.getStructTopic("robotToCamera", Transform3d.struct).publish();
         driverModePublisher = cameraTable.getBooleanTopic("driverModeRequest").publish();
         driverModeSubscriber = cameraTable.getBooleanTopic("driverMode").subscribe(false);
         fpsLimitPublisher = cameraTable.getIntegerTopic("fpsLimitRequest").publish();
@@ -214,6 +219,15 @@ public class PhotonCamera implements AutoCloseable {
 
         // HACK - check if things are compatible
         verifyDependencies();
+
+        robotToCamera.ifPresent(this::publishRobotToCameraTransform);
+    }
+
+    private void publishRobotToCameraTransform() {
+        robotToCamera.ifPresentOrElse(
+            (transform) -> robotToCameraPublisher.set(transform),
+            () -> robotToCameraPublisher.set(new Transform3d()) // TODO: See if this default value can cause any issues.
+        );
     }
 
     static void verifyDependencies() {
@@ -528,6 +542,25 @@ public class PhotonCamera implements AutoCloseable {
      */
     public final NetworkTable getCameraTable() {
         return cameraTable;
+    }
+
+    /**
+     * Returns the camera's transform from the robot
+     * 
+     * @return The camera's transform from the robot, if it is set. Empty otherwise.
+     */
+    public Optional<Transform3d> getCameraTransform() {
+        return robotToCamera;
+    }
+
+    /**
+     * Sets the camera's transform from the robot. This is used for pose estimation.
+     *
+     * @param robotToCamera The transform from the robot to the camera.
+     */
+    public void setCameraTransform(Transform3d robotToCamera) {
+        this.robotToCamera = Optional.of(robotToCamera);
+        publishRobotToCameraTransform();
     }
 
     void verifyVersion() {

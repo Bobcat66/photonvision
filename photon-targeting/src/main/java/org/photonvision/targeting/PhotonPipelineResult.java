@@ -18,6 +18,7 @@
 package org.photonvision.targeting;
 
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import edu.wpi.first.math.geometry.Transform3d;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,9 +41,12 @@ public class PhotonPipelineResult
     /** The multitag result, if using an AprilTag pipeline with Multi-Target Estimation enabled. */
     public Optional<MultiTargetPNPResult> multitagResult;
 
+    /** The transform from the robot to the camera. */
+    public Optional<Transform3d> robotToCamera;
+
     /** Constructs an empty pipeline result. */
     public PhotonPipelineResult() {
-        this(new PhotonPipelineMetadata(), List.of(), Optional.empty());
+        this(new PhotonPipelineMetadata(), List.of(), Optional.empty(), Optional.empty());
     }
 
     /**
@@ -66,7 +70,9 @@ public class PhotonPipelineResult
                 new PhotonPipelineMetadata(
                         captureTimestampMicros, publishTimestampMicros, sequenceID, timeSinceLastPong),
                 targets,
-                Optional.empty());
+                Optional.empty(),
+                Optional.empty()
+            );
     }
 
     /**
@@ -80,6 +86,7 @@ public class PhotonPipelineResult
      * @param timeSinceLastPong The time since the last Time Sync Pong in uS.
      * @param targets The list of targets identified by the pipeline.
      * @param result Result from multi-target PNP.
+     * @param robotToCamera The transform from the robot to the camera.
      */
     public PhotonPipelineResult(
             long sequenceID,
@@ -87,21 +94,28 @@ public class PhotonPipelineResult
             long publishTimestamp,
             long timeSinceLastPong,
             List<PhotonTrackedTarget> targets,
-            Optional<MultiTargetPNPResult> result) {
+            Optional<MultiTargetPNPResult> result,
+            Optional<Transform3d> robotToCamera
+        ) {
         this(
                 new PhotonPipelineMetadata(
                         captureTimestamp, publishTimestamp, sequenceID, timeSinceLastPong),
                 targets,
-                result);
+                result,
+                robotToCamera
+            );
     }
 
     public PhotonPipelineResult(
             PhotonPipelineMetadata metadata,
             List<PhotonTrackedTarget> targets,
-            Optional<MultiTargetPNPResult> result) {
+            Optional<MultiTargetPNPResult> result,
+            Optional<Transform3d> robotToCamera
+        ) {
         this.metadata = metadata;
         this.targets.addAll(targets);
         this.multitagResult = result;
+        this.robotToCamera = robotToCamera;
     }
 
     /**
@@ -214,6 +228,9 @@ public class PhotonPipelineResult
         if (multitagResult == null) {
             if (other.multitagResult != null) return false;
         } else if (!multitagResult.equals(other.multitagResult)) return false;
+        if (robotToCamera == null) {
+            if (other.robotToCamera != null) return false;
+        } else if (!robotToCamera.equals(other.robotToCamera)) return false;
         return true;
     }
 

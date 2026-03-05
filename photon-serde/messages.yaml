@@ -92,3 +92,6 @@
   - name: multitagResult
     type: MultiTargetPNPResult
     optional: True
+  - name: robotToCamera
+    type: Transform3d
+    optional: True
