@@ -17,6 +17,7 @@
 
 package org.photonvision.targeting.proto;
 
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.util.protobuf.Protobuf;
 import java.util.Optional;
 import org.photonvision.proto.Photon.ProtobufPhotonPipelineResult;
@@ -52,7 +53,10 @@ public class PhotonPipelineResultProto
                 PhotonTrackedTarget.proto.unpack(msg.getTargets()),
                 msg.hasMultiTargetResult()
                         ? Optional.of(MultiTargetPNPResult.proto.unpack(msg.getMultiTargetResult()))
-                        : Optional.empty());
+                        : Optional.empty(),
+                msg.hasRobotToCamera()                        
+                    ? Optional.of(Transform3d.proto.unpack(msg.getRobotToCamera()))
+                    : Optional.empty());
     }
 
     @Override
