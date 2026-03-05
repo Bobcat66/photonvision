@@ -220,7 +220,9 @@ public class PhotonCamera implements AutoCloseable {
         // HACK - check if things are compatible
         verifyDependencies();
 
-        robotToCamera.ifPresent(this::publishRobotToCameraTransform);
+        if (robotToCamera.isPresent()) {
+            publishRobotToCameraTransform();
+        }
     }
 
     private void publishRobotToCameraTransform() {
