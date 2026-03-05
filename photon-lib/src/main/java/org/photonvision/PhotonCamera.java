@@ -32,6 +32,7 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.numbers.*;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.BooleanSubscriber;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.IntegerEntry;
 import edu.wpi.first.networktables.IntegerPublisher;
@@ -63,6 +64,7 @@ public class PhotonCamera implements AutoCloseable {
 
     private final NetworkTable cameraTable;
     PacketSubscriber<PhotonPipelineResult> resultSubscriber;
+    Optional<Transform3d> robotToCamera;
     BooleanPublisher driverModePublisher;
     BooleanSubscriber driverModeSubscriber;
     IntegerPublisher fpsLimitPublisher;
@@ -133,9 +135,37 @@ public class PhotonCamera implements AutoCloseable {
      *     simulation, but should *usually* be the default NTInstance from
      *     NetworkTableInstance::getDefault
      * @param cameraName The name of the camera, as seen in the UI.
+     * @param robotToCamera The transform from the robot to the camera. This is used for pose estimation
+     */
+    public PhotonCamera(NetworkTableInstance instance, String cameraName, Transform3d robotToCamera) {
+        this(instance, cameraName, Optional.of(robotToCamera));
+    }
+
+    /**
+     * Constructs a PhotonCamera from a root table.
+     *
+     * @param instance The NetworkTableInstance to pull data from. This can be a custom instance in
+     *     simulation, but should *usually* be the default NTInstance from
+     *     NetworkTableInstance::getDefault
+     * @param cameraName The name of the camera, as seen in the UI.
+     * @param robotToCamera The transform from the robot to the camera. This is used for pose estimation
      */
     public PhotonCamera(NetworkTableInstance instance, String cameraName) {
+        this(instance, cameraName, Optional.empty());
+    }
+
+    /**
+     * Internal implementation of the constructor
+     * 
+     * @param instance The NetworkTableInstance to pull data from. This can be a custom instance in
+     *     simulation, but should *usually* be the default NTInstance from
+     *     NetworkTableInstance::getDefault
+     * @param cameraName The name of the camera, as seen in the UI.
+     * @param robotToCamera The transform from the robot to the camera. This is used for pose estimation
+     */
+    private PhotonCamera(NetworkTableInstance instance, String cameraName, Optional<Transform3d> robotToCamera) {
         name = cameraName;
+        this.robotToCamera = robotToCamera;
         disconnectAlert =
                 new Alert(
                         PHOTON_ALERT_GROUP, "PhotonCamera '" + name + "' is disconnected.", AlertType.kWarning);
@@ -392,6 +422,12 @@ public class PhotonCamera implements AutoCloseable {
     public int getPipelineIndex() {
         return (int) pipelineIndexState.get(0);
     }
+
+    /**
+     * Returns the robot-to-camera transform.
+     * 
+     * @return The robot-to-camera transform, if it is set. Optional.empty() otherwise.
+     */
 
     /**
      * Allows the user to select the active pipeline index.
