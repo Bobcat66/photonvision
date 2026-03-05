@@ -649,7 +649,9 @@ public class PhotonCameraSim implements AutoCloseable {
                         // Pretend like we heard a pong recently
                         1000L + (long) ((Math.random() - 0.5) * 50),
                         detectableTgts,
-                        multitagResult);
+                        multitagResult,
+                        cam.getCameraTransform()
+                    );
         return ret;
     }
 
