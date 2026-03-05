@@ -75,6 +75,45 @@ public class PhotonPipelineResult
             );
     }
 
+
+    /**
+     * Constructs a pipeline result.
+     *
+     * @param sequenceID The number of frames processed by this camera since boot
+     * @param captureTimestamp The time, in uS in the coprocessor's timebase, that the coprocessor
+     *     captured the image this result contains the targeting info of
+     * @param publishTimestamp The time, in uS in the coprocessor's timebase, that the coprocessor
+     *     published targeting info
+     * @param timeSinceLastPong The time since the last Time Sync Pong in uS.
+     * @param targets The list of targets identified by the pipeline.
+     * @param result Result from multi-target PNP.
+     * @param robotToCamera The transform from the robot to the camera.
+     */
+    public PhotonPipelineResult(
+            long sequenceID,
+            long captureTimestamp,
+            long publishTimestamp,
+            long timeSinceLastPong,
+            List<PhotonTrackedTarget> targets,
+            Optional<MultiTargetPNPResult> result
+        ) {
+        this(
+                new PhotonPipelineMetadata(
+                        captureTimestamp, publishTimestamp, sequenceID, timeSinceLastPong),
+                targets,
+                result,
+                Optional.empty()
+            );
+    }
+
+    public PhotonPipelineResult(
+            PhotonPipelineMetadata metadata,
+            List<PhotonTrackedTarget> targets,
+            Optional<MultiTargetPNPResult> result
+        ) {
+        this(metadata, targets, result, Optional.empty());
+    }
+
     /**
      * Constructs a pipeline result.
      *
