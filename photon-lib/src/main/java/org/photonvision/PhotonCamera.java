@@ -152,7 +152,6 @@ public class PhotonCamera implements AutoCloseable {
      *     simulation, but should *usually* be the default NTInstance from
      *     NetworkTableInstance::getDefault
      * @param cameraName The name of the camera, as seen in the UI.
-     * @param robotToCamera The transform from the robot to the camera. This is used for pose estimation
      */
     public PhotonCamera(NetworkTableInstance instance, String cameraName) {
         this(instance, cameraName, Optional.empty());
