@@ -63,6 +63,15 @@ class PhotonPipelineResult : public PhotonPipelineResult_PhotonStruct {
   template <typename... Args>
   explicit PhotonPipelineResult(Args&&... args)
       : Base{std::forward<Args>(args)...} {}
+  
+  // Old constructor for backwards compatibility.
+  explicit PhotonPipelineResult(
+      long sequenceID, long captureTimestamp, long publishTimestamp,
+      long timeSinceLastPong, std::vector<PhotonTrackedTarget> targets,
+      std::optional<MultiTargetPNPResult> result)
+      : Base(PhotonPipelineMetadata{captureTimestamp, publishTimestamp,
+                                   sequenceID, timeSinceLastPong},
+             targets, result, std::nullopt) {}
 
   /**
    * Returns the best target in this pipeline result. If there are no targets,
