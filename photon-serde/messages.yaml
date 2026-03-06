@@ -81,6 +81,10 @@
     type: int16
     vla: True
 
+- name: RobotToCameraTransform
+  fields:
+  - name: robotToCamera
+    type: Transform3d
 
 - name: PhotonPipelineResult
   fields:
@@ -93,5 +97,5 @@
     type: MultiTargetPNPResult
     optional: True
   - name: robotToCamera
-    type: Transform3d
+    type: RobotToCameraTransform
     optional: True

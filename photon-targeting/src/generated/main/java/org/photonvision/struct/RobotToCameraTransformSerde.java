@@ -35,19 +35,19 @@ import org.photonvision.targeting.*;
 
 // WPILib imports (if any)
 import edu.wpi.first.util.struct.Struct;
-
+import edu.wpi.first.math.geometry.Transform3d;
 
 /**
- * Auto-generated serialization/deserialization helper for PhotonPipelineResult
+ * Auto-generated serialization/deserialization helper for RobotToCameraTransform
  */
-public class PhotonPipelineResultSerde implements PacketSerde<PhotonPipelineResult> {
+public class RobotToCameraTransformSerde implements PacketSerde<RobotToCameraTransform> {
 
     @Override
-    public final String getInterfaceUUID() { return "b0040327f63abf872824e05641cbdede"; }
+    public final String getInterfaceUUID() { return "575b4e398df72967da55b383dfe7784d"; }
     @Override
-    public final String getSchema() { return "PhotonPipelineMetadata:ac0a45f686457856fb30af77699ea356 metadata;PhotonTrackedTarget:cc6dbb5c5c1e0fa808108019b20863f1 targets[?];optional MultiTargetPNPResult:541096947e9f3ca2d3f425ff7b04aa7b multitagResult;optional RobotToCameraTransform:575b4e398df72967da55b383dfe7784d robotToCamera;"; }
+    public final String getSchema() { return "Transform3d robotToCamera;"; }
     @Override
-    public final String getTypeName() { return "PhotonPipelineResult"; }
+    public final String getTypeName() { return "RobotToCameraTransform"; }
 
     @Override
     public int getMaxByteSize() {
@@ -56,35 +56,15 @@ public class PhotonPipelineResultSerde implements PacketSerde<PhotonPipelineResu
     }
 
     @Override
-    public void pack(Packet packet, PhotonPipelineResult value) {
-        // field metadata is of non-intrinsic type PhotonPipelineMetadata
-        PhotonPipelineMetadata.photonStruct.pack(packet, value.metadata);
-
-        // targets is a custom VLA!
-        packet.encodeList(value.targets);
-
-        // multitagResult is optional! it better not be a VLA too
-        packet.encodeOptional(value.multitagResult);
-
-        // robotToCamera is optional! it better not be a VLA too
-        packet.encodeOptional(value.robotToCamera);
+    public void pack(Packet packet, RobotToCameraTransform value) {
+        PacketUtils.packTransform3d(packet, value.robotToCamera);
     }
 
     @Override
-    public PhotonPipelineResult unpack(Packet packet) {
-        var ret = new PhotonPipelineResult();
+    public RobotToCameraTransform unpack(Packet packet) {
+        var ret = new RobotToCameraTransform();
 
-        // metadata is of non-intrinsic type PhotonPipelineMetadata
-        ret.metadata = PhotonPipelineMetadata.photonStruct.unpack(packet);
-
-        // targets is a custom VLA!
-        ret.targets = packet.decodeList(PhotonTrackedTarget.photonStruct);
-
-        // multitagResult is optional! it better not be a VLA too
-        ret.multitagResult = packet.decodeOptional(MultiTargetPNPResult.photonStruct);
-
-        // robotToCamera is optional! it better not be a VLA too
-        ret.robotToCamera = packet.decodeOptional(RobotToCameraTransform.photonStruct);
+        ret.robotToCamera = PacketUtils.unpackTransform3d(packet);
 
         return ret;
     }
@@ -92,14 +72,14 @@ public class PhotonPipelineResultSerde implements PacketSerde<PhotonPipelineResu
     @Override
     public PacketSerde<?>[] getNestedPhotonMessages() {
         return new PacketSerde<?>[] {
-            MultiTargetPNPResult.photonStruct,PhotonTrackedTarget.photonStruct,RobotToCameraTransform.photonStruct,PhotonPipelineMetadata.photonStruct
+            
         };
     }
 
     @Override
     public Struct<?>[] getNestedWpilibMessages() {
         return new Struct<?>[] {
-            
+            Transform3d.struct
         };
     }
 }

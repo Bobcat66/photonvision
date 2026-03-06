@@ -19,6 +19,7 @@ package org.photonvision.vision.processes;
 
 import edu.wpi.first.cscore.CameraServerJNI;
 import edu.wpi.first.cscore.VideoException;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import io.javalin.websocket.WsContext;
 import java.util.ArrayList;
@@ -89,6 +90,8 @@ public class VisionModule {
 
     private int fpsLimit = -1;
 
+    private Transform3d robotToCameraTransform = null;
+
     FileSaveFrameConsumer inputFrameSaver;
     FileSaveFrameConsumer outputFrameSaver;
 
@@ -153,7 +156,9 @@ public class VisionModule {
                         pipelineManager::getDriverMode,
                         this::setDriverMode,
                         this::getFPSLimit,
-                        this::setFPSLimit);
+                        this::setFPSLimit,
+                        this::setRobotToCameraTransform
+                        );
         uiDataConsumer = new UIDataPublisher(visionSource.getSettables().getConfiguration().uniqueName);
         statusLEDsConsumer =
                 new StatusLEDConsumer(visionSource.getSettables().getConfiguration().uniqueName);
@@ -632,6 +637,17 @@ public class VisionModule {
      */
     public void setFPSLimit(int fps) {
         this.fpsLimit = fps;
+        saveAndBroadcastAll();
+    }
+
+    /**
+     * Set camera transform for this vision module. As of now this doesn't affect vision processing in any way
+     * 
+     * @param robotToCameraTransform the transform from the robot's origin to the camera's origin, in the robot's coordinate system. This should be provided in meters.
+     */
+
+    public void setRobotToCameraTransform(Transform3d robotToCameraTransform) {
+        this.robotToCameraTransform = robotToCameraTransform;
         saveAndBroadcastAll();
     }
 

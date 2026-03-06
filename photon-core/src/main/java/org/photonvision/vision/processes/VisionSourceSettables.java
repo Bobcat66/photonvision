@@ -18,6 +18,8 @@
 package org.photonvision.vision.processes;
 
 import edu.wpi.first.cscore.VideoMode;
+import edu.wpi.first.math.geometry.Transform3d;
+
 import java.util.HashMap;
 import org.opencv.core.Size;
 import org.photonvision.common.configuration.CameraConfiguration;
@@ -124,6 +126,11 @@ public abstract class VisionSourceSettables {
     public void removeCalibration(Size unrotatedImageSize) {
         configuration.removeCalibration(unrotatedImageSize);
         calculateFrameStaticProps();
+    }
+
+    public void setRobotToCamera(Transform3d robotToCamera) {
+        configuration.setRobotToCamera(robotToCamera);
+        // calculateFrameStaticProps(); // This shouldn't be necessary
     }
 
     protected void calculateFrameStaticProps() {

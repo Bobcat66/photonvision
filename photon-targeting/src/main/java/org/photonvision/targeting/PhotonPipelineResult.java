@@ -41,8 +41,8 @@ public class PhotonPipelineResult
     /** The multitag result, if using an AprilTag pipeline with Multi-Target Estimation enabled. */
     public Optional<MultiTargetPNPResult> multitagResult;
 
-    /** The transform from the robot to the camera. */
-    public Optional<Transform3d> robotToCamera;
+    /** The transform from the robot to the camera. This is an optional value, but photonserde doesn't seem to support optional Transform3ds*/
+    public Optional<RobotToCameraTransform> robotToCamera;
 
     /** Constructs an empty pipeline result. */
     public PhotonPipelineResult() {
@@ -154,7 +154,7 @@ public class PhotonPipelineResult
         this.metadata = metadata;
         this.targets.addAll(targets);
         this.multitagResult = result;
-        this.robotToCamera = robotToCamera;
+        this.robotToCamera = robotToCamera.map(RobotToCameraTransform::new);
     }
 
     /**
@@ -218,6 +218,16 @@ public class PhotonPipelineResult
      */
     public Optional<MultiTargetPNPResult> getMultiTagResult() {
         return multitagResult;
+    }
+
+    /**
+     * Return the robot to camera transform. Be sure to check {@code getRobotToCamera().isPresent()}
+     * before using the transform!
+     * 
+     * @return The robot to camera transform. Empty if no transform is set.
+     */
+    public Optional<Transform3d> getRobotToCamera() {
+        return robotToCamera.map(RobotToCameraTransform::unwrap);
     }
 
     /**

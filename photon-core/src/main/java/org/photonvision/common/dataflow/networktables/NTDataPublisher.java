@@ -56,6 +56,9 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
     private final Consumer<Integer> fpsLimitConsumer;
     private final Supplier<Integer> fpsLimitSupplier;
 
+    NTDataChangeListener robotToCameraListener;
+    private final Consumer<Transform3d> robotToCameraConsumer;
+
     public NTDataPublisher(
             String cameraNickname,
             Supplier<Integer> pipelineIndexSupplier,
@@ -63,13 +66,16 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
             BooleanSupplier driverModeSupplier,
             Consumer<Boolean> driverModeConsumer,
             Supplier<Integer> fpsLimitSupplier,
-            Consumer<Integer> fpsLimitConsumer) {
+            Consumer<Integer> fpsLimitConsumer,
+            Consumer<Transform3d> robotToCameraConsumer
+        ) {
         this.pipelineIndexSupplier = pipelineIndexSupplier;
         this.pipelineIndexConsumer = pipelineIndexConsumer;
         this.driverModeSupplier = driverModeSupplier;
         this.driverModeConsumer = driverModeConsumer;
         this.fpsLimitSupplier = fpsLimitSupplier;
         this.fpsLimitConsumer = fpsLimitConsumer;
+        this.robotToCameraConsumer = robotToCameraConsumer;
 
         updateCameraNickname(cameraNickname);
         updateEntries();
@@ -97,6 +103,12 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
             // TODO: Log
         }
         logger.debug("Set pipeline index to " + newIndex);
+    }
+
+    private void onRobotToCameraChange(NetworkTableEvent entryNotification) {
+        var newRobotToCamera = (Transform3d) entryNotification.valueData.value.getValue();
+        robotToCameraConsumer.accept(newRobotToCamera);
+        logger.debug("Updated robot to camera transform to " + newRobotToCamera);
     }
 
     private void onDriverModeChange(NetworkTableEvent entryNotification) {
@@ -149,6 +161,10 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
         fpsLimitListener =
                 new NTDataChangeListener(
                         ts.subTable.getInstance(), ts.fpsLimitSubscriber, this::onFPSLimitChange);
+
+        robotToCameraListener =
+                new NTDataChangeListener(
+                        ts.subTable.getInstance(), ts.robotToCameraSubscriber, this::onRobotToCameraChange);
     }
 
     public void updateCameraNickname(String newCameraNickname) {
