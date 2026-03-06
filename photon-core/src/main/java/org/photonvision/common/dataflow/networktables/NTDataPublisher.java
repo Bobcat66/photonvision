@@ -67,8 +67,7 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
             Consumer<Boolean> driverModeConsumer,
             Supplier<Integer> fpsLimitSupplier,
             Consumer<Integer> fpsLimitConsumer,
-            Consumer<Transform3d> robotToCameraConsumer
-        ) {
+            Consumer<Transform3d> robotToCameraConsumer) {
         this.pipelineIndexSupplier = pipelineIndexSupplier;
         this.pipelineIndexConsumer = pipelineIndexConsumer;
         this.driverModeSupplier = driverModeSupplier;
@@ -204,7 +203,8 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
                         NetworkTablesManager.getInstance().getTimeSinceLastPong(),
                         TrackedTarget.simpleFromTrackedTargets(acceptedResult.targets),
                         acceptedResult.multiTagResult,
-                        Optional.empty() // TODO: robotToCamera -- should pull this from the NT table, temporary solution for testing
+                        Optional.empty() // TODO: robotToCamera -- should pull this from the NT table, temporary
+                        // solution for testing
                         );
 
         // random guess at size of the array

@@ -17,8 +17,8 @@
 
 package org.photonvision.targeting;
 
-import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.util.protobuf.ProtobufSerializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,8 +41,12 @@ public class PhotonPipelineResult
     /** The multitag result, if using an AprilTag pipeline with Multi-Target Estimation enabled. */
     public Optional<MultiTargetPNPResult> multitagResult;
 
-    /** The transform from the robot to the camera. This is an optional value, but photonserde doesn't seem to support optional Transform3ds*/
-    public Optional<RobotToCameraTransform> robotToCamera;
+    /**
+     * The transform from the robot to the camera. This is an optional value, but photonserde doesn't
+     * seem to support optional Transform3ds
+     */
+    public Optional<RobotToCameraTransform>
+            robotToCamera; // TODO: Rename RobotToCameraTransform to RobotToCameraWrapper or something
 
     /** Constructs an empty pipeline result. */
     public PhotonPipelineResult() {
@@ -71,10 +75,8 @@ public class PhotonPipelineResult
                         captureTimestampMicros, publishTimestampMicros, sequenceID, timeSinceLastPong),
                 targets,
                 Optional.empty(),
-                Optional.empty()
-            );
+                Optional.empty());
     }
-
 
     /**
      * Constructs a pipeline result.
@@ -94,22 +96,19 @@ public class PhotonPipelineResult
             long publishTimestamp,
             long timeSinceLastPong,
             List<PhotonTrackedTarget> targets,
-            Optional<MultiTargetPNPResult> result
-        ) {
+            Optional<MultiTargetPNPResult> result) {
         this(
                 new PhotonPipelineMetadata(
                         captureTimestamp, publishTimestamp, sequenceID, timeSinceLastPong),
                 targets,
                 result,
-                Optional.empty()
-            );
+                Optional.empty());
     }
 
     public PhotonPipelineResult(
             PhotonPipelineMetadata metadata,
             List<PhotonTrackedTarget> targets,
-            Optional<MultiTargetPNPResult> result
-        ) {
+            Optional<MultiTargetPNPResult> result) {
         this(metadata, targets, result, Optional.empty());
     }
 
@@ -133,23 +132,20 @@ public class PhotonPipelineResult
             long timeSinceLastPong,
             List<PhotonTrackedTarget> targets,
             Optional<MultiTargetPNPResult> result,
-            Optional<Transform3d> robotToCamera
-        ) {
+            Optional<Transform3d> robotToCamera) {
         this(
                 new PhotonPipelineMetadata(
                         captureTimestamp, publishTimestamp, sequenceID, timeSinceLastPong),
                 targets,
                 result,
-                robotToCamera
-            );
+                robotToCamera);
     }
 
     public PhotonPipelineResult(
             PhotonPipelineMetadata metadata,
             List<PhotonTrackedTarget> targets,
             Optional<MultiTargetPNPResult> result,
-            Optional<Transform3d> robotToCamera
-        ) {
+            Optional<Transform3d> robotToCamera) {
         this.metadata = metadata;
         this.targets.addAll(targets);
         this.multitagResult = result;
@@ -222,7 +218,7 @@ public class PhotonPipelineResult
     /**
      * Return the robot to camera transform. Be sure to check {@code getRobotToCamera().isPresent()}
      * before using the transform!
-     * 
+     *
      * @return The robot to camera transform. Empty if no transform is set.
      */
     public Optional<Transform3d> getRobotToCamera() {

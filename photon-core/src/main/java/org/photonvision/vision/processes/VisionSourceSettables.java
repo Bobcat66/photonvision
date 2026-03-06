@@ -19,7 +19,6 @@ package org.photonvision.vision.processes;
 
 import edu.wpi.first.cscore.VideoMode;
 import edu.wpi.first.math.geometry.Transform3d;
-
 import java.util.HashMap;
 import org.opencv.core.Size;
 import org.photonvision.common.configuration.CameraConfiguration;

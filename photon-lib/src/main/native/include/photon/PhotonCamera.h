@@ -29,6 +29,7 @@
 #include <vector>
 
 #include <frc/Alert.h>
+#include <frc/geometry/Transform3d.h>
 #include <networktables/BooleanTopic.h>
 #include <networktables/DoubleArrayTopic.h>
 #include <networktables/DoubleTopic.h>
@@ -73,6 +74,20 @@ class PhotonCamera {
    * UI).
    */
   explicit PhotonCamera(const std::string_view cameraName);
+
+  /**
+   * Constructs a PhotonCamera from a root table.
+   *
+   * @param instance The NetworkTableInstance to pull data from. This can be a
+   * custom instance in simulation, but should *usually* be the default
+   * NTInstance from {@link NetworkTableInstance::getDefault}
+   * @param cameraName The name of the camera, as seen in the UI.
+   * over.
+   * @param robotToCamera The transform from the robot's center to the camera. This is used for pose estimation
+   */
+  explicit PhotonCamera(nt::NetworkTableInstance instance,
+                        const std::string_view cameraName,
+                        const std::optional<frc::Transform3d>& robotToCamera);
 
   PhotonCamera(PhotonCamera&&) = default;
 
@@ -244,6 +259,8 @@ class PhotonCamera {
   frc::Alert disconnectAlert;
   frc::Alert timesyncAlert;
 
+  const std::optional<frc::Transform3d>& GetRobotToCamera() const { return robotToCamera; }
+
  private:
   units::second_t lastVersionCheckTime = 0_s;
   static bool VERSION_CHECK_ENABLED;
@@ -260,6 +277,7 @@ class PhotonCamera {
   void CheckTimeSyncOrWarn(photon::PhotonPipelineResult& result);
 
   std::vector<std::string> tablesThatLookLikePhotonCameras();
+  std::optional<frc::Transform3d> robotToCamera;
 };
 
 }  // namespace photon

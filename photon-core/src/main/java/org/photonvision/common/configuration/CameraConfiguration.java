@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.cscore.UsbCameraInfo;
 import edu.wpi.first.math.geometry.Transform3d;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -214,8 +213,9 @@ public class CameraConfiguration {
 
     /**
      * Set the robot to camera transform for this camera configuration.
-     * 
-     * @param robotToCamera the transform from the robot's origin to the camera's origin, in the robot's coordinate system.
+     *
+     * @param robotToCamera the transform from the robot's origin to the camera's origin, in the
+     *     robot's coordinate system.
      */
     public void setRobotToCamera(Transform3d robotToCamera) {
         this.robotToCamera = robotToCamera;

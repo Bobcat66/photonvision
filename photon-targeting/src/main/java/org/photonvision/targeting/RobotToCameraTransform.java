@@ -17,18 +17,16 @@
 
 package org.photonvision.targeting;
 
-import org.photonvision.common.dataflow.structures.PacketSerde;
-import org.photonvision.struct.MultiTargetPNPResultSerde;
-import org.photonvision.struct.RobotToCameraTransformSerde;
-import org.photonvision.targeting.serde.PhotonStructSerializable;
-import org.photonvision.targeting.proto.RobotToCameraTransformProto;
-
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.util.protobuf.ProtobufSerializable;
+import org.photonvision.common.dataflow.structures.PacketSerde;
+import org.photonvision.struct.RobotToCameraTransformSerde;
+import org.photonvision.targeting.proto.RobotToCameraTransformProto;
+import org.photonvision.targeting.serde.PhotonStructSerializable;
 
 // We need a wrapper class for photonserde, as this needs to be an optional value
-public class RobotToCameraTransform 
-    implements ProtobufSerializable, PhotonStructSerializable<RobotToCameraTransform> {
+public class RobotToCameraTransform
+        implements ProtobufSerializable, PhotonStructSerializable<RobotToCameraTransform> {
     public Transform3d robotToCamera;
 
     public RobotToCameraTransform() {
@@ -56,5 +54,5 @@ public class RobotToCameraTransform
 
     public static Transform3d unwrap(RobotToCameraTransform transform) {
         return transform.getTransform3d();
-     }
+    }
 }

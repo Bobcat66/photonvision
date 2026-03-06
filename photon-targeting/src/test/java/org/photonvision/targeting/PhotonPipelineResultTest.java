@@ -188,8 +188,7 @@ public class PhotonPipelineResultTest {
                                         new PnpResult(
                                                 new Transform3d(new Translation3d(1, 2, 3), new Rotation3d(1, 2, 3)), 0.1),
                                         List.of((short) 1, (short) 2, (short) 3))),
-                        Optional.of(
-                                new Transform3d(new Translation3d(1, 2, 3), new Rotation3d(1, 2, 3))));
+                        Optional.of(new Transform3d(new Translation3d(1, 2, 3), new Rotation3d(1, 2, 3))));
         b =
                 new PhotonPipelineResult(
                         3,
@@ -244,8 +243,7 @@ public class PhotonPipelineResultTest {
                                         new PnpResult(
                                                 new Transform3d(new Translation3d(1, 2, 3), new Rotation3d(1, 2, 3)), 0.1),
                                         List.of((short) 1, (short) 2, (short) 3))),
-                        Optional.of(
-                                new Transform3d(new Translation3d(1, 2, 3), new Rotation3d(1, 2, 3))));
+                        Optional.of(new Transform3d(new Translation3d(1, 2, 3), new Rotation3d(1, 2, 3))));
         assertEquals(a, b);
     }
 
@@ -405,8 +403,7 @@ public class PhotonPipelineResultTest {
                                         new PnpResult(
                                                 new Transform3d(new Translation3d(1, 8, 3), new Rotation3d(1, 2, 3)), 0.1),
                                         List.of((short) 3, (short) 4, (short) 7))),
-                        Optional.of(
-                                new Transform3d(new Translation3d(1, 2, 3), new Rotation3d(1, 2, 3))));
+                        Optional.of(new Transform3d(new Translation3d(1, 2, 3), new Rotation3d(1, 2, 3))));
         b =
                 new PhotonPipelineResult(
                         3,
@@ -461,8 +458,7 @@ public class PhotonPipelineResultTest {
                                         new PnpResult(
                                                 new Transform3d(new Translation3d(1, 2, 3), new Rotation3d(1, 2, 3)), 0.1),
                                         List.of((short) 1, (short) 2, (short) 3))),
-                        Optional.of(
-                                new Transform3d(new Translation3d(1, 2, 3), new Rotation3d(1, 2, 3))));
+                        Optional.of(new Transform3d(new Translation3d(1, 2, 3), new Rotation3d(1, 2, 3))));
         assertNotEquals(a, b);
     }
 }

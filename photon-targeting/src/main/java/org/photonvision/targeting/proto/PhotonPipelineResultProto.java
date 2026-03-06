@@ -54,9 +54,9 @@ public class PhotonPipelineResultProto
                 msg.hasMultiTargetResult()
                         ? Optional.of(MultiTargetPNPResult.proto.unpack(msg.getMultiTargetResult()))
                         : Optional.empty(),
-                msg.hasRobotToCamera()                        
-                    ? Optional.of(Transform3d.proto.unpack(msg.getRobotToCamera()))
-                    : Optional.empty());
+                msg.hasRobotToCamera()
+                        ? Optional.of(Transform3d.proto.unpack(msg.getRobotToCamera()))
+                        : Optional.empty());
     }
 
     @Override

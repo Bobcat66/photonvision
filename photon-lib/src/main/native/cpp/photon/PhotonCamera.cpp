@@ -122,7 +122,8 @@ static const std::string TYPE_STRING =
     std::string{SerdeType<PhotonPipelineResult>::GetSchemaHash()};
 
 PhotonCamera::PhotonCamera(nt::NetworkTableInstance instance,
-                           const std::string_view cameraName)
+                           const std::string_view cameraName,
+                           const std::optional<frc::Transform3d>& robotToCamera)
     : mainTable(instance.GetTable("photonvision")),
       rootTable(mainTable->GetSubTable(cameraName)),
       rawBytesEntry(
@@ -165,6 +166,7 @@ PhotonCamera::PhotonCamera(nt::NetworkTableInstance instance,
                       std::string{"PhotonCamera '"} + std::string{cameraName} +
                           "' is disconnected.",
                       frc::Alert::AlertType::kWarning),
+      robotToCamera(robotToCamera),
       timesyncAlert(PHOTON_ALERT_GROUP, "", frc::Alert::AlertType::kWarning) {
   verifyDependencies();
   HAL_Report(HALUsageReporting::kResourceType_PhotonCamera, InstanceCount);
@@ -175,6 +177,10 @@ PhotonCamera::PhotonCamera(nt::NetworkTableInstance instance,
   // so we should be fine to call this from the ctor
   InitTspServer();
 }
+
+PhotonCamera::PhotonCamera(nt::NetworkTableInstance instance,
+                           const std::string_view cameraName)
+    : PhotonCamera(instance, cameraName, std::nullopt) {}
 
 PhotonCamera::PhotonCamera(const std::string_view cameraName)
     : PhotonCamera(nt::NetworkTableInstance::GetDefault(), cameraName) {}

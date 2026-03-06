@@ -157,8 +157,7 @@ public class VisionModule {
                         this::setDriverMode,
                         this::getFPSLimit,
                         this::setFPSLimit,
-                        this::setRobotToCameraTransform
-                        );
+                        this::setRobotToCameraTransform);
         uiDataConsumer = new UIDataPublisher(visionSource.getSettables().getConfiguration().uniqueName);
         statusLEDsConsumer =
                 new StatusLEDConsumer(visionSource.getSettables().getConfiguration().uniqueName);
@@ -641,11 +640,12 @@ public class VisionModule {
     }
 
     /**
-     * Set camera transform for this vision module. As of now this doesn't affect vision processing in any way
-     * 
-     * @param robotToCameraTransform the transform from the robot's origin to the camera's origin, in the robot's coordinate system. This should be provided in meters.
+     * Set camera transform for this vision module. As of now this doesn't affect vision processing in
+     * any way
+     *
+     * @param robotToCameraTransform the transform from the robot's origin to the camera's origin, in
+     *     the robot's coordinate system. This should be provided in meters.
      */
-
     public void setRobotToCameraTransform(Transform3d robotToCameraTransform) {
         this.robotToCameraTransform = robotToCameraTransform;
         saveAndBroadcastAll();

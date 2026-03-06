@@ -29,12 +29,11 @@ import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.*;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.BooleanSubscriber;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
-import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.networktables.IntegerEntry;
 import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.IntegerSubscriber;
@@ -43,6 +42,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.StringSubscriber;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -54,7 +54,6 @@ import java.util.Optional;
 import org.opencv.core.Core;
 import org.photonvision.common.hardware.VisionLEDMode;
 import org.photonvision.common.networktables.PacketSubscriber;
-import org.photonvision.common.networktables.PacketPublisher;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.timesync.TimeSyncSingleton;
 
@@ -139,7 +138,8 @@ public class PhotonCamera implements AutoCloseable {
      *     simulation, but should *usually* be the default NTInstance from
      *     NetworkTableInstance::getDefault
      * @param cameraName The name of the camera, as seen in the UI.
-     * @param robotToCamera The transform from the robot to the camera. This is used for pose estimation
+     * @param robotToCamera The transform from the robot to the camera. This is used for pose
+     *     estimation
      */
     public PhotonCamera(NetworkTableInstance instance, String cameraName, Transform3d robotToCamera) {
         this(instance, cameraName, Optional.of(robotToCamera));
@@ -159,14 +159,16 @@ public class PhotonCamera implements AutoCloseable {
 
     /**
      * Internal implementation of the constructor
-     * 
+     *
      * @param instance The NetworkTableInstance to pull data from. This can be a custom instance in
      *     simulation, but should *usually* be the default NTInstance from
      *     NetworkTableInstance::getDefault
      * @param cameraName The name of the camera, as seen in the UI.
-     * @param robotToCamera The transform from the robot to the camera. This is used for pose estimation
+     * @param robotToCamera The transform from the robot to the camera. This is used for pose
+     *     estimation
      */
-    private PhotonCamera(NetworkTableInstance instance, String cameraName, Optional<Transform3d> robotToCamera) {
+    private PhotonCamera(
+            NetworkTableInstance instance, String cameraName, Optional<Transform3d> robotToCamera) {
         name = cameraName;
         this.robotToCamera = robotToCamera;
         disconnectAlert =
@@ -185,8 +187,10 @@ public class PhotonCamera implements AutoCloseable {
                                 PubSubOption.periodic(0.01),
                                 PubSubOption.sendAll(true),
                                 PubSubOption.pollStorage(20));
-        resultSubscriber = new PacketSubscriber<>(rawBytesEntry_pipelineResult, PhotonPipelineResult.photonStruct);
-        robotToCameraPublisher = cameraTable.getStructTopic("robotToCamera", Transform3d.struct).publish();
+        resultSubscriber =
+                new PacketSubscriber<>(rawBytesEntry_pipelineResult, PhotonPipelineResult.photonStruct);
+        robotToCameraPublisher =
+                cameraTable.getStructTopic("robotToCamera", Transform3d.struct).publish();
         driverModePublisher = cameraTable.getBooleanTopic("driverModeRequest").publish();
         driverModeSubscriber = cameraTable.getBooleanTopic("driverMode").subscribe(false);
         fpsLimitPublisher = cameraTable.getIntegerTopic("fpsLimitRequest").publish();
@@ -226,9 +230,11 @@ public class PhotonCamera implements AutoCloseable {
 
     private void publishRobotToCameraTransform() {
         robotToCamera.ifPresentOrElse(
-            (transform) -> robotToCameraPublisher.set(transform),
-            () -> robotToCameraPublisher.set(new Transform3d()) // TODO: See if this default value can cause any issues.
-        );
+                (transform) -> robotToCameraPublisher.set(transform),
+                () ->
+                        robotToCameraPublisher.set(
+                                new Transform3d()) // TODO: See if this default value can cause any issues.
+                );
     }
 
     static void verifyDependencies() {
@@ -440,7 +446,7 @@ public class PhotonCamera implements AutoCloseable {
 
     /**
      * Returns the robot-to-camera transform.
-     * 
+     *
      * @return The robot-to-camera transform, if it is set. Optional.empty() otherwise.
      */
 
@@ -547,7 +553,7 @@ public class PhotonCamera implements AutoCloseable {
 
     /**
      * Returns the camera's transform from the robot
-     * 
+     *
      * @return The camera's transform from the robot, if it is set. Empty otherwise.
      */
     public Optional<Transform3d> getCameraTransform() {
