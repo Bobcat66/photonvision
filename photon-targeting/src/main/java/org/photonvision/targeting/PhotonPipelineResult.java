@@ -87,7 +87,6 @@ public class PhotonPipelineResult
      * @param timeSinceLastPong The time since the last Time Sync Pong in uS.
      * @param targets The list of targets identified by the pipeline.
      * @param result Result from multi-target PNP.
-     * @param robotToCamera The transform from the robot to the camera.
      */
     public PhotonPipelineResult(
             long sequenceID,
