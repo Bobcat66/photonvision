@@ -92,6 +92,13 @@ class PhotonCamera {
   PhotonCamera(PhotonCamera&&) = default;
 
   ~PhotonCamera() = default;
+  
+  /**
+   * Returns the robot to camera transform
+   * 
+   * @return The transform from the robot's center to the camera, if it was set. Empty otherwise.
+   */
+  std::optional<frc::Transform3d> GetRobotToCamera() { return robotToCamera; }
 
   /**
    * The list of pipeline results sent by PhotonVision since the last call to
@@ -258,8 +265,6 @@ class PhotonCamera {
 
   frc::Alert disconnectAlert;
   frc::Alert timesyncAlert;
-
-  const std::optional<frc::Transform3d>& GetRobotToCamera() const { return robotToCamera; }
 
  private:
   units::second_t lastVersionCheckTime = 0_s;

@@ -345,7 +345,7 @@ PhotonPipelineResult PhotonCameraSim::Process(
                              1000000},
       detectableTgts, multiTagResults, 
         cam->GetRobotToCamera()
-          ? std::make_optional<photon::RobotToCameraTransform>(photon::RobotToCameraTransform(camera->GetRobotToCamera())) : std::nullopt};
+          ? std::make_optional<photon::RobotToCameraTransform>(photon::RobotToCameraTransform(cam->GetRobotToCamera().value())) : std::nullopt};
 }
 void PhotonCameraSim::SubmitProcessedFrame(const PhotonPipelineResult& result) {
   SubmitProcessedFrame(result, wpi::Now());

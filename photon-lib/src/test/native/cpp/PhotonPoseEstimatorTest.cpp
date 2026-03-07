@@ -330,7 +330,7 @@ TEST(PhotonPoseEstimatorTest, PnpDistanceTrigSolve) {
 
   photon::PhotonPipelineResult result = cameraOneSim.Process(
       1_ms, realPose.TransformBy(estimator.GetRobotToCameraTransform()),
-      targets, std::make_optional<photon::RobotToCameraTransform>(photon::RobotToCameraTransform{frc::Transform3d{frc::Translation3d(0_m, 0_m, 1_m), frc::Rotation3d()}}));
+      targets);
   cameraOne.testResult = {result};
   cameraOne.testResult[0].SetReceiveTimestamp(17_s);
 

@@ -166,8 +166,8 @@ PhotonCamera::PhotonCamera(nt::NetworkTableInstance instance,
                       std::string{"PhotonCamera '"} + std::string{cameraName} +
                           "' is disconnected.",
                       frc::Alert::AlertType::kWarning),
-      robotToCamera(robotToCamera),
-      timesyncAlert(PHOTON_ALERT_GROUP, "", frc::Alert::AlertType::kWarning) {
+      timesyncAlert(PHOTON_ALERT_GROUP, "", frc::Alert::AlertType::kWarning),
+      robotToCamera(robotToCamera) {
   verifyDependencies();
   HAL_Report(HALUsageReporting::kResourceType_PhotonCamera, InstanceCount);
   InstanceCount++;
