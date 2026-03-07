@@ -55,4 +55,14 @@ public class RobotToCameraTransform
     public static Transform3d unwrap(RobotToCameraTransform transform) {
         return transform.getTransform3d();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        RobotToCameraTransform that = (RobotToCameraTransform) o;
+
+        return robotToCamera.equals(that.robotToCamera);
+    }
 }

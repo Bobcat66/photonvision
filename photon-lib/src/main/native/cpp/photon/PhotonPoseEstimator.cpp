@@ -53,6 +53,8 @@
 #define OPENCV_DISABLE_EIGEN_TENSOR_SUPPORT
 #include <opencv2/core/eigen.hpp>
 WPI_IGNORE_DEPRECATED
+
+//TODO: Update to use the new PhotonPipelineResult
 namespace photon {
 
 namespace detail {

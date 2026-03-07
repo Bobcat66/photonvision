@@ -138,18 +138,18 @@ public class PhotonPipelineResult
                         captureTimestamp, publishTimestamp, sequenceID, timeSinceLastPong),
                 targets,
                 result,
-                robotToCamera);
+                robotToCamera.map(RobotToCameraTransform::new));
     }
 
     public PhotonPipelineResult(
             PhotonPipelineMetadata metadata,
             List<PhotonTrackedTarget> targets,
             Optional<MultiTargetPNPResult> result,
-            Optional<Transform3d> robotToCamera) {
+            Optional<RobotToCameraTransform> robotToCamera) {
         this.metadata = metadata;
         this.targets.addAll(targets);
         this.multitagResult = result;
-        this.robotToCamera = robotToCamera.map(RobotToCameraTransform::new);
+        this.robotToCamera = robotToCamera;
     }
 
     /**
