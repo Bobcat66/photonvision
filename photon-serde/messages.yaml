@@ -81,11 +81,6 @@
     type: int16
     vla: True
 
-- name: RobotToCameraTransform
-  fields:
-  - name: robotToCamera
-    type: Transform3d
-
 - name: PhotonPipelineResult
   fields:
   - name: metadata

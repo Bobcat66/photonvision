@@ -88,7 +88,7 @@ TEST(PacketTest, PnpResult) {
 
 TEST(PacketTest, PhotonPipelineResult) {
   PhotonPipelineResult result(PhotonPipelineMetadata(0, 0, 1, 2),
-                              std::vector<PhotonTrackedTarget>{}, std::nullopt, std::make_optional<RobotToCameraTransform>(RobotToCameraTransform{frc::Transform3d{frc::Translation3d(0_m, 0_m, 1_m), frc::Rotation3d()}}));
+                              std::vector<PhotonTrackedTarget>{}, std::nullopt, std::make_optional<Transform3d>(frc::Transform3d{frc::Translation3d(0_m, 0_m, 1_m), frc::Rotation3d()}));
 
   Packet p;
   p.Pack<decltype(result)>(result);

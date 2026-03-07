@@ -18,11 +18,9 @@
 package org.photonvision.utils;
 
 import edu.wpi.first.math.geometry.*;
-
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-
 import org.photonvision.common.dataflow.structures.Packet;
 
 @SuppressWarnings("doclint")
@@ -120,7 +118,8 @@ public class PacketUtils {
         return new Pose3d(unpackTranslation3d(packet), unpackRotation3d(packet));
     }
 
-    public static <T> void packOptional(Packet packet, Optional<T> optional, BiConsumer<Packet, T> packer) {
+    public static <T> void packOptional(
+            Packet packet, Optional<T> optional, BiConsumer<Packet, T> packer) {
         if (optional.isPresent()) {
             packet.encode(true);
             packer.accept(packet, optional.get());
