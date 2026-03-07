@@ -97,5 +97,5 @@
     type: MultiTargetPNPResult
     optional: True
   - name: robotToCamera
-    type: RobotToCameraTransform
+    type: Transform3d
     optional: True
