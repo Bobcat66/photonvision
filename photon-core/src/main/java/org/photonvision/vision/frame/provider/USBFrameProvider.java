@@ -127,7 +127,11 @@ public class USBFrameProvider extends CpuImageProcessor {
                 ret = new CVMat(mat, frame);
             }
 
-            return new CapturedFrame(ret, settables.getFrameStaticProperties(), captureTimeUs * 1000);
+            return new CapturedFrame(
+                    ret,
+                    settables.getFrameStaticProperties(),
+                    captureTimeUs * 1000,
+                    settables.getConfiguration().robotToCamera);
         }
     }
 

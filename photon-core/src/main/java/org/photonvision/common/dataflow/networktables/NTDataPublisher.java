@@ -203,7 +203,11 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
                         NetworkTablesManager.getInstance().getTimeSinceLastPong(),
                         TrackedTarget.simpleFromTrackedTargets(acceptedResult.targets),
                         acceptedResult.multiTagResult,
-                        Optional.empty() // TODO: robotToCamera -- should pull this from the NT table, temporary
+                        Optional.ofNullable(
+                                acceptedResult
+                                        .inputAndOutputFrame
+                                        .robotToCamera) // TODO: robotToCamera -- should pull this from the NT table,
+                        // temporary
                         // solution for testing
                         );
 

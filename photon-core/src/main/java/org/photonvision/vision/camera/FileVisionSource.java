@@ -19,6 +19,7 @@ package org.photonvision.vision.camera;
 
 import edu.wpi.first.cscore.UsbCameraInfo;
 import edu.wpi.first.cscore.VideoMode;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.util.PixelFormat;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -45,13 +46,18 @@ public class FileVisionSource extends VisionSource {
                         Path.of(cameraConfiguration.getDevicePath()),
                         cameraConfiguration.FOV,
                         FileFrameProvider.MAX_FPS,
-                        calibration);
+                        calibration,
+                        this::getRobotToCamera);
 
         if (getCameraConfiguration().cameraQuirks == null)
             getCameraConfiguration().cameraQuirks = QuirkyCamera.DefaultCamera;
 
         settables =
                 new FileSourceSettables(cameraConfiguration, frameProvider.get().frameStaticProperties);
+    }
+
+    public Transform3d getRobotToCamera() {
+        return settables.getConfiguration().robotToCamera;
     }
 
     public FileVisionSource(String name, String imagePath, double fov) {

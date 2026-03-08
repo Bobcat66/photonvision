@@ -17,6 +17,7 @@
 
 package org.photonvision.vision.frame.provider;
 
+import edu.wpi.first.math.geometry.Transform3d;
 import org.photonvision.common.util.numbers.IntegerCouple;
 import org.photonvision.vision.frame.Frame;
 import org.photonvision.vision.frame.FrameProvider;
@@ -33,12 +34,22 @@ public abstract class CpuImageProcessor extends FrameProvider {
         CVMat colorImage;
         FrameStaticProperties staticProps;
         long captureTimestamp;
+        Transform3d robotToCamera;
 
         public CapturedFrame(
-                CVMat colorImage, FrameStaticProperties staticProps, long captureTimestampNanos) {
+                CVMat colorImage,
+                FrameStaticProperties staticProps,
+                long captureTimestampNanos,
+                Transform3d robotToCamera) {
             this.colorImage = colorImage;
             this.staticProps = staticProps;
             this.captureTimestamp = captureTimestampNanos;
+            this.robotToCamera = robotToCamera;
+        }
+
+        public CapturedFrame(
+                CVMat colorImage, FrameStaticProperties staticProps, long captureTimestampNanos) {
+            this(colorImage, staticProps, captureTimestampNanos, null);
         }
     }
 
@@ -93,7 +104,8 @@ public abstract class CpuImageProcessor extends FrameProvider {
                 input.captureTimestamp,
                 input.staticProps != null
                         ? input.staticProps.rotate(m_rImagePipe.getParams().rotation())
-                        : input.staticProps);
+                        : input.staticProps,
+                input.robotToCamera);
     }
 
     @Override
