@@ -99,7 +99,7 @@ public class PhotonPipelineResultSerde implements PacketSerde<PhotonPipelineResu
     @Override
     public PacketSerde<?>[] getNestedPhotonMessages() {
         return new PacketSerde<?>[] {
-            PhotonTrackedTarget.photonStruct,MultiTargetPNPResult.photonStruct,PhotonPipelineMetadata.photonStruct
+            MultiTargetPNPResult.photonStruct,PhotonTrackedTarget.photonStruct,PhotonPipelineMetadata.photonStruct
         };
     }
 

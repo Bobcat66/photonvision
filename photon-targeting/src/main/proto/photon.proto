@@ -57,10 +57,6 @@ message ProtobufPhotonTrackedTarget {
   float obj_detection_conf = 12;
 }
 
-message ProtobufRobotToCameraTransform {
-  wpi.proto.ProtobufTransform3d robotToCamera = 1;
-}
-
 message ProtobufPhotonPipelineResult {
   double latency_ms = 1 [deprecated = true];
 

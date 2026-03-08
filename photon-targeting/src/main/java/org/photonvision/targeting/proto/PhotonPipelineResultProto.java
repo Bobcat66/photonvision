@@ -70,6 +70,12 @@ public class PhotonPipelineResultProto
             msg.clearMultiTargetResult();
         }
 
+        if (value.getRobotToCamera().isPresent()) {
+            Transform3d.proto.pack(msg.getMutableRobotToCamera(), value.getRobotToCamera().get());
+        } else {
+            msg.clearRobotToCamera();
+        }
+
         msg.setSequenceId(value.metadata.getSequenceID());
         msg.setCaptureTimestampMicros(value.metadata.getCaptureTimestampMicros());
         msg.setNtPublishTimestampMicros(value.metadata.getPublishTimestampMicros());
