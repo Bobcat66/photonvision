@@ -57,6 +57,9 @@ public class FileVisionSource extends VisionSource {
     }
 
     public Transform3d getRobotToCamera() {
+        if (settables == null) {
+            return null;
+        }
         return settables.getConfiguration().robotToCamera;
     }
 
