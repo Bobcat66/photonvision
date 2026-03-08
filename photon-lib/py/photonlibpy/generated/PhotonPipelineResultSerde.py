@@ -57,7 +57,7 @@ class PhotonPipelineResultSerde:
         # multitagResult is optional! it better not be a VLA too
         ret.encodeOptional(value.multitagResult, MultiTargetPNPResult.photonStruct)
 
-        ret.encodeTransform(value.robotToCamera)
+        ret.encodeOptionalShimmed(value.robotToCamera, ret.encodeTransform)
         return ret
 
     @staticmethod
@@ -73,7 +73,8 @@ class PhotonPipelineResultSerde:
         # multitagResult is optional! it better not be a VLA too
         ret.multitagResult = packet.decodeOptional(MultiTargetPNPResult.photonStruct)
 
-        ret.robotToCamera = packet.decodeTransform()
+        # robotToCamera is optional and shimmed!
+        ret.robotToCamera = packet.decodeOptionalShimmed(packet.decodeTransform)
 
         return ret
 
