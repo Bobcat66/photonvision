@@ -34,31 +34,29 @@ namespace photon {
 
 class Packet;
 
-template<typename T>
+template <typename T>
 struct optional_inner;
 
-template<typename T>
+template <typename T>
 struct optional_inner<std::optional<T>> {
-    using type = T;
+  using type = T;
 };
 
-template<typename T>
-using optional_inner_t =
-    typename optional_inner<std::remove_cvref_t<T>>::type;
+template <typename T>
+using optional_inner_t = typename optional_inner<std::remove_cvref_t<T>>::type;
 
-template<typename T>
+template <typename T>
 struct is_optional : std::false_type {};
 
-template<typename T>
+template <typename T>
 struct is_optional<std::optional<T>> : std::true_type {};
 
-template<typename T>
+template <typename T>
 concept Optional = is_optional<std::remove_cvref_t<T>>::value;
 
-template<typename Opt, typename... I>
-concept OptionalWPIStructSerializable = 
-  Optional<Opt> && 
-  wpi::StructSerializable<optional_inner_t<Opt>, I...>;
+template <typename Opt, typename... I>
+concept OptionalWPIStructSerializable =
+    Optional<Opt> && wpi::StructSerializable<optional_inner_t<Opt>, I...>;
 
 // Struct is where all our actual ser/de methods are implemented
 template <typename T>

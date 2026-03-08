@@ -16,7 +16,7 @@
 ###############################################################################
 
 import struct
-from typing import Generic, Optional, Protocol, TypeVar, Callable
+from typing import Callable, Generic, Optional, Protocol, TypeVar
 
 import wpilib
 from wpimath.geometry import Quaternion, Rotation3d, Transform3d, Translation3d
@@ -206,7 +206,7 @@ class Packet:
             return serde.unpack(self)
         else:
             return None
-        
+
     def decodeOptionalShimmed(self, shim: Callable[[], T]) -> Optional[T]:
         if self.decodeBoolean():
             return shim()
