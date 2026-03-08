@@ -63,7 +63,7 @@ class PhotonPipelineResult : public PhotonPipelineResult_PhotonStruct {
   template <typename... Args>
   explicit PhotonPipelineResult(Args&&... args)
       : Base{std::forward<Args>(args)...} {}
-  
+
   /**
    * Returns the best target in this pipeline result. If there are no targets,
    * this method will return null. The best target is determined by the target

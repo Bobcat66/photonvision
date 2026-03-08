@@ -861,6 +861,10 @@ class LegacyPhotonPoseEstimatorTest {
                         new TargetCorner(127.17118732489361, 313.81406314178633),
                         new TargetCorner(104.28543773760417, 309.6516557438994));
 
+        final double camPitch = Units.degreesToRadians(30.0);
+        final Transform3d kRobotToCam =
+                new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0, -camPitch, 0));
+
         var result =
                 new PhotonPipelineResult(
                         new PhotonPipelineMetadata(10000, 2000, 1, 100),
@@ -882,10 +886,6 @@ class LegacyPhotonPoseEstimatorTest {
                                                 0.1),
                                         new ArrayList<Short>(8))),
                         Optional.of(new Transform3d(new Translation3d(1, 2, 3), new Rotation3d(4, 5, 6))));
-
-        final double camPitch = Units.degreesToRadians(30.0);
-        final Transform3d kRobotToCam =
-                new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0, -camPitch, 0));
 
         PhotonPoseEstimator estimator =
                 new PhotonPoseEstimator(

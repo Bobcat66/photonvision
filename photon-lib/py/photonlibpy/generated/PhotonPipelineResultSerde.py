@@ -37,13 +37,12 @@ if TYPE_CHECKING:
     from ..targeting import PhotonPipelineMetadata  # noqa
     from ..targeting import PhotonPipelineResult  # noqa
     from ..targeting import PhotonTrackedTarget  # noqa
-    from ..targeting import RobotToCameraTransform  # noqa
 
 
 class PhotonPipelineResultSerde:
     # Message definition md5sum. See photon_packet.adoc for details
-    MESSAGE_VERSION = "b0040327f63abf872824e05641cbdede"
-    MESSAGE_FORMAT = "PhotonPipelineMetadata:ac0a45f686457856fb30af77699ea356 metadata;PhotonTrackedTarget:cc6dbb5c5c1e0fa808108019b20863f1 targets[?];optional MultiTargetPNPResult:541096947e9f3ca2d3f425ff7b04aa7b multitagResult;optional RobotToCameraTransform:575b4e398df72967da55b383dfe7784d robotToCamera;"
+    MESSAGE_VERSION = "c3e6b96bad05f102560d0abcad50debc"
+    MESSAGE_FORMAT = "PhotonPipelineMetadata:ac0a45f686457856fb30af77699ea356 metadata;PhotonTrackedTarget:cc6dbb5c5c1e0fa808108019b20863f1 targets[?];optional MultiTargetPNPResult:541096947e9f3ca2d3f425ff7b04aa7b multitagResult;optional Transform3d robotToCamera;"
 
     @staticmethod
     def pack(value: "PhotonPipelineResult") -> "Packet":
@@ -58,8 +57,7 @@ class PhotonPipelineResultSerde:
         # multitagResult is optional! it better not be a VLA too
         ret.encodeOptional(value.multitagResult, MultiTargetPNPResult.photonStruct)
 
-        # robotToCamera is optional! it better not be a VLA too
-        ret.encodeOptional(value.robotToCamera, RobotToCameraTransform.photonStruct)
+        ret.encodeOptionalShimmed(value.robotToCamera, ret.encodeTransform)
         return ret
 
     @staticmethod
@@ -75,8 +73,8 @@ class PhotonPipelineResultSerde:
         # multitagResult is optional! it better not be a VLA too
         ret.multitagResult = packet.decodeOptional(MultiTargetPNPResult.photonStruct)
 
-        # robotToCamera is optional! it better not be a VLA too
-        ret.robotToCamera = packet.decodeOptional(RobotToCameraTransform.photonStruct)
+        # robotToCamera is optional and shimmed!
+        ret.robotToCamera = packet.decodeOptionalShimmed(packet.decodeTransform)
 
         return ret
 
