@@ -90,7 +90,9 @@ TEST(PhotonPoseEstimatorTest, LowestAmbiguityStrategy) {
 
   cameraOne.test = true;
   cameraOne.testResult = {photon::PhotonPipelineResult{
-      photon::PhotonPipelineMetadata{0, 0, 2000, 1000}, targets, std::nullopt, std::make_optional<photon::RobotToCameraTransform>(photon::RobotToCameraTransform{frc::Transform3d{frc::Translation3d(0_m, 0_m, 1_m), frc::Rotation3d()}})}};
+      photon::PhotonPipelineMetadata{0, 0, 2000, 1000}, targets, std::nullopt,
+      std::make_optional<frc::Transform3d>(frc::Transform3d{
+          frc::Translation3d(0_m, 0_m, 1_m), frc::Rotation3d()})}};
   cameraOne.testResult[0].SetReceiveTimestamp(units::second_t(11));
 
   photon::PhotonPoseEstimator estimator(aprilTags, frc::Transform3d{});
@@ -150,7 +152,9 @@ TEST(PhotonPoseEstimatorTest, ClosestToCameraHeightStrategy) {
 
   cameraOne.test = true;
   cameraOne.testResult = {photon::PhotonPipelineResult{
-      photon::PhotonPipelineMetadata{0, 0, 2000, 1000}, targets, std::nullopt, std::make_optional<photon::RobotToCameraTransform>(photon::RobotToCameraTransform{frc::Transform3d{frc::Translation3d(0_m, 0_m, 1_m), frc::Rotation3d()}})}};
+      photon::PhotonPipelineMetadata{0, 0, 2000, 1000}, targets, std::nullopt,
+      std::make_optional<frc::Transform3d>(frc::Transform3d{
+          frc::Translation3d(0_m, 0_m, 1_m), frc::Rotation3d()})}};
   cameraOne.testResult[0].SetReceiveTimestamp(17_s);
 
   photon::PhotonPoseEstimator estimator(aprilTags, {{0_m, 0_m, 4_m}, {}});
@@ -198,7 +202,9 @@ TEST(PhotonPoseEstimatorTest, ClosestToReferencePoseStrategy) {
 
   cameraOne.test = true;
   cameraOne.testResult = {photon::PhotonPipelineResult{
-      photon::PhotonPipelineMetadata{0, 0, 2000, 1000}, targets, std::nullopt, std::make_optional<photon::RobotToCameraTransform>(photon::RobotToCameraTransform{frc::Transform3d{frc::Translation3d(0_m, 0_m, 1_m), frc::Rotation3d()}})}};
+      photon::PhotonPipelineMetadata{0, 0, 2000, 1000}, targets, std::nullopt,
+      std::make_optional<frc::Transform3d>(frc::Transform3d{
+          frc::Translation3d(0_m, 0_m, 1_m), frc::Rotation3d()})}};
   cameraOne.testResult[0].SetReceiveTimestamp(units::second_t(17));
 
   photon::PhotonPoseEstimator estimator(aprilTags, {});
@@ -248,7 +254,9 @@ TEST(PhotonPoseEstimatorTest, ClosestToLastPose) {
 
   cameraOne.test = true;
   cameraOne.testResult = {photon::PhotonPipelineResult{
-      photon::PhotonPipelineMetadata{0, 0, 2000, 1000}, targets, std::nullopt, std::make_optional<photon::RobotToCameraTransform>(photon::RobotToCameraTransform{frc::Transform3d{frc::Translation3d(0_m, 0_m, 1_m), frc::Rotation3d()}})}};
+      photon::PhotonPipelineMetadata{0, 0, 2000, 1000}, targets, std::nullopt,
+      std::make_optional<frc::Transform3d>(frc::Transform3d{
+          frc::Translation3d(0_m, 0_m, 1_m), frc::Rotation3d()})}};
   cameraOne.testResult[0].SetReceiveTimestamp(units::second_t(17));
 
   photon::PhotonPoseEstimator estimator(aprilTags, {});
@@ -288,7 +296,9 @@ TEST(PhotonPoseEstimatorTest, ClosestToLastPose) {
 
   cameraOne.testResult = {photon::PhotonPipelineResult{
       photon::PhotonPipelineMetadata{0, 0, 2000, 1000}, targetsThree,
-      std::nullopt, std::make_optional<photon::RobotToCameraTransform>(photon::RobotToCameraTransform{frc::Transform3d{frc::Translation3d(0_m, 0_m, 1_m), frc::Rotation3d()}})}};
+      std::nullopt,
+      std::make_optional<frc::Transform3d>(frc::Transform3d{
+          frc::Translation3d(0_m, 0_m, 1_m), frc::Rotation3d()})}};
   cameraOne.testResult[0].SetReceiveTimestamp(units::second_t(21));
 
   for (const auto& result : cameraOne.GetAllUnreadResults()) {
@@ -410,7 +420,9 @@ TEST(PhotonPoseEstimatorTest, AverageBestPoses) {
 
   cameraOne.test = true;
   cameraOne.testResult = {photon::PhotonPipelineResult{
-      photon::PhotonPipelineMetadata{0, 0, 2000, 1000}, targets, std::nullopt, std::make_optional<photon::RobotToCameraTransform>(photon::RobotToCameraTransform{frc::Transform3d{frc::Translation3d(0_m, 0_m, 1_m), frc::Rotation3d()}})}};
+      photon::PhotonPipelineMetadata{0, 0, 2000, 1000}, targets, std::nullopt,
+      std::make_optional<frc::Transform3d>(frc::Transform3d{
+          frc::Translation3d(0_m, 0_m, 1_m), frc::Rotation3d()})}};
   cameraOne.testResult[0].SetReceiveTimestamp(units::second_t(15));
 
   photon::PhotonPoseEstimator estimator(aprilTags, {});
@@ -451,7 +463,9 @@ TEST(PhotonPoseEstimatorTest, MultiTagOnCoprocFallback) {
 
   cameraOne.test = true;
   cameraOne.testResult = {photon::PhotonPipelineResult{
-      photon::PhotonPipelineMetadata{0, 0, 2000, 1000}, targets, std::nullopt, std::make_optional<photon::RobotToCameraTransform>(photon::RobotToCameraTransform{frc::Transform3d{frc::Translation3d(0_m, 0_m, 1_m), frc::Rotation3d()}})}};
+      photon::PhotonPipelineMetadata{0, 0, 2000, 1000}, targets, std::nullopt,
+      std::make_optional<frc::Transform3d>(frc::Transform3d{
+          frc::Translation3d(0_m, 0_m, 1_m), frc::Rotation3d()})}};
   cameraOne.testResult[0].SetReceiveTimestamp(units::second_t(11));
 
   photon::PhotonPoseEstimator estimator(aprilTags, frc::Transform3d{});
@@ -479,7 +493,9 @@ TEST(PhotonPoseEstimatorTest, CopyResult) {
   std::vector<photon::PhotonTrackedTarget> targets{};
 
   auto testResult = photon::PhotonPipelineResult{
-      photon::PhotonPipelineMetadata{0, 0, 2000, 1000}, targets, std::nullopt, std::make_optional<photon::RobotToCameraTransform>(photon::RobotToCameraTransform{frc::Transform3d{frc::Translation3d(0_m, 0_m, 1_m), frc::Rotation3d()}})};
+      photon::PhotonPipelineMetadata{0, 0, 2000, 1000}, targets, std::nullopt,
+      std::make_optional<frc::Transform3d>(frc::Transform3d{
+          frc::Translation3d(0_m, 0_m, 1_m), frc::Rotation3d()})};
   testResult.SetReceiveTimestamp(units::second_t(11));
 
   auto test2 = testResult;
@@ -519,7 +535,9 @@ TEST(PhotonPoseEstimatorTest, ConstrainedPnpOneTag) {
 
   photon::PhotonPipelineResult result{
       photon::PhotonPipelineMetadata{1, 10000, 2000, 100}, targets,
-      multiTagResult, std::make_optional<photon::RobotToCameraTransform>(photon::RobotToCameraTransform{frc::Transform3d{frc::Translation3d(0_m, 0_m, 1_m), frc::Rotation3d()}})};
+      multiTagResult,
+      std::make_optional<frc::Transform3d>(frc::Transform3d{
+          frc::Translation3d(0_m, 0_m, 1_m), frc::Rotation3d()})};
 
   cameraOne.test = true;
   cameraOne.testResult = {result};

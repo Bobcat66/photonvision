@@ -83,7 +83,8 @@ class PhotonCamera {
    * NTInstance from {@link NetworkTableInstance::getDefault}
    * @param cameraName The name of the camera, as seen in the UI.
    * over.
-   * @param robotToCamera The transform from the robot's center to the camera. This is used for pose estimation
+   * @param robotToCamera The transform from the robot's center to the camera.
+   * This is used for pose estimation
    */
   explicit PhotonCamera(nt::NetworkTableInstance instance,
                         const std::string_view cameraName,
@@ -92,11 +93,12 @@ class PhotonCamera {
   PhotonCamera(PhotonCamera&&) = default;
 
   ~PhotonCamera() = default;
-  
+
   /**
    * Returns the robot to camera transform
-   * 
-   * @return The transform from the robot's center to the camera, if it was set. Empty otherwise.
+   *
+   * @return The transform from the robot's center to the camera, if it was set.
+   * Empty otherwise.
    */
   std::optional<frc::Transform3d> GetRobotToCamera() { return robotToCamera; }
 

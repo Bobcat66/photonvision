@@ -54,7 +54,7 @@
 #include <opencv2/core/eigen.hpp>
 WPI_IGNORE_DEPRECATED
 
-//TODO: Update to use the new PhotonPipelineResult
+// TODO: Update to use the new PhotonPipelineResult
 namespace photon {
 
 namespace detail {
