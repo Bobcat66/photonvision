@@ -83,6 +83,16 @@ struct EstimatedRobotPose {
  */
 class PhotonPoseEstimator {
  public:
+
+
+  /**
+   * Create a new PhotonPoseEstimator.
+   * 
+   * @param aprilTags A AprilTagFieldLayout linking AprilTag IDs to Pose3ds with
+   * respect to the FIRST field.
+   */
+
+  explicit PhotonPoseEstimator(frc::AprilTagFieldLayout aprilTags);
   /**
    * Create a new PhotonPoseEstimator.
    *
@@ -90,6 +100,7 @@ class PhotonPoseEstimator {
    * respect to the FIRST field.
    * @param robotToCamera Transform3d from the center of the robot to the camera
    * mount positions (ie, robot ➔ camera).
+   * @deprecated robotToCamera is now retrieved from PhotonPipelineResults
    */
   explicit PhotonPoseEstimator(frc::AprilTagFieldLayout aprilTags,
                                frc::Transform3d robotToCamera);
@@ -102,11 +113,11 @@ class PhotonPoseEstimator {
    * @param strategy The strategy it should use to determine the best pose.
    * @param robotToCamera Transform3d from the center of the robot to the camera
    * mount positions (ie, robot ➔ camera).
-   * @deprecated Use individual estimation methods with the 2 argument
+   * @deprecated Use individual estimation methods with the 1 argument
    * constructor instead.
    */
   [[deprecated(
-      "Use individual estimation methods with the 2 argument constructor "
+      "Use individual estimation methods with the 1 argument constructor "
       "instead.")]]
   explicit PhotonPoseEstimator(frc::AprilTagFieldLayout aprilTags,
                                PoseStrategy strategy,
@@ -193,6 +204,8 @@ class PhotonPoseEstimator {
    *
    * @param robotToCamera The current transform from the center of the robot to
    * the camera mount position.
+   * 
+   * @deprecated robotToCamera is now stored in PhotonPipelineResult
    */
   inline void SetRobotToCameraTransform(frc::Transform3d robotToCamera) {
     m_robotToCamera = robotToCamera;

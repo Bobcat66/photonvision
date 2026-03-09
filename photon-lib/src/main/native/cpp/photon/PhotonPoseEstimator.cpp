@@ -66,6 +66,19 @@ cv::Point3d TagCornerToObjectPoint(units::meter_t cornerX,
                                    units::meter_t cornerY, frc::Pose3d tagPose);
 }  // namespace detail
 
+
+PhotonPoseEstimator::PhotonPoseEstimator(frc::AprilTagFieldLayout tags)
+    : aprilTags(tags),
+      m_robotToCamera(),
+      lastPose(frc::Pose3d()),
+      referencePose(frc::Pose3d()),
+      poseCacheTimestamp(-1_s),
+      headingBuffer(frc::TimeInterpolatableBuffer<frc::Rotation2d>(1_s)) {
+  HAL_Report(HALUsageReporting::kResourceType_PhotonPoseEstimator,
+             InstanceCount);
+  InstanceCount++;
+}
+
 PhotonPoseEstimator::PhotonPoseEstimator(frc::AprilTagFieldLayout tags,
                                          frc::Transform3d robotToCamera)
     : aprilTags(tags),
@@ -212,7 +225,7 @@ std::optional<EstimatedRobotPose> PhotonPoseEstimator::Update(
       if (result.MultiTagResult().has_value()) {
         fieldToRobotSeed =
             frc::Pose3d{} + (result.MultiTagResult()->estimatedPose.best +
-                             m_robotToCamera.Inverse());
+                             result.GetRobotToCamera().value().Inverse());
       } else {
         std::optional<EstimatedRobotPose> nestedUpdate =
             Update(result, cameraMatrixData, cameraDistCoeffs, {},
@@ -259,6 +272,13 @@ bool ShouldEstimate(const PhotonPipelineResult& result) {
     return false;
   }
 
+  // Result has no robot to camera transform -- can't do estimation
+  if (!result.GetRobotToCamera().has_value()) {
+    FRC_ReportError(frc::warn::Warning,
+                    "Result has no robot to camera transform!");
+    return false;
+  }
+
   // If no targets seen, trivial case -- can't do estimation
   return result.HasTargets();
 }
@@ -296,7 +316,7 @@ PhotonPoseEstimator::EstimateLowestAmbiguityPose(
 
   return EstimatedRobotPose{
       fiducialPose->TransformBy(bestTarget.GetBestCameraToTarget().Inverse())
-          .TransformBy(m_robotToCamera.Inverse()),
+          .TransformBy(cameraResult.GetRobotToCamera().value().Inverse()),
       cameraResult.GetTimestamp(), cameraResult.GetTargets(), LOWEST_AMBIGUITY};
 }
 
@@ -323,19 +343,19 @@ PhotonPoseEstimator::EstimateClosestToCameraHeightPose(
     frc::Pose3d const targetPose = *fiducialPose;
 
     units::meter_t const alternativeDifference = units::math::abs(
-        m_robotToCamera.Z() -
+        cameraResult.GetRobotToCamera().value().Z() -
         targetPose.TransformBy(target.GetAlternateCameraToTarget().Inverse())
             .Z());
 
     units::meter_t const bestDifference = units::math::abs(
-        m_robotToCamera.Z() -
+        cameraResult.GetRobotToCamera().value().Z() -
         targetPose.TransformBy(target.GetBestCameraToTarget().Inverse()).Z());
 
     if (alternativeDifference < smallestHeightDifference) {
       smallestHeightDifference = alternativeDifference;
       pose = EstimatedRobotPose{
           targetPose.TransformBy(target.GetAlternateCameraToTarget().Inverse())
-              .TransformBy(m_robotToCamera.Inverse()),
+              .TransformBy(cameraResult.GetRobotToCamera().value().Inverse()),
           cameraResult.GetTimestamp(), cameraResult.GetTargets(),
           CLOSEST_TO_CAMERA_HEIGHT};
     }
@@ -343,7 +363,7 @@ PhotonPoseEstimator::EstimateClosestToCameraHeightPose(
       smallestHeightDifference = bestDifference;
       pose = EstimatedRobotPose{
           targetPose.TransformBy(target.GetBestCameraToTarget().Inverse())
-              .TransformBy(m_robotToCamera.Inverse()),
+              .TransformBy(cameraResult.GetRobotToCamera().value().Inverse()),
           cameraResult.GetTimestamp(), cameraResult.GetTargets(),
           CLOSEST_TO_CAMERA_HEIGHT};
     }
@@ -377,10 +397,10 @@ PhotonPoseEstimator::EstimateClosestToReferencePose(
 
     const auto altPose =
         targetPose.TransformBy(target.GetAlternateCameraToTarget().Inverse())
-            .TransformBy(m_robotToCamera.Inverse());
+            .TransformBy(cameraResult.GetRobotToCamera().value().Inverse());
     const auto bestPose =
         targetPose.TransformBy(target.GetBestCameraToTarget().Inverse())
-            .TransformBy(m_robotToCamera.Inverse());
+            .TransformBy(cameraResult.GetRobotToCamera().value().Inverse());
 
     units::meter_t const alternativeDifference = units::math::abs(
         referencePose.Translation().Distance(altPose.Translation()));
@@ -462,7 +482,7 @@ PhotonPoseEstimator::EstimateCoprocMultiTagPose(
   const auto field2camera = cameraResult.MultiTagResult()->estimatedPose.best;
 
   const auto fieldToRobot =
-      frc::Pose3d() + field2camera + m_robotToCamera.Inverse();
+      frc::Pose3d() + field2camera + cameraResult.GetRobotToCamera().value().Inverse();
   return photon::EstimatedRobotPose(fieldToRobot, cameraResult.GetTimestamp(),
                                     cameraResult.GetTargets(),
                                     MULTI_TAG_PNP_ON_COPROCESSOR);
@@ -519,7 +539,7 @@ std::optional<EstimatedRobotPose> PhotonPoseEstimator::EstimateRioMultiTagPose(
   const frc::Pose3d pose = detail::ToPose3d(tvec, rvec);
 
   return photon::EstimatedRobotPose(
-      pose.TransformBy(m_robotToCamera.Inverse()), cameraResult.GetTimestamp(),
+      pose.TransformBy(cameraResult.GetRobotToCamera().value().Inverse()), cameraResult.GetTimestamp(),
       cameraResult.GetTargets(), MULTI_TAG_PNP_ON_RIO);
 }
 
@@ -545,7 +565,7 @@ PhotonPoseEstimator::EstimatePnpDistanceTrigSolvePose(
           bestTarget.GetBestCameraToTarget().Translation().Norm(),
           frc::Rotation3d(0_rad, -units::degree_t(bestTarget.GetPitch()),
                           -units::degree_t(bestTarget.GetYaw())))
-          .RotateBy(m_robotToCamera.Rotation())
+          .RotateBy(cameraResult.GetRobotToCamera().value().Rotation())
           .ToTranslation2d()
           .RotateBy(headingSample);
 
@@ -564,7 +584,7 @@ PhotonPoseEstimator::EstimatePnpDistanceTrigSolvePose(
       tagPose.Translation() - camToTagTranslation;
 
   frc::Translation2d camToRobotTranslation =
-      (-m_robotToCamera.Translation().ToTranslation2d())
+      (-cameraResult.GetRobotToCamera().value().Translation().ToTranslation2d())
           .RotateBy(headingSample);
 
   frc::Pose2d robotPose = frc::Pose2d(
@@ -600,7 +620,7 @@ PhotonPoseEstimator::EstimateAverageBestTargetsPose(
     if (target.GetPoseAmbiguity() == 0) {
       return EstimatedRobotPose{
           targetPose.TransformBy(target.GetBestCameraToTarget().Inverse())
-              .TransformBy(m_robotToCamera.Inverse()),
+              .TransformBy(cameraResult.GetRobotToCamera().value().Inverse()),
           cameraResult.GetTimestamp(), cameraResult.GetTargets(),
           AVERAGE_BEST_TARGETS};
     }
@@ -653,7 +673,7 @@ PhotonPoseEstimator::EstimateConstrainedSolvepnpPose(
 
   std::optional<photon::PnpResult> pnpResult =
       VisionEstimation::EstimateRobotPoseConstrainedSolvePNP(
-          cameraMatrix, distCoeffs, targets, m_robotToCamera, seedPose,
+          cameraMatrix, distCoeffs, targets, cameraResult.GetRobotToCamera().value(), seedPose,
           aprilTags, photon::kAprilTag36h11, headingFree,
           frc::Rotation2d{
               headingBuffer.Sample(cameraResult.GetTimestamp()).value()},
