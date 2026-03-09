@@ -168,10 +168,12 @@ class LegacyPhotonPoseEstimatorTest {
                                                 new TargetCorner(1, 2),
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
-                                                new TargetCorner(7, 8)))));
+                                                new TargetCorner(7, 8)))),
+                        Optional.empty(),
+                        Optional.of(new Transform3d()));
 
         PhotonPoseEstimator estimator =
-                new PhotonPoseEstimator(aprilTags, PoseStrategy.LOWEST_AMBIGUITY, new Transform3d());
+                new PhotonPoseEstimator(aprilTags, PoseStrategy.LOWEST_AMBIGUITY, Transform3d.kZero);
 
         Optional<EstimatedRobotPose> estimatedPose = estimator.update(cameraOne.result);
         Pose3d pose = estimatedPose.get().estimatedPose;
@@ -253,13 +255,13 @@ class LegacyPhotonPoseEstimatorTest {
                                                 new TargetCorner(1, 2),
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
-                                                new TargetCorner(7, 8)))));
+                                                new TargetCorner(7, 8)))),
+                        Optional.empty(),
+                        Optional.of(new Transform3d(new Translation3d(0, 0, 4), new Rotation3d())));
 
         PhotonPoseEstimator estimator =
                 new PhotonPoseEstimator(
-                        aprilTags,
-                        PoseStrategy.CLOSEST_TO_CAMERA_HEIGHT,
-                        new Transform3d(new Translation3d(0, 0, 4), new Rotation3d()));
+                        aprilTags, PoseStrategy.CLOSEST_TO_CAMERA_HEIGHT, Transform3d.kZero);
 
         Optional<EstimatedRobotPose> estimatedPose = estimator.update(cameraOne.result);
         Pose3d pose = estimatedPose.get().estimatedPose;
@@ -341,13 +343,13 @@ class LegacyPhotonPoseEstimatorTest {
                                                 new TargetCorner(1, 2),
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
-                                                new TargetCorner(7, 8)))));
+                                                new TargetCorner(7, 8)))),
+                        Optional.empty(),
+                        Optional.of(new Transform3d(new Translation3d(0, 0, 0), new Rotation3d())));
 
         PhotonPoseEstimator estimator =
                 new PhotonPoseEstimator(
-                        aprilTags,
-                        PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
-                        new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()));
+                        aprilTags, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, new Transform3d());
         estimator.setReferencePose(new Pose3d(1, 1, 1, new Rotation3d()));
 
         Optional<EstimatedRobotPose> estimatedPose = estimator.update(cameraOne.result);
@@ -430,7 +432,9 @@ class LegacyPhotonPoseEstimatorTest {
                                                 new TargetCorner(1, 2),
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
-                                                new TargetCorner(7, 8)))));
+                                                new TargetCorner(7, 8)))),
+                        Optional.empty(),
+                        Optional.of(new Transform3d(new Translation3d(0, 0, 0), new Rotation3d())));
 
         PhotonPoseEstimator estimator =
                 new PhotonPoseEstimator(
@@ -512,7 +516,9 @@ class LegacyPhotonPoseEstimatorTest {
                                                 new TargetCorner(1, 2),
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
-                                                new TargetCorner(7, 8)))));
+                                                new TargetCorner(7, 8)))),
+                        Optional.empty(),
+                        Optional.of(new Transform3d(new Translation3d(0, 0, 0), new Rotation3d())));
 
         estimatedPose = estimator.update(cameraOne.result);
         pose = estimatedPose.get().estimatedPose;
@@ -610,7 +616,9 @@ class LegacyPhotonPoseEstimatorTest {
                                                 new TargetCorner(1, 2),
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
-                                                new TargetCorner(7, 8)))));
+                                                new TargetCorner(7, 8)))),
+                        Optional.empty(),
+                        Optional.of(new Transform3d(new Translation3d(0, 0, 0), new Rotation3d())));
 
         PhotonPoseEstimator estimator =
                 new PhotonPoseEstimator(
@@ -728,7 +736,10 @@ class LegacyPhotonPoseEstimatorTest {
                                                 new TargetCorner(1, 2),
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
-                                                new TargetCorner(7, 8))))); // 3 3 3 ambig .4
+                                                new TargetCorner(7, 8)))),
+                        Optional.empty(),
+                        Optional.of(
+                                new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()))); // 3 3 3 ambig .4
 
         PhotonPoseEstimator estimator =
                 new PhotonPoseEstimator(
@@ -795,7 +806,9 @@ class LegacyPhotonPoseEstimatorTest {
                                                 new TargetCorner(1, 2),
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
-                                                new TargetCorner(7, 8)))));
+                                                new TargetCorner(7, 8)))),
+                        Optional.empty(),
+                        Optional.of(Transform3d.kZero));
         PhotonPoseEstimator estimator =
                 new PhotonPoseEstimator(aprilTags, PoseStrategy.MULTI_TAG_PNP_ON_RIO, Transform3d.kZero);
         estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
@@ -882,7 +895,7 @@ class LegacyPhotonPoseEstimatorTest {
                                                                         0.9130568172784148))),
                                                 0.1),
                                         new ArrayList<Short>(8))),
-                        Optional.of(new Transform3d(new Translation3d(1, 2, 3), new Rotation3d(4, 5, 6))));
+                        Optional.of(kRobotToCam));
 
         PhotonPoseEstimator estimator =
                 new PhotonPoseEstimator(
