@@ -535,19 +535,18 @@ class LegacyPhotonPoseEstimatorTest {
                 aprilTags.getTags().stream()
                         .map((AprilTag x) -> new VisionTargetSim(x.pose, TargetModel.kAprilTag36h11, x.ID))
                         .toList();
+        /* Compound Rolled + Pitched + Yaw */
+        Transform3d compoundTestTransform =
+                new Transform3d(
+                        -Units.inchesToMeters(12),
+                        -Units.inchesToMeters(11),
+                        3,
+                        new Rotation3d(
+                                Units.degreesToRadians(37), Units.degreesToRadians(6), Units.degreesToRadians(60)));
+
+        cameraOne.setCameraTransform(compoundTestTransform);
         try (PhotonCameraSim cameraOneSim =
                 new PhotonCameraSim(cameraOne, SimCameraProperties.PERFECT_90DEG())) {
-            /* Compound Rolled + Pitched + Yaw */
-            Transform3d compoundTestTransform =
-                    new Transform3d(
-                            -Units.inchesToMeters(12),
-                            -Units.inchesToMeters(11),
-                            3,
-                            new Rotation3d(
-                                    Units.degreesToRadians(37),
-                                    Units.degreesToRadians(6),
-                                    Units.degreesToRadians(60)));
-
             var estimator =
                     new PhotonPoseEstimator(
                             aprilTags, PoseStrategy.PNP_DISTANCE_TRIG_SOLVE, compoundTestTransform);
@@ -572,6 +571,7 @@ class LegacyPhotonPoseEstimatorTest {
             Transform3d straightOnTestTransform = new Transform3d(0, 0, 3, Rotation3d.kZero);
 
             // estimator.setRobotToCameraTransform(straightOnTestTransform);
+            cameraOne.setCameraTransform(straightOnTestTransform);
 
             /* Pose to compare with */
             realPose = new Pose3d(4.81, 2.38, 0, new Rotation3d(0, 0, 2.818));
