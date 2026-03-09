@@ -549,8 +549,7 @@ class LegacyPhotonPoseEstimatorTest {
             /* this is the real pose of the robot base we test against */
             var realPose = new Pose3d(7.3, 4.42, 0, new Rotation3d(0, 0, 2.197));
             PhotonPipelineResult result =
-                    cameraOneSim.process(
-                            1, realPose.transformBy(estimator.getRobotToCameraTransform()), simTargets);
+                    cameraOneSim.process(1, realPose.transformBy(compoundTestTransform), simTargets);
             var bestTarget = result.getBestTarget();
             assertNotNull(bestTarget);
             assertEquals(0, bestTarget.fiducialId);
@@ -566,13 +565,11 @@ class LegacyPhotonPoseEstimatorTest {
             /* Straight on */
             Transform3d straightOnTestTransform = new Transform3d(0, 0, 3, Rotation3d.kZero);
 
-            estimator.setRobotToCameraTransform(straightOnTestTransform);
+            // estimator.setRobotToCameraTransform(straightOnTestTransform);
 
             /* Pose to compare with */
             realPose = new Pose3d(4.81, 2.38, 0, new Rotation3d(0, 0, 2.818));
-            result =
-                    cameraOneSim.process(
-                            1, realPose.transformBy(estimator.getRobotToCameraTransform()), simTargets);
+            result = cameraOneSim.process(1, realPose.transformBy(straightOnTestTransform), simTargets);
 
             estimator.addHeadingData(result.getTimestampSeconds(), realPose.getRotation().toRotation2d());
             estimatedPose = estimator.update(result);
