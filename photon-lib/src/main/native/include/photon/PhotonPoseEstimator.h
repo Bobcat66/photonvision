@@ -83,11 +83,9 @@ struct EstimatedRobotPose {
  */
 class PhotonPoseEstimator {
  public:
-
-
   /**
    * Create a new PhotonPoseEstimator.
-   * 
+   *
    * @param aprilTags A AprilTagFieldLayout linking AprilTag IDs to Pose3ds with
    * respect to the FIRST field.
    */
@@ -204,7 +202,7 @@ class PhotonPoseEstimator {
    *
    * @param robotToCamera The current transform from the center of the robot to
    * the camera mount position.
-   * 
+   *
    * @deprecated robotToCamera is now stored in PhotonPipelineResult
    */
   inline void SetRobotToCameraTransform(frc::Transform3d robotToCamera) {

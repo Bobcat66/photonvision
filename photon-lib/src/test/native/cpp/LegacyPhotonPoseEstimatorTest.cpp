@@ -154,8 +154,8 @@ TEST(LegacyPhotonPoseEstimatorTest, ClosestToCameraHeightStrategy) {
   cameraOne.test = true;
   cameraOne.testResult = {photon::PhotonPipelineResult{
       photon::PhotonPipelineMetadata{0, 0, 2000, 1000}, targets, std::nullopt,
-      std::make_optional<frc::Transform3d>(frc::Transform3d
-          {{0_m, 0_m, 4_m}, {}})}};
+      std::make_optional<frc::Transform3d>(
+          frc::Transform3d{{0_m, 0_m, 4_m}, {}})}};
   cameraOne.testResult[0].SetReceiveTimestamp(17_s);
 
   photon::PhotonPoseEstimator estimator(
@@ -298,8 +298,7 @@ TEST(LegacyPhotonPoseEstimatorTest, ClosestToLastPose) {
 
   cameraOne.testResult = {photon::PhotonPipelineResult{
       photon::PhotonPipelineMetadata{0, 0, 2000, 1000}, targetsThree,
-      std::nullopt,
-    std::make_optional<frc::Transform3d>({})}};
+      std::nullopt, std::make_optional<frc::Transform3d>({})}};
   cameraOne.testResult[0].SetReceiveTimestamp(units::second_t(21));
 
   // std::optional<photon::EstimatedRobotPose> estimatedPose;
@@ -646,8 +645,7 @@ TEST(LegacyPhotonPoseEstimatorTest, ConstrainedPnpOneTag) {
 
   photon::PhotonPipelineResult result{
       photon::PhotonPipelineMetadata{1, 10000, 2000, 100}, targets,
-      multiTagResult,
-      std::make_optional<frc::Transform3d>(kRobotToCam)};
+      multiTagResult, std::make_optional<frc::Transform3d>(kRobotToCam)};
 
   cameraOne.test = true;
   cameraOne.testResult = {result};

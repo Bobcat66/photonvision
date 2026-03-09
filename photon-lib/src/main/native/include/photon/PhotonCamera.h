@@ -102,13 +102,14 @@ class PhotonCamera {
    */
   std::optional<frc::Transform3d> GetRobotToCamera() { return robotToCamera; }
 
-
   /**
    * Sets the robot to camera transform
-   * 
+   *
    * @param newRobotToCamera the robot to camera transform
    */
-  void SetRobotToCamera(frc::Transform3d newRobotToCamera) { robotToCamera = std::make_optional<frc::Transform3d>(newRobotToCamera);}
+  void SetRobotToCamera(frc::Transform3d newRobotToCamera) {
+    robotToCamera = std::make_optional<frc::Transform3d>(newRobotToCamera);
+  }
   /**
    * The list of pipeline results sent by PhotonVision since the last call to
    * GetAllUnreadResults(). Calling this function clears the internal FIFO

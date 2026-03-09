@@ -66,7 +66,6 @@ cv::Point3d TagCornerToObjectPoint(units::meter_t cornerX,
                                    units::meter_t cornerY, frc::Pose3d tagPose);
 }  // namespace detail
 
-
 PhotonPoseEstimator::PhotonPoseEstimator(frc::AprilTagFieldLayout tags)
     : aprilTags(tags),
       m_robotToCamera(),
@@ -481,8 +480,8 @@ PhotonPoseEstimator::EstimateCoprocMultiTagPose(
 
   const auto field2camera = cameraResult.MultiTagResult()->estimatedPose.best;
 
-  const auto fieldToRobot =
-      frc::Pose3d() + field2camera + cameraResult.GetRobotToCamera().value().Inverse();
+  const auto fieldToRobot = frc::Pose3d() + field2camera +
+                            cameraResult.GetRobotToCamera().value().Inverse();
   return photon::EstimatedRobotPose(fieldToRobot, cameraResult.GetTimestamp(),
                                     cameraResult.GetTargets(),
                                     MULTI_TAG_PNP_ON_COPROCESSOR);
@@ -539,8 +538,9 @@ std::optional<EstimatedRobotPose> PhotonPoseEstimator::EstimateRioMultiTagPose(
   const frc::Pose3d pose = detail::ToPose3d(tvec, rvec);
 
   return photon::EstimatedRobotPose(
-      pose.TransformBy(cameraResult.GetRobotToCamera().value().Inverse()), cameraResult.GetTimestamp(),
-      cameraResult.GetTargets(), MULTI_TAG_PNP_ON_RIO);
+      pose.TransformBy(cameraResult.GetRobotToCamera().value().Inverse()),
+      cameraResult.GetTimestamp(), cameraResult.GetTargets(),
+      MULTI_TAG_PNP_ON_RIO);
 }
 
 std::optional<EstimatedRobotPose>
@@ -673,8 +673,9 @@ PhotonPoseEstimator::EstimateConstrainedSolvepnpPose(
 
   std::optional<photon::PnpResult> pnpResult =
       VisionEstimation::EstimateRobotPoseConstrainedSolvePNP(
-          cameraMatrix, distCoeffs, targets, cameraResult.GetRobotToCamera().value(), seedPose,
-          aprilTags, photon::kAprilTag36h11, headingFree,
+          cameraMatrix, distCoeffs, targets,
+          cameraResult.GetRobotToCamera().value(), seedPose, aprilTags,
+          photon::kAprilTag36h11, headingFree,
           frc::Rotation2d{
               headingBuffer.Sample(cameraResult.GetTimestamp()).value()},
           headingScaleFactor);

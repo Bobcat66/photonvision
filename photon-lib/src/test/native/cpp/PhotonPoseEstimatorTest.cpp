@@ -292,8 +292,7 @@ TEST(PhotonPoseEstimatorTest, ClosestToLastPose) {
 
   cameraOne.testResult = {photon::PhotonPipelineResult{
       photon::PhotonPipelineMetadata{0, 0, 2000, 1000}, targetsThree,
-      std::nullopt,
-      std::make_optional<frc::Transform3d>({})}};
+      std::nullopt, std::make_optional<frc::Transform3d>({})}};
   cameraOne.testResult[0].SetReceiveTimestamp(units::second_t(21));
 
   for (const auto& result : cameraOne.GetAllUnreadResults()) {
@@ -533,8 +532,7 @@ TEST(PhotonPoseEstimatorTest, ConstrainedPnpOneTag) {
                                      frc::Rotation3d(0_rad, -camPitch, 0_rad)};
   photon::PhotonPipelineResult result{
       photon::PhotonPipelineMetadata{1, 10000, 2000, 100}, targets,
-      multiTagResult,
-      std::make_optional<frc::Transform3d>(kRobotToCam)};
+      multiTagResult, std::make_optional<frc::Transform3d>(kRobotToCam)};
 
   cameraOne.test = true;
   cameraOne.testResult = {result};
