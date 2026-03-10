@@ -171,6 +171,7 @@ PhotonCamera::PhotonCamera(nt::NetworkTableInstance instance,
       timesyncAlert(PHOTON_ALERT_GROUP, "", frc::Alert::AlertType::kWarning),
       robotToCamera(robotToCamera) {
   verifyDependencies();
+  if (robotToCamera.is_present()) robotToCameraPublisher.Set(robotToCamera.value());
   HAL_Report(HALUsageReporting::kResourceType_PhotonCamera, InstanceCount);
   InstanceCount++;
 

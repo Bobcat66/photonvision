@@ -16,7 +16,7 @@
 ###############################################################################
 
 from enum import Enum
-from typing import List
+from typing import List, Optional
 
 import hal
 import ntcore
@@ -24,6 +24,7 @@ import ntcore
 # magical import to make serde stuff work
 import photonlibpy.generated  # noqa
 import wpilib
+from wpilib.geometry import Transform3d
 from wpilib import RobotController, Timer
 
 from .packet import Packet
@@ -51,7 +52,7 @@ def setVersionCheckEnabled(enabled: bool):
 class PhotonCamera:
     instance_count = 1
 
-    def __init__(self, cameraName: str):
+    def __init__(self, cameraName: str, robotToCamera: Transform3d):
         """Constructs a PhotonCamera from the name of the camera.
 
         :param cameraName: The nickname of the camera (found in the PhotonVision UI).
@@ -67,7 +68,10 @@ class PhotonCamera:
             bytes([]),
             ntcore.PubSubOptions(periodic=0.01, sendAll=True),
         )
-
+        self._robotToCameraPublisher = self._cameraTable.getStructTopic(
+            "robotToCamera",
+            Transform3d
+        ).publish()
         self._driverModePublisher = self._cameraTable.getBooleanTopic(
             "driverModeRequest"
         ).publish()
@@ -110,6 +114,8 @@ class PhotonCamera:
         self.topicNameSubscriber = ntcore.MultiSubscriber(
             instance, ["/photonvision/"], ntcore.PubSubOptions(topicsOnly=True)
         )
+
+        self._robotToCameraPublisher.set(robotToCamera)
 
         self._prevHeartbeat = 0
         self._prevHeartbeatChangeTime = Timer.getFPGATimestamp()
@@ -179,6 +185,20 @@ class PhotonCamera:
             # We don't trust NT4 time, hack around
             retVal.ntReceiveTimestampMicros = now
             return retVal
+    
+    def getRobotToCamera(self) -> Optional[Transform3d]:
+        """
+        returns the robot to camera transform, or None if not present
+
+        :returns: the robot to camera transform, or None if not present"""
+        return self._robotToCamera
+    
+    def setRobotToCamera(self, robotToCamera: Transform3d) -> None:
+        """
+        Set the robotToCamera, and publish to NT
+        """
+        self._robotToCamera = robotToCamera
+        self._robotToCameraPublisher.set(robotToCamera)
 
     def getDriverMode(self) -> bool:
         """Returns whether the camera is in driver mode.
