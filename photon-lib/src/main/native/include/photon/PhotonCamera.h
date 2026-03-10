@@ -38,6 +38,7 @@
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/RawTopic.h>
+#include <networktables/StructTopic.h>
 #include <networktables/StringTopic.h>
 #include <units/time.h>
 
@@ -107,9 +108,7 @@ class PhotonCamera {
    *
    * @param newRobotToCamera the robot to camera transform
    */
-  void SetRobotToCamera(frc::Transform3d newRobotToCamera) {
-    robotToCamera = std::make_optional<frc::Transform3d>(newRobotToCamera);
-  }
+  void SetRobotToCamera(frc::Transform3d newRobotToCamera);
   /**
    * The list of pipeline results sent by PhotonVision since the last call to
    * GetAllUnreadResults(). Calling this function clears the internal FIFO
@@ -246,6 +245,7 @@ class PhotonCamera {
   std::shared_ptr<nt::NetworkTable> mainTable;
   std::shared_ptr<nt::NetworkTable> rootTable;
   nt::RawSubscriber rawBytesEntry;
+  nt::StructPublisher<frc::Transform3d> robotToCameraPublisher;
   nt::IntegerPublisher inputSaveImgEntry;
   nt::IntegerSubscriber inputSaveImgSubscriber;
   nt::IntegerPublisher outputSaveImgEntry;

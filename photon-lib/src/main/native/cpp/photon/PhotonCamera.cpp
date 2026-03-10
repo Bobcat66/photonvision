@@ -131,6 +131,8 @@ PhotonCamera::PhotonCamera(nt::NetworkTableInstance instance,
               .Subscribe(
                   TYPE_STRING, {},
                   {.pollStorage = 20, .periodic = 0.01, .sendAll = true})),
+      robotToCameraPublisher(
+          rootTable->GetStructTopic<frc::Transform3d>("robotToCamera").Publish()),
       inputSaveImgEntry(
           rootTable->GetIntegerTopic("inputSaveImgCmd").Publish()),
       inputSaveImgSubscriber(
@@ -458,6 +460,11 @@ std::vector<std::string> PhotonCamera::tablesThatLookLikePhotonCameras() {
       });
 
   return ret;
+}
+
+void PhotonCamera::SetRobotToCamera(frc::Transform3d newRobotToCamera) {
+  robotToCamera = std::make_optional(newRobotToCamera);
+  robotToCameraPublisher.Set(robotToCamera.value());
 }
 
 }  // namespace photon
