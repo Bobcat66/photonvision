@@ -212,16 +212,6 @@ public class CameraConfiguration {
     }
 
     /**
-     * Set the robot to camera transform for this camera configuration.
-     *
-     * @param robotToCamera the transform from the robot's origin to the camera's origin, in the
-     *     robot's coordinate system.
-     */
-    public void setRobotToCamera(Transform3d robotToCamera) {
-        this.robotToCamera = robotToCamera;
-    }
-
-    /**
      * cscore will auto-reconnect to the camera path we give it. v4l does not guarantee that if i swap
      * cameras around, the same /dev/videoN ID will be assigned to that camera. So instead default to
      * pinning to a particular USB port, or by "path" (appears to be a global identifier on Windows).

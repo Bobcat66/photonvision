@@ -60,7 +60,7 @@ public class FileVisionSource extends VisionSource {
         if (settables == null) {
             return null;
         }
-        return settables.getConfiguration().robotToCamera;
+        return settables.getRobotToCamera();
     }
 
     public FileVisionSource(String name, String imagePath, double fov) {

@@ -23,8 +23,6 @@ import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTablesJNI;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -80,15 +78,6 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
 
         updateCameraNickname(cameraNickname);
         updateEntries();
-        // HACK: Wait to connect to NT before polling robotToCamera
-        while (!ts.robotToCameraExists()) {
-            try {
-                Thread.sleep(100); // yield
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-        updateRobotToCamera(ts.robotToCameraSubscriber.get(null));
     }
 
     private void onPipelineIndexChange(NetworkTableEvent entryNotification) {
@@ -116,11 +105,9 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
     }
 
     private void onRobotToCameraChange(NetworkTableEvent entryNotification) {
-        var newRobotToCamera = (Transform3d) entryNotification.valueData.value.getValue();
-        updateRobotToCamera(newRobotToCamera);
-    }
-
-    private void updateRobotToCamera(Transform3d robotToCamera) {
+        // HACK: the entryNotification's value can't be cast to Transform3d, so we read directly from
+        // the subscriber
+        var robotToCamera = ts.robotToCameraSubscriber.get();
         robotToCameraConsumer.accept(robotToCamera);
         logger.debug("Updated robot to camera transform to " + robotToCamera);
     }

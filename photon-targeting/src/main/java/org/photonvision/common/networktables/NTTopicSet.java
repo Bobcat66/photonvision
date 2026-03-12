@@ -32,7 +32,6 @@ import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.networktables.StructSubscriber;
 import edu.wpi.first.networktables.StructTopic;
-
 import org.photonvision.targeting.PhotonPipelineResult;
 
 /**

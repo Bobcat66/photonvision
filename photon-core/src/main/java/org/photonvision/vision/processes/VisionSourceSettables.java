@@ -128,8 +128,11 @@ public abstract class VisionSourceSettables {
     }
 
     public void setRobotToCamera(Transform3d robotToCamera) {
-        configuration.setRobotToCamera(robotToCamera);
-        // calculateFrameStaticProps(); // This shouldn't be necessary
+        configuration.robotToCamera = robotToCamera;
+    }
+
+    public Transform3d getRobotToCamera() {
+        return configuration.robotToCamera;
     }
 
     protected void calculateFrameStaticProps() {
