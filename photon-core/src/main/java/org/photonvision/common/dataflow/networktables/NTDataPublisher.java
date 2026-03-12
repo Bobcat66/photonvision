@@ -80,6 +80,7 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
 
         updateCameraNickname(cameraNickname);
         updateEntries();
+        // Wait to connect to NT before polling robotToCamera
         while (!ts.robotToCameraExists()) {
             try {
                 Thread.sleep(100); // yield
@@ -87,8 +88,6 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
                 Thread.currentThread().interrupt();
             }
         }
-        initialTransform = ts.robotToCameraSubscriber.get();
-        // if a robotToCamera is already being published on NT, update
         updateRobotToCamera(ts.robotToCameraSubscriber.get(null));
     }
 
