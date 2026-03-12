@@ -23,6 +23,8 @@ import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTablesJNI;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -78,6 +80,16 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
 
         updateCameraNickname(cameraNickname);
         updateEntries();
+        while (!ts.robotToCameraExists()) {
+            try {
+                Thread.sleep(100); // yield
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        initialTransform = ts.robotToCameraSubscriber.get();
+        // if a robotToCamera is already being published on NT, update
+        updateRobotToCamera(ts.robotToCameraSubscriber.get(null));
     }
 
     private void onPipelineIndexChange(NetworkTableEvent entryNotification) {
@@ -106,8 +118,12 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
 
     private void onRobotToCameraChange(NetworkTableEvent entryNotification) {
         var newRobotToCamera = (Transform3d) entryNotification.valueData.value.getValue();
-        robotToCameraConsumer.accept(newRobotToCamera);
-        logger.debug("Updated robot to camera transform to " + newRobotToCamera);
+        updateRobotToCamera(newRobotToCamera);
+    }
+
+    private void updateRobotToCamera(Transform3d robotToCamera) {
+        robotToCameraConsumer.accept(robotToCamera);
+        logger.debug("Updated robot to camera transform to " + robotToCamera);
     }
 
     private void onDriverModeChange(NetworkTableEvent entryNotification) {
@@ -146,6 +162,7 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
         if (pipelineIndexListener != null) pipelineIndexListener.remove();
         if (driverModeListener != null) driverModeListener.remove();
         if (fpsLimitListener != null) fpsLimitListener.remove();
+        if (robotToCameraListener != null) robotToCameraListener.remove();
 
         ts.updateEntries();
 

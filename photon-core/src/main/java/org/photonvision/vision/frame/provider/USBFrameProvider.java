@@ -91,7 +91,11 @@ public class USBFrameProvider extends CpuImageProcessor {
                 logger.error("Error grabbing image: " + error);
             }
 
-            return new CapturedFrame(mat, settables.getFrameStaticProperties(), captureTimeNs);
+            return new CapturedFrame(
+                    mat,
+                    settables.getFrameStaticProperties(),
+                    captureTimeNs,
+                    settables.getConfiguration().robotToCamera);
         } else {
             // We allocate memory so we don't fill a Mat in use by another thread (memory model is easier)
             // TODO - consider a frame pool

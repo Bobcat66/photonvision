@@ -31,6 +31,8 @@ import edu.wpi.first.networktables.ProtobufPublisher;
 import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.networktables.StructSubscriber;
+import edu.wpi.first.networktables.StructTopic;
+
 import org.photonvision.targeting.PhotonPipelineResult;
 
 /**
@@ -80,8 +82,8 @@ public class NTTopicSet {
     public DoubleArrayPublisher cameraDistortionPublisher;
 
     // Camera Intrinsics
+    public StructTopic<Transform3d> robotToCameraTopic;
     public StructSubscriber<Transform3d> robotToCameraSubscriber;
-    public StructPublisher<Transform3d> robotToCameraPublisher;
 
     public void updateEntries() {
         var rawBytesEntry =
@@ -132,8 +134,12 @@ public class NTTopicSet {
 
         cameraIntrinsicsPublisher = subTable.getDoubleArrayTopic("cameraIntrinsics").publish();
         cameraDistortionPublisher = subTable.getDoubleArrayTopic("cameraDistortion").publish();
-        robotToCameraSubscriber =
-                subTable.getStructTopic("robotToCamera", Transform3d.struct).subscribe(null);
+        robotToCameraTopic = subTable.getStructTopic("robotToCamera", Transform3d.struct);
+        robotToCameraSubscriber = robotToCameraTopic.subscribe(null);
+    }
+
+    public boolean robotToCameraExists() {
+        return robotToCameraTopic.exists();
     }
 
     @SuppressWarnings("DuplicatedCode")

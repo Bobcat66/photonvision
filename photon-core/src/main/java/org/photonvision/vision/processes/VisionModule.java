@@ -90,8 +90,6 @@ public class VisionModule {
 
     private int fpsLimit = -1;
 
-    private Transform3d robotToCameraTransform = null;
-
     FileSaveFrameConsumer inputFrameSaver;
     FileSaveFrameConsumer outputFrameSaver;
 
@@ -647,7 +645,7 @@ public class VisionModule {
      *     the robot's coordinate system. This should be provided in meters.
      */
     public void setRobotToCameraTransform(Transform3d robotToCameraTransform) {
-        this.robotToCameraTransform = robotToCameraTransform;
+        this.visionSource.getSettables().setRobotToCamera(robotToCameraTransform);
         saveAndBroadcastAll();
     }
 
