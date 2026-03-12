@@ -132,7 +132,8 @@ PhotonCamera::PhotonCamera(nt::NetworkTableInstance instance,
                   TYPE_STRING, {},
                   {.pollStorage = 20, .periodic = 0.01, .sendAll = true})),
       robotToCameraPublisher(
-          rootTable->GetStructTopic<frc::Transform3d>("robotToCamera").Publish()),
+          rootTable->GetStructTopic<frc::Transform3d>("robotToCamera")
+              .Publish()),
       inputSaveImgEntry(
           rootTable->GetIntegerTopic("inputSaveImgCmd").Publish()),
       inputSaveImgSubscriber(
@@ -171,7 +172,8 @@ PhotonCamera::PhotonCamera(nt::NetworkTableInstance instance,
       timesyncAlert(PHOTON_ALERT_GROUP, "", frc::Alert::AlertType::kWarning),
       robotToCamera(robotToCamera) {
   verifyDependencies();
-  if (robotToCamera.has_value()) robotToCameraPublisher.Set(robotToCamera.value());
+  if (robotToCamera.has_value())
+    robotToCameraPublisher.Set(robotToCamera.value());
   HAL_Report(HALUsageReporting::kResourceType_PhotonCamera, InstanceCount);
   InstanceCount++;
 

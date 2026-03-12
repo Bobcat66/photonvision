@@ -38,8 +38,8 @@
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/RawTopic.h>
-#include <networktables/StructTopic.h>
 #include <networktables/StringTopic.h>
+#include <networktables/StructTopic.h>
 #include <units/time.h>
 
 #include "photon/targeting/PhotonPipelineResult.h"

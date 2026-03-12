@@ -80,7 +80,7 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
 
         updateCameraNickname(cameraNickname);
         updateEntries();
-        // Wait to connect to NT before polling robotToCamera
+        // HACK: Wait to connect to NT before polling robotToCamera
         while (!ts.robotToCameraExists()) {
             try {
                 Thread.sleep(100); // yield

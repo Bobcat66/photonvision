@@ -24,8 +24,8 @@ import ntcore
 # magical import to make serde stuff work
 import photonlibpy.generated  # noqa
 import wpilib
-from wpilib.geometry import Transform3d
 from wpilib import RobotController, Timer
+from wpilib.geometry import Transform3d
 
 from .packet import Packet
 from .targeting.photonPipelineResult import PhotonPipelineResult
@@ -69,8 +69,7 @@ class PhotonCamera:
             ntcore.PubSubOptions(periodic=0.01, sendAll=True),
         )
         self._robotToCameraPublisher = self._cameraTable.getStructTopic(
-            "robotToCamera",
-            Transform3d
+            "robotToCamera", Transform3d
         ).publish()
         self._driverModePublisher = self._cameraTable.getBooleanTopic(
             "driverModeRequest"
@@ -185,14 +184,14 @@ class PhotonCamera:
             # We don't trust NT4 time, hack around
             retVal.ntReceiveTimestampMicros = now
             return retVal
-    
+
     def getRobotToCamera(self) -> Optional[Transform3d]:
         """
         returns the robot to camera transform, or None if not present
 
         :returns: the robot to camera transform, or None if not present"""
         return self._robotToCamera
-    
+
     def setRobotToCamera(self, robotToCamera: Transform3d) -> None:
         """
         Set the robotToCamera, and publish to NT
