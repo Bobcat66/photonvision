@@ -126,6 +126,9 @@ class PhotonPoseEstimator:
         """
         if cameraResult.getTimestampSeconds() < 0:
             return False
+        
+        if cameraResult.robotToCamera == None:
+            return False
 
         # If no targets seen, trivial case -- can't do estimation
         return len(cameraResult.targets) > 0
@@ -180,7 +183,7 @@ class PhotonPoseEstimator:
             tagPose.toPose2d().translation() - camToTagTranslation
         )
         camToRobotTranslation: Translation2d = -(
-            self.robotToCamera.translation().toTranslation2d()
+            result.robotToCamera.translation().toTranslation2d()
         )
         camToRobotTranslation = camToRobotTranslation.rotateBy(headingSample)
         robotPose = Pose2d(
@@ -209,7 +212,7 @@ class PhotonPoseEstimator:
                 Pose3d()
                 .transformBy(best_tf)  # field-to-camera
                 .relativeTo(self._fieldTags.getOrigin())
-                .transformBy(self.robotToCamera.inverse())  # field-to-robot
+                .transformBy(result.robotToCamera.inverse())  # field-to-robot
             )
             return EstimatedRobotPose(
                 best,
@@ -258,7 +261,7 @@ class PhotonPoseEstimator:
         return EstimatedRobotPose(
             targetPosition.transformBy(
                 lowestAmbiguityTarget.getBestCameraToTarget().inverse()
-            ).transformBy(self.robotToCamera.inverse()),
+            ).transformBy(result.robotToCamera.inverse()),
             result.getTimestampSeconds(),
             result.targets,
         )
