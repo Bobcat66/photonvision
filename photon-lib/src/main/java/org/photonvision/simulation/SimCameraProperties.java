@@ -911,4 +911,74 @@ public class SimCameraProperties {
         prop.setLatencyStdDevMs(20);
         return prop;
     }
+
+    // PLACEHOLDERS
+
+    /**
+     * Creates a set of camera properties matching those of a Limelight 3A running at 640x480
+     * resolution.
+     *
+     * <p>Note that this set of properties represents <i>a camera setup</i>, not <i>your camera
+     * setup</i>. Do not use these camera properties for any non-sim vision calculations, especially
+     * the calibration data. Always use your camera's calibration data to do vision calculations in
+     * non-sim environments. These properties exist as a sample that may be used to get representative
+     * data in sim.
+     *
+     * @return The properties for this camera setup
+     */
+    public static SimCameraProperties LL3A_640_480() {
+        var prop = new SimCameraProperties();
+        return prop;
+    }
+
+    /**
+     * Creates a set of camera properties matching those of a Limelight 3G running at 1280x800
+     * resolution.
+     *
+     * <p>Note that this set of properties represents <i>a camera setup</i>, not <i>your camera
+     * setup</i>. Do not use these camera properties for any non-sim vision calculations, especially
+     * the calibration data. Always use your camera's calibration data to do vision calculations in
+     * non-sim environments. These properties exist as a sample that may be used to get representative
+     * data in sim.
+     *
+     * @return The properties for this camera setup
+     */
+    public static SimCameraProperties LL3G_1280_800() {
+        var prop = new SimCameraProperties();
+        return prop;
+    }
+
+    /**
+     * Creates a set of camera properties matching those of an OV9281 running at 640x480
+     * resolution.
+     *
+     * <p>Note that this set of properties represents <i>a camera setup</i>, not <i>your camera
+     * setup</i>. Do not use these camera properties for any non-sim vision calculations, especially
+     * the calibration data. Always use your camera's calibration data to do vision calculations in
+     * non-sim environments. These properties exist as a sample that may be used to get representative
+     * data in sim.
+     *
+     * @return The properties for this camera setup
+     */
+    public static SimCameraProperties OV9281_640_480() {
+        var prop = new SimCameraProperties();
+        return prop;
+    }
+
+    /**
+     * Creates a set of camera properties matching those of an OV9781 running at 640x480
+     * resolution.
+     *
+     * <p>Note that this set of properties represents <i>a camera setup</i>, not <i>your camera
+     * setup</i>. Do not use these camera properties for any non-sim vision calculations, especially
+     * the calibration data. Always use your camera's calibration data to do vision calculations in
+     * non-sim environments. These properties exist as a sample that may be used to get representative
+     * data in sim.
+     *
+     * @return The properties for this camera setup
+     */
+    public static SimCameraProperties OV9781_640_480() {
+        var prop = new SimCameraProperties();
+        return prop;
+    }
 }
