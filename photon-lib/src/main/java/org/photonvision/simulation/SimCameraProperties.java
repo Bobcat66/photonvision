@@ -962,6 +962,33 @@ public class SimCameraProperties {
      */
     public static SimCameraProperties OV9281_640_480() {
         var prop = new SimCameraProperties();
+        prop.setCalibration(
+            640,
+            80,
+            MatBuilder.fill(
+                Nat.N3(),
+                Nat.N3(),
+                // intrinsic
+                546.3143948353263,
+                0.0,
+                296.42381213516353,
+                0.0,
+                546.0532579998105,
+                207.86760898090824,
+                0.0,
+                0.0,
+                1.0
+            ),
+            VecBuilder.fill( // distort
+                0.05473890069301983,
+                -0.10464346338180709,
+                -5.295779092531407E-4,
+                4.954068386248279E-4,
+                0.06675490610809086,
+                -0.0019893593106705483,
+                0.00429422452794186,
+                -0.0026907135928877324
+            ));
         return prop;
     }
 
