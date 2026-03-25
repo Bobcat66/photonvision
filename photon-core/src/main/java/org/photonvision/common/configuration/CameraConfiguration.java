@@ -57,8 +57,6 @@ public class CameraConfiguration {
 
     public QuirkyCamera cameraQuirks;
 
-    public Transform3d robotToCamera = null;
-
     public double FOV = 70;
     public List<CameraCalibrationCoefficients> calibrations = new ArrayList<>();
     public int currentPipelineIndex = 0;

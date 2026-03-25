@@ -638,15 +638,13 @@ public class VisionModule {
     }
 
     /**
-     * Set camera transform for this vision module. As of now this doesn't affect vision processing in
-     * any way
+     * Set camera transform for this vision module.
      *
      * @param robotToCameraTransform the transform from the robot's origin to the camera's origin, in
      *     the robot's coordinate system. This should be provided in meters.
      */
     public void setRobotToCameraTransform(Transform3d robotToCameraTransform) {
         this.visionSource.getSettables().setRobotToCamera(robotToCameraTransform);
-        saveAndBroadcastAll();
     }
 
     /**
