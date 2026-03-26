@@ -24,8 +24,32 @@
 
 package org.photonvision;
 
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.numbers.*;
+import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.BooleanSubscriber;
+import edu.wpi.first.networktables.DoubleArraySubscriber;
+import edu.wpi.first.networktables.IntegerArrayPublisher;
+import edu.wpi.first.networktables.IntegerArraySubscriber;
+import edu.wpi.first.networktables.IntegerEntry;
+import edu.wpi.first.networktables.IntegerPublisher;
+import edu.wpi.first.networktables.IntegerSubscriber;
+import edu.wpi.first.networktables.MultiSubscriber;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.PubSubOption;
+import edu.wpi.first.networktables.StringSubscriber;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.opencv.core.Core;
@@ -74,6 +98,11 @@ public class PhotonCamera implements AutoCloseable {
     DoubleArraySubscriber cameraDistortionSubscriber;
     MultiSubscriber topicNameSubscriber;
     NetworkTable rootPhotonTable;
+    IntegerArrayPublisher rejectTagIdPublisher;
+    IntegerArraySubscriber rejectTagIdSubscriber;
+    BooleanSubscriber overrideCoprocRejectTag;
+    boolean rejectTagIdsFirstRun = true;
+    boolean overrideCoprocRejecTagWarning = false;
 
     @Override
     public void close() {
@@ -93,6 +122,8 @@ public class PhotonCamera implements AutoCloseable {
         cameraIntrinsicsSubscriber.close();
         cameraDistortionSubscriber.close();
         topicNameSubscriber.close();
+        rejectTagIdPublisher.close();
+        rejectTagIdSubscriber.close();
     }
 
     private final String path;
@@ -111,6 +142,7 @@ public class PhotonCamera implements AutoCloseable {
 
     private final Alert disconnectAlert;
     private final Alert timesyncAlert;
+    private final Alert overrideRejectTagAlert;
 
     /**
      * Sets whether or not coprocessor version checks will occur. Setting this to true will silence
@@ -137,6 +169,9 @@ public class PhotonCamera implements AutoCloseable {
         disconnectAlert =
                 new Alert(
                         PHOTON_ALERT_GROUP, "PhotonCamera '" + name + "' is disconnected.", Alert.Level.MEDIUM);
+        overrideRejectTagAlert =
+                new Alert(
+                        PHOTON_ALERT_GROUP, "PhotonCamera '" + name + "' is having rejected tags overriden from robot code.", AlertType.kWarning);
         timesyncAlert = new Alert(PHOTON_ALERT_GROUP, "", Alert.Level.MEDIUM);
         rootPhotonTable = instance.getTable(kTableName);
         this.cameraTable = rootPhotonTable.getSubTable(cameraName);
@@ -164,6 +199,9 @@ public class PhotonCamera implements AutoCloseable {
                 cameraTable.getDoubleArrayTopic("cameraIntrinsics").subscribe(null);
         cameraDistortionSubscriber =
                 cameraTable.getDoubleArrayTopic("cameraDistortion").subscribe(null);
+        rejectTagIdSubscriber = cameraTable.getIntegerArrayTopic("rejectTagids").subscribe(new long[] {});
+        rejectTagIdPublisher = cameraTable.getIntegerArrayTopic("rejectTagids").publish();
+        overrideCoprocRejectTag = cameraTable.getBooleanTopic("overrideCoprocRejectTag").subscribe(false);
 
         ledModeRequest = rootPhotonTable.getIntegerTopic("ledModeRequest").publish();
         ledModeState = rootPhotonTable.getIntegerTopic("ledModeState").subscribe(-1);
@@ -253,6 +291,7 @@ public class PhotonCamera implements AutoCloseable {
     public List<PhotonPipelineResult> getAllUnreadResults() {
         verifyVersion();
         updateDisconnectAlert();
+        updateOverrrideCoprocRejectTagAlert();
 
         // Grab the latest results. We don't care about the timestamps from NT - the metadata header has
         // this, latency compensated by the Time Sync Client
@@ -296,6 +335,10 @@ public class PhotonCamera implements AutoCloseable {
 
     private void updateDisconnectAlert() {
         disconnectAlert.set(!isConnected());
+    }
+
+    private void updateOverrrideCoprocRejectTagAlert() {
+        overrideRejectTagAlert.set(overrideCoprocRejecTagWarning);
     }
 
     private void checkTimeSyncOrWarn(PhotonPipelineResult result) {
@@ -359,6 +402,45 @@ public class PhotonCamera implements AutoCloseable {
      */
     public void setFPSLimit(int fps) {
         fpsLimitPublisher.set(fps);
+    }
+
+
+    /**
+     * Gets the tags being rejected from detections and pose estimation.
+     *
+     * @return A list with the IDs of the tags being rejected.
+     */
+    public long[] getRejectedTags() {
+        return rejectTagIdSubscriber.get();
+    }
+
+
+    /**
+     * Sets the tags to be rejected from detections and pose estimation.
+     *
+     * @param rejectedTagIds A list with the IDs of the tags to reject.
+     */
+    public void setRejectedTags(List<Integer> rejectedTagIds) {
+        long[] rejectTagIds = new long[rejectedTagIds.size()];
+        for (var i = 0; i < rejectedTagIds.size(); i++) {
+            rejectTagIds[i] = rejectedTagIds.get(i);
+        }
+        setRejectedTags(rejectTagIds);
+    }
+
+    /**
+     * Sets the tags to be rejected from detections and pose estimation.
+     *
+     * @param rejectedTagIds A list with the IDs of the tags to reject.
+     */
+    public void setRejectedTags(long[] rejectedTagIds) {
+        if (rejectTagIdSubscriber.get().length != 0 && !overrideCoprocRejectTag.get() && rejectTagIdsFirstRun) {
+            overrideCoprocRejecTagWarning = true;
+        }
+        if (isConnected()) {
+          rejectTagIdsFirstRun = false;
+          rejectTagIdPublisher.set(rejectedTagIds);
+        }
     }
 
     /**
