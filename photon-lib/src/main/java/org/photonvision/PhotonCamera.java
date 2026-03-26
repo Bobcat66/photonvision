@@ -49,7 +49,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.opencv.core.Core;
@@ -199,9 +198,11 @@ public class PhotonCamera implements AutoCloseable {
                 cameraTable.getDoubleArrayTopic("cameraIntrinsics").subscribe(null);
         cameraDistortionSubscriber =
                 cameraTable.getDoubleArrayTopic("cameraDistortion").subscribe(null);
-        rejectTagIdSubscriber = cameraTable.getIntegerArrayTopic("rejectTagids").subscribe(new long[] {});
+        rejectTagIdSubscriber =
+                cameraTable.getIntegerArrayTopic("rejectTagids").subscribe(new long[] {});
         rejectTagIdPublisher = cameraTable.getIntegerArrayTopic("rejectTagids").publish();
-        overrideCoprocRejectTag = cameraTable.getBooleanTopic("overrideCoprocRejectTag").subscribe(false);
+        overrideCoprocRejectTag =
+                cameraTable.getBooleanTopic("overrideCoprocRejectTag").subscribe(false);
 
         ledModeRequest = rootPhotonTable.getIntegerTopic("ledModeRequest").publish();
         ledModeState = rootPhotonTable.getIntegerTopic("ledModeState").subscribe(-1);
@@ -404,7 +405,6 @@ public class PhotonCamera implements AutoCloseable {
         fpsLimitPublisher.set(fps);
     }
 
-
     /**
      * Gets the tags being rejected from detections and pose estimation.
      *
@@ -413,7 +413,6 @@ public class PhotonCamera implements AutoCloseable {
     public long[] getRejectedTags() {
         return rejectTagIdSubscriber.get();
     }
-
 
     /**
      * Sets the tags to be rejected from detections and pose estimation.
@@ -434,12 +433,14 @@ public class PhotonCamera implements AutoCloseable {
      * @param rejectedTagIds A list with the IDs of the tags to reject.
      */
     public void setRejectedTags(long[] rejectedTagIds) {
-        if (rejectTagIdSubscriber.get().length != 0 && !overrideCoprocRejectTag.get() && rejectTagIdsFirstRun) {
+        if (rejectTagIdSubscriber.get().length != 0
+                && !overrideCoprocRejectTag.get()
+                && rejectTagIdsFirstRun) {
             overrideCoprocRejecTagWarning = true;
         }
         if (isConnected()) {
-          rejectTagIdsFirstRun = false;
-          rejectTagIdPublisher.set(rejectedTagIds);
+            rejectTagIdsFirstRun = false;
+            rejectTagIdPublisher.set(rejectedTagIds);
         }
     }
 
