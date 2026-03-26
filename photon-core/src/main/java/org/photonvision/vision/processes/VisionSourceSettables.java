@@ -36,7 +36,7 @@ public abstract class VisionSourceSettables {
 
     private final CameraConfiguration configuration;
 
-    private AtomicReference<Transform3d> robotToCamera = new AtomicReference<>();
+    private final AtomicReference<Transform3d> robotToCamera = new AtomicReference<>();
 
     protected VisionSourceSettables(CameraConfiguration configuration) {
         this.configuration = configuration;
