@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.wpi.first.cscore.UsbCameraInfo;
-import edu.wpi.first.math.geometry.Transform3d;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
