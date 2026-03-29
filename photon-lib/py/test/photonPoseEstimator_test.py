@@ -134,12 +134,10 @@ def test_lowestAmbiguityStrategy():
         ],
         metadata=PhotonPipelineMetadata(0, int(2 * 1e3), 0),
         multitagResult=None,
-        robotToCamera=Transform3d()
+        robotToCamera=Transform3d(),
     )
 
-    estimator = PhotonPoseEstimator(
-        aprilTags
-    )
+    estimator = PhotonPoseEstimator(aprilTags)
 
     estimatedPose = estimator.estimateLowestAmbiguityPose(cameraOne.result)
 
@@ -177,9 +175,7 @@ def test_pnpDistanceTrigSolve():
         ),
     )
 
-    estimator = PhotonPoseEstimator(
-        aprilTags
-    )
+    estimator = PhotonPoseEstimator(aprilTags)
     cameraOne.setRobotToCamera(compoundTestTransform)
 
     realPose = Pose3d(7.3, 4.42, 0, Rotation3d(0, 0, 2.197))  # Pose to compare with
@@ -265,12 +261,10 @@ def test_multiTagOnCoprocStrategy():
         multitagResult=MultiTargetPNPResult(
             PnpResult(Transform3d(1, 3, 2, Rotation3d()))
         ),
-        robotToCamera=Transform3d()
+        robotToCamera=Transform3d(),
     )
 
-    estimator = PhotonPoseEstimator(
-        AprilTagFieldLayout()
-    )
+    estimator = PhotonPoseEstimator(AprilTagFieldLayout())
 
     estimatedPose = estimator.estimateCoprocMultiTagPose(cameraOne.result)
     assert estimatedPose is not None
