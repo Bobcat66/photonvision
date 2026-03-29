@@ -34,7 +34,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
@@ -139,28 +138,6 @@ public class PhotonPoseEstimator {
      * Create a new PhotonPoseEstimator.
      *
      * @param fieldTags A WPILib {@link AprilTagFieldLayout} linking AprilTag IDs to Pose3d objects
-     *     with respect to the FIRST field using the <a href=
-     *     "https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/coordinate-systems.html#field-coordinate-system">Field
-     *     Coordinate System</a>. Note that setting the origin of this layout object will affect the
-     *     results from this class.
-     * @param robotToCamera Transform3d from the center of the robot to the camera mount position (ie,
-     *     robot ➔ camera) in the <a href=
-     *     "https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/coordinate-systems.html#robot-coordinate-system">Robot
-     *     Coordinate System</a>.
-     * @deprecated PhotonPoseEstimator robotToCamera is now pulled from the Frame's robotToCamera, so
-     *     this constructor is no longer necessary. Use the 1 argument constructor instead.
-     */
-    public PhotonPoseEstimator(AprilTagFieldLayout fieldTags, Transform3d robotToCamera) {
-        this.fieldTags = fieldTags;
-
-        HAL.report(tResourceType.kResourceType_PhotonPoseEstimator, InstanceCount);
-        InstanceCount++;
-    }
-
-    /**
-     * Create a new PhotonPoseEstimator.
-     *
-     * @param fieldTags A WPILib {@link AprilTagFieldLayout} linking AprilTag IDs to Pose3d objects
      */
     public PhotonPoseEstimator(AprilTagFieldLayout fieldTags) {
         this.fieldTags = fieldTags;
@@ -178,15 +155,10 @@ public class PhotonPoseEstimator {
      *     Coordinate System</a>. Note that setting the origin of this layout object will affect the
      *     results from this class.
      * @param strategy The strategy it should use to determine the best pose.
-     * @param robotToCamera Transform3d from the center of the robot to the camera mount position (ie,
-     *     robot ➔ camera) in the <a href=
-     *     "https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/coordinate-systems.html#robot-coordinate-system">Robot
-     *     Coordinate System</a>.
-     * @deprecated Use individual estimation methods with the 2 argument constructor instead.
+     * @deprecated Use individual estimation methods with the 1 argument constructor instead.
      */
     @Deprecated(forRemoval = true, since = "2026")
-    public PhotonPoseEstimator(
-            AprilTagFieldLayout fieldTags, PoseStrategy strategy, Transform3d robotToCamera) {
+    public PhotonPoseEstimator(AprilTagFieldLayout fieldTags, PoseStrategy strategy) {
         this.fieldTags = fieldTags;
         this.primaryStrategy = strategy;
 

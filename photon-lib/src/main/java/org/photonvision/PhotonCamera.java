@@ -138,8 +138,10 @@ public class PhotonCamera implements AutoCloseable {
      *     simulation, but should *usually* be the default NTInstance from
      *     NetworkTableInstance::getDefault
      * @param cameraName The name of the camera, as seen in the UI.
-     * @param robotToCamera The transform from the robot to the camera. This is used for pose
-     *     estimation
+     * @param robotToCamera Transform3d from the center of the robot to the camera mount position (ie,
+     *     robot ➔ camera) in the <a href=
+     *     "https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/coordinate-systems.html#robot-coordinate-system">Robot
+     *     Coordinate System</a>.
      */
     public PhotonCamera(NetworkTableInstance instance, String cameraName, Transform3d robotToCamera) {
         this(instance, cameraName, Optional.of(robotToCamera));
@@ -157,16 +159,7 @@ public class PhotonCamera implements AutoCloseable {
         this(instance, cameraName, Optional.empty());
     }
 
-    /**
-     * Internal implementation of the constructor
-     *
-     * @param instance The NetworkTableInstance to pull data from. This can be a custom instance in
-     *     simulation, but should *usually* be the default NTInstance from
-     *     NetworkTableInstance::getDefault
-     * @param cameraName The name of the camera, as seen in the UI.
-     * @param robotToCamera The transform from the robot to the camera. This is used for pose
-     *     estimation
-     */
+    /** Internal implementation of the constructor */
     private PhotonCamera(
             NetworkTableInstance instance, String cameraName, Optional<Transform3d> robotToCamera) {
         name = cameraName;
@@ -224,17 +217,8 @@ public class PhotonCamera implements AutoCloseable {
         verifyDependencies();
 
         if (robotToCamera.isPresent()) {
-            publishRobotToCameraTransform();
+            robotToCameraPublisher.set(robotToCamera.get());
         }
-    }
-
-    private void publishRobotToCameraTransform() {
-        robotToCamera.ifPresentOrElse(
-                (transform) -> robotToCameraPublisher.set(transform),
-                () ->
-                        robotToCameraPublisher.set(
-                                new Transform3d()) // TODO: See if this default value can cause any issues.
-                );
     }
 
     static void verifyDependencies() {
@@ -293,6 +277,19 @@ public class PhotonCamera implements AutoCloseable {
      */
     public PhotonCamera(String cameraName) {
         this(NetworkTableInstance.getDefault(), cameraName);
+    }
+
+    /**
+     * Constructs a PhotonCamera from the name of the camera and its transform from the robot.
+     *
+     * @param cameraName the name of the camera, as seen in the UI
+     * @param robotToCamera Transform3d from the center of the robot to the camera mount position (ie,
+     *     robot ➔ camera) in the <a href=
+     *     "https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/coordinate-systems.html#robot-coordinate-system">Robot
+     *     Coordinate System</a>.
+     */
+    public PhotonCamera(String cameraName, Transform3d robotToCamera) {
+        this(NetworkTableInstance.getDefault(), cameraName, Optional.of(robotToCamera));
     }
 
     /**
@@ -556,18 +553,21 @@ public class PhotonCamera implements AutoCloseable {
      *
      * @return The camera's transform from the robot, if it is set. Empty otherwise.
      */
-    public Optional<Transform3d> getCameraTransform() {
+    public Optional<Transform3d> getRobotToCamera() {
         return robotToCamera;
     }
 
     /**
      * Sets the camera's transform from the robot. This is used for pose estimation.
      *
-     * @param robotToCamera The transform from the robot to the camera.
+     * @param robotToCamera Transform3d from the center of the robot to the camera mount position (ie,
+     *     robot ➔ camera) in the <a href=
+     *     "https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/coordinate-systems.html#robot-coordinate-system">Robot
+     *     Coordinate System</a>.
      */
-    public void setCameraTransform(Transform3d robotToCamera) {
+    public void setRobotToCamera(Transform3d robotToCamera) {
         this.robotToCamera = Optional.of(robotToCamera);
-        publishRobotToCameraTransform();
+        robotToCameraPublisher.set(robotToCamera);
     }
 
     void verifyVersion() {

@@ -650,7 +650,7 @@ public class PhotonCameraSim implements AutoCloseable {
                         1000L + (long) ((Math.random() - 0.5) * 50),
                         detectableTgts,
                         multitagResult,
-                        cam.getCameraTransform());
+                        cam.getRobotToCamera());
         return ret;
     }
 

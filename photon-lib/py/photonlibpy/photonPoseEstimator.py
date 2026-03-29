@@ -26,7 +26,6 @@ from wpimath.geometry import (
     Pose3d,
     Rotation2d,
     Rotation3d,
-    Transform3d,
     Translation2d,
     Translation3d,
 )
@@ -48,7 +47,6 @@ class PhotonPoseEstimator:
     def __init__(
         self,
         fieldTags: AprilTagFieldLayout,
-        robotToCamera: Transform3d,
     ):
         """Create a new PhotonPoseEstimator.
 
@@ -56,11 +54,8 @@ class PhotonPoseEstimator:
                            with respect to the FIRST field using the Field Coordinate System.
                            Note that setting the origin of this layout object will affect the
                            results from this class.
-        :param robotToCamera: Transform3d from the center of the robot to the camera mount position (i.e.,
-                                robot ➔ camera) in the Robot Coordinate System.
         """
         self._fieldTags = fieldTags
-        self.robotToCamera = robotToCamera
 
         self._reportedErrors: set[int] = set()
         self._headingBuffer = TimeInterpolatableRotation2dBuffer(1)
@@ -174,7 +169,7 @@ class PhotonPoseEstimator:
                     -wpimath.units.degreesToRadians(bestTarget.getYaw()),
                 ),
             )
-            .rotateBy(self.robotToCamera.rotation())
+            .rotateBy(result.robotToCamera.rotation())
             .toTranslation2d()
             .rotateBy(headingSample)
         )

@@ -77,6 +77,17 @@ class PhotonCamera {
   explicit PhotonCamera(const std::string_view cameraName);
 
   /**
+   * Constructs a PhotonCamera from the name of the camera and a robot to camera
+   * transform.
+   * @param cameraName The nickname of the camera (found in the PhotonVision
+   * UI).
+   * @param robotToCamera Transform3d from the center of the robot to the camera
+   * mount positions (ie, robot ➔ camera).
+   */
+  explicit PhotonCamera(const std::string_view cameraName,
+                        frc::Transform3d robotToCamera);
+
+  /**
    * Constructs a PhotonCamera from a root table.
    *
    * @param instance The NetworkTableInstance to pull data from. This can be a
@@ -84,12 +95,12 @@ class PhotonCamera {
    * NTInstance from {@link NetworkTableInstance::getDefault}
    * @param cameraName The name of the camera, as seen in the UI.
    * over.
-   * @param robotToCamera The transform from the robot's center to the camera.
-   * This is used for pose estimation
+   * @param robotToCamera Transform3d from the center of the robot to the camera
+   * mount positions (ie, robot ➔ camera).
    */
   explicit PhotonCamera(nt::NetworkTableInstance instance,
                         const std::string_view cameraName,
-                        const std::optional<frc::Transform3d>& robotToCamera);
+                        frc::Transform3d robotToCamera);
 
   PhotonCamera(PhotonCamera&&) = default;
 
@@ -106,7 +117,8 @@ class PhotonCamera {
   /**
    * Sets the robot to camera transform
    *
-   * @param newRobotToCamera the robot to camera transform
+   * @param newRobotToCamera Transform3d from the center of the robot to the
+   * camera mount positions (ie, robot ➔ camera).
    */
   void SetRobotToCamera(frc::Transform3d newRobotToCamera);
   /**
@@ -277,6 +289,12 @@ class PhotonCamera {
   frc::Alert timesyncAlert;
 
  private:
+  /**
+   * Internal implementation of the constructor.
+   */
+  explicit PhotonCamera(nt::NetworkTableInstance instance,
+                        const std::string_view cameraName,
+                        std::optional<frc::Transform3d> robotToCamera);
   units::second_t lastVersionCheckTime = 0_s;
   static bool VERSION_CHECK_ENABLED;
   inline static int InstanceCount = 1;

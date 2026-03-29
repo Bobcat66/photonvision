@@ -91,17 +91,6 @@ class PhotonPoseEstimator {
    */
 
   explicit PhotonPoseEstimator(frc::AprilTagFieldLayout aprilTags);
-  /**
-   * Create a new PhotonPoseEstimator.
-   *
-   * @param aprilTags A AprilTagFieldLayout linking AprilTag IDs to Pose3ds with
-   * respect to the FIRST field.
-   * @param robotToCamera Transform3d from the center of the robot to the camera
-   * mount positions (ie, robot ➔ camera).
-   * @deprecated robotToCamera is now retrieved from PhotonPipelineResults
-   */
-  explicit PhotonPoseEstimator(frc::AprilTagFieldLayout aprilTags,
-                               frc::Transform3d robotToCamera);
 
   /**
    * Create a new PhotonPoseEstimator.
@@ -109,8 +98,6 @@ class PhotonPoseEstimator {
    * @param aprilTags A AprilTagFieldLayout linking AprilTag IDs to Pose3ds with
    * respect to the FIRST field.
    * @param strategy The strategy it should use to determine the best pose.
-   * @param robotToCamera Transform3d from the center of the robot to the camera
-   * mount positions (ie, robot ➔ camera).
    * @deprecated Use individual estimation methods with the 1 argument
    * constructor instead.
    */
@@ -118,8 +105,7 @@ class PhotonPoseEstimator {
       "Use individual estimation methods with the 1 argument constructor "
       "instead.")]]
   explicit PhotonPoseEstimator(frc::AprilTagFieldLayout aprilTags,
-                               PoseStrategy strategy,
-                               frc::Transform3d robotToCamera);
+                               PoseStrategy strategy);
 
   /**
    * Get the AprilTagFieldLayout being used by the PositionEstimator.
@@ -187,26 +173,6 @@ class PhotonPoseEstimator {
       InvalidatePoseCache();
     }
     this->referencePose = referencePose;
-  }
-
-  /**
-   * @return The current transform from the center of the robot to the camera
-   *         mount position.
-   */
-  inline frc::Transform3d GetRobotToCameraTransform() {
-    return m_robotToCamera;
-  }
-
-  /**
-   * Useful for pan and tilt mechanisms, or cameras on turrets
-   *
-   * @param robotToCamera The current transform from the center of the robot to
-   * the camera mount position.
-   *
-   * @deprecated robotToCamera is now stored in PhotonPipelineResult
-   */
-  inline void SetRobotToCameraTransform(frc::Transform3d robotToCamera) {
-    m_robotToCamera = robotToCamera;
   }
 
   /**
@@ -428,8 +394,6 @@ class PhotonPoseEstimator {
   frc::AprilTagFieldLayout aprilTags;
   PoseStrategy strategy;
   PoseStrategy multiTagFallbackStrategy = LOWEST_AMBIGUITY;
-
-  frc::Transform3d m_robotToCamera;
 
   frc::Pose3d lastPose;
   frc::Pose3d referencePose;

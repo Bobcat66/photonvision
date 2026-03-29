@@ -123,7 +123,7 @@ static const std::string TYPE_STRING =
 
 PhotonCamera::PhotonCamera(nt::NetworkTableInstance instance,
                            const std::string_view cameraName,
-                           const std::optional<frc::Transform3d>& robotToCamera)
+                           std::optional<frc::Transform3d> robotToCamera)
     : mainTable(instance.GetTable("photonvision")),
       rootTable(mainTable->GetSubTable(cameraName)),
       rawBytesEntry(
@@ -187,8 +187,18 @@ PhotonCamera::PhotonCamera(nt::NetworkTableInstance instance,
                            const std::string_view cameraName)
     : PhotonCamera(instance, cameraName, std::nullopt) {}
 
+PhotonCamera::PhotonCamera(nt::NetworkTableInstance instance,
+                           const std::string_view cameraName,
+                           const frc::Transform3d robotToCamera)
+    : PhotonCamera(instance, cameraName, std::make_optional(robotToCamera)) {}
+
 PhotonCamera::PhotonCamera(const std::string_view cameraName)
     : PhotonCamera(nt::NetworkTableInstance::GetDefault(), cameraName) {}
+
+PhotonCamera::PhotonCamera(const std::string_view cameraName,
+                           const frc::Transform3d robotToCamera)
+    : PhotonCamera(nt::NetworkTableInstance::GetDefault(), cameraName,
+                   std::make_optional(robotToCamera)) {}
 
 PhotonPipelineResult PhotonCamera::GetLatestResult() {
   if (test) {

@@ -530,7 +530,7 @@ class PhotonPoseEstimatorTest {
                         3,
                         new Rotation3d(
                                 Units.degreesToRadians(37), Units.degreesToRadians(6), Units.degreesToRadians(60)));
-        cameraOne.setCameraTransform(compoundTestTransform);
+        cameraOne.setRobotToCamera(compoundTestTransform);
         try (PhotonCameraSim cameraOneSim =
                 new PhotonCameraSim(cameraOne, SimCameraProperties.PERFECT_90DEG())) {
             var estimator = new PhotonPoseEstimator(aprilTags);
@@ -554,7 +554,7 @@ class PhotonPoseEstimatorTest {
             /* Straight on */
             Transform3d straightOnTestTransform = new Transform3d(0, 0, 3, Rotation3d.kZero);
 
-            cameraOne.setCameraTransform(straightOnTestTransform);
+            cameraOne.setRobotToCamera(straightOnTestTransform);
 
             /* Pose to compare with */
             realPose = new Pose3d(4.81, 2.38, 0, new Rotation3d(0, 0, 2.818));

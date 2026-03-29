@@ -95,8 +95,7 @@ TEST(LegacyPhotonPoseEstimatorTest, LowestAmbiguityStrategy) {
       std::make_optional<frc::Transform3d>(frc::Transform3d{})}};
   cameraOne.testResult[0].SetReceiveTimestamp(units::second_t(11));
 
-  photon::PhotonPoseEstimator estimator(aprilTags, photon::LOWEST_AMBIGUITY,
-                                        frc::Transform3d{});
+  photon::PhotonPoseEstimator estimator(aprilTags, photon::LOWEST_AMBIGUITY);
 
   std::optional<photon::EstimatedRobotPose> estimatedPose;
   for (const auto& result : cameraOne.GetAllUnreadResults()) {
@@ -158,8 +157,8 @@ TEST(LegacyPhotonPoseEstimatorTest, ClosestToCameraHeightStrategy) {
           frc::Transform3d{{0_m, 0_m, 4_m}, {}})}};
   cameraOne.testResult[0].SetReceiveTimestamp(17_s);
 
-  photon::PhotonPoseEstimator estimator(
-      aprilTags, photon::CLOSEST_TO_CAMERA_HEIGHT, {{0_m, 0_m, 4_m}, {}});
+  photon::PhotonPoseEstimator estimator(aprilTags,
+                                        photon::CLOSEST_TO_CAMERA_HEIGHT);
 
   std::optional<photon::EstimatedRobotPose> estimatedPose;
   for (const auto& result : cameraOne.GetAllUnreadResults()) {
@@ -209,7 +208,7 @@ TEST(LegacyPhotonPoseEstimatorTest, ClosestToReferencePoseStrategy) {
   cameraOne.testResult[0].SetReceiveTimestamp(units::second_t(17));
 
   photon::PhotonPoseEstimator estimator(aprilTags,
-                                        photon::CLOSEST_TO_REFERENCE_POSE, {});
+                                        photon::CLOSEST_TO_REFERENCE_POSE);
   estimator.SetReferencePose(
       frc::Pose3d(1_m, 1_m, 1_m, frc::Rotation3d(0_rad, 0_rad, 0_rad)));
 
@@ -260,8 +259,8 @@ TEST(LegacyPhotonPoseEstimatorTest, ClosestToLastPose) {
       std::make_optional<frc::Transform3d>({})}};
   cameraOne.testResult[0].SetReceiveTimestamp(units::second_t(17));
 
-  photon::PhotonPoseEstimator estimator(aprilTags, photon::CLOSEST_TO_LAST_POSE,
-                                        {});
+  photon::PhotonPoseEstimator estimator(aprilTags,
+                                        photon::CLOSEST_TO_LAST_POSE);
   estimator.SetLastPose(
       frc::Pose3d(1_m, 1_m, 1_m, frc::Rotation3d(0_rad, 0_rad, 0_rad)));
 
@@ -335,8 +334,8 @@ TEST(LegacyPhotonPoseEstimatorTest, PnpDistanceTrigSolve) {
 
   cameraOne.SetRobotToCamera(compoundTestTransform);
 
-  photon::PhotonPoseEstimator estimator(
-      aprilTags, photon::PNP_DISTANCE_TRIG_SOLVE, compoundTestTransform);
+  photon::PhotonPoseEstimator estimator(aprilTags,
+                                        photon::PNP_DISTANCE_TRIG_SOLVE);
 
   /* real pose of the robot base to test against */
   frc::Pose3d realPose =
@@ -428,8 +427,8 @@ TEST(LegacyPhotonPoseEstimatorTest, AverageBestPoses) {
       std::make_optional<frc::Transform3d>({})}};
   cameraOne.testResult[0].SetReceiveTimestamp(units::second_t(15));
 
-  photon::PhotonPoseEstimator estimator(aprilTags, photon::AVERAGE_BEST_TARGETS,
-                                        {});
+  photon::PhotonPoseEstimator estimator(aprilTags,
+                                        photon::AVERAGE_BEST_TARGETS);
 
   std::optional<photon::EstimatedRobotPose> estimatedPose;
   for (const auto& result : cameraOne.GetAllUnreadResults()) {
@@ -474,8 +473,8 @@ TEST(LegacyPhotonPoseEstimatorTest, PoseCache) {
 
   cameraOne.test = true;
 
-  photon::PhotonPoseEstimator estimator(aprilTags, photon::AVERAGE_BEST_TARGETS,
-                                        {});
+  photon::PhotonPoseEstimator estimator(aprilTags,
+                                        photon::AVERAGE_BEST_TARGETS);
 
   // empty input, expect empty out
   cameraOne.testResult = {photon::PhotonPipelineResult{
@@ -567,8 +566,7 @@ TEST(LegacyPhotonPoseEstimatorTest, MultiTagOnRioFallback) {
       std::make_optional<frc::Transform3d>({})}};
   cameraOne.testResult[0].SetReceiveTimestamp(units::second_t(11));
 
-  photon::PhotonPoseEstimator estimator(aprilTags, photon::LOWEST_AMBIGUITY,
-                                        frc::Transform3d{});
+  photon::PhotonPoseEstimator estimator(aprilTags, photon::LOWEST_AMBIGUITY);
 
   std::optional<photon::EstimatedRobotPose> estimatedPose;
   for (const auto& result : cameraOne.GetAllUnreadResults()) {
@@ -603,7 +601,7 @@ TEST(LegacyPhotonPoseEstimatorTest, CopyResult) {
 TEST(LegacyPhotonPoseEstimatorTest, ConstrainedPnpEmptyCase) {
   photon::PhotonPoseEstimator estimator(
       frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2024Crescendo),
-      photon::CONSTRAINED_SOLVEPNP, frc::Transform3d());
+      photon::CONSTRAINED_SOLVEPNP);
 
   photon::PhotonPipelineResult result;
   auto estimate = estimator.Update(result);
@@ -653,7 +651,7 @@ TEST(LegacyPhotonPoseEstimatorTest, ConstrainedPnpOneTag) {
 
   photon::PhotonPoseEstimator estimator(
       frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2024Crescendo),
-      photon::CONSTRAINED_SOLVEPNP, kRobotToCam);
+      photon::CONSTRAINED_SOLVEPNP);
 
   estimator.AddHeadingData(cameraOne.testResult[0].GetTimestamp(),
                            frc::Rotation2d());

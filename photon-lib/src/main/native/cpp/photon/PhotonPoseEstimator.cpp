@@ -68,7 +68,6 @@ cv::Point3d TagCornerToObjectPoint(units::meter_t cornerX,
 
 PhotonPoseEstimator::PhotonPoseEstimator(frc::AprilTagFieldLayout tags)
     : aprilTags(tags),
-      m_robotToCamera(),
       lastPose(frc::Pose3d()),
       referencePose(frc::Pose3d()),
       poseCacheTimestamp(-1_s),
@@ -79,24 +78,9 @@ PhotonPoseEstimator::PhotonPoseEstimator(frc::AprilTagFieldLayout tags)
 }
 
 PhotonPoseEstimator::PhotonPoseEstimator(frc::AprilTagFieldLayout tags,
-                                         frc::Transform3d robotToCamera)
-    : aprilTags(tags),
-      m_robotToCamera(robotToCamera),
-      lastPose(frc::Pose3d()),
-      referencePose(frc::Pose3d()),
-      poseCacheTimestamp(-1_s),
-      headingBuffer(frc::TimeInterpolatableBuffer<frc::Rotation2d>(1_s)) {
-  HAL_Report(HALUsageReporting::kResourceType_PhotonPoseEstimator,
-             InstanceCount);
-  InstanceCount++;
-}
-
-PhotonPoseEstimator::PhotonPoseEstimator(frc::AprilTagFieldLayout tags,
-                                         PoseStrategy strat,
-                                         frc::Transform3d robotToCamera)
+                                         PoseStrategy strat)
     : aprilTags(tags),
       strategy(strat),
-      m_robotToCamera(robotToCamera),
       lastPose(frc::Pose3d()),
       referencePose(frc::Pose3d()),
       poseCacheTimestamp(-1_s),

@@ -94,7 +94,7 @@ TEST(PhotonPoseEstimatorTest, LowestAmbiguityStrategy) {
       std::make_optional<frc::Transform3d>({})}};
   cameraOne.testResult[0].SetReceiveTimestamp(units::second_t(11));
 
-  photon::PhotonPoseEstimator estimator(aprilTags, frc::Transform3d{});
+  photon::PhotonPoseEstimator estimator(aprilTags);
 
   std::optional<photon::EstimatedRobotPose> estimatedPose;
   for (const auto& result : cameraOne.GetAllUnreadResults()) {
@@ -155,7 +155,7 @@ TEST(PhotonPoseEstimatorTest, ClosestToCameraHeightStrategy) {
       std::make_optional<frc::Transform3d>({{0_m, 0_m, 4_m}, {}})}};
   cameraOne.testResult[0].SetReceiveTimestamp(17_s);
 
-  photon::PhotonPoseEstimator estimator(aprilTags, {{0_m, 0_m, 4_m}, {}});
+  photon::PhotonPoseEstimator estimator(aprilTags);
 
   std::optional<photon::EstimatedRobotPose> estimatedPose;
   for (const auto& result : cameraOne.GetAllUnreadResults()) {
@@ -204,7 +204,7 @@ TEST(PhotonPoseEstimatorTest, ClosestToReferencePoseStrategy) {
       std::make_optional<frc::Transform3d>({})}};
   cameraOne.testResult[0].SetReceiveTimestamp(units::second_t(17));
 
-  photon::PhotonPoseEstimator estimator(aprilTags, {});
+  photon::PhotonPoseEstimator estimator(aprilTags);
 
   std::optional<photon::EstimatedRobotPose> estimatedPose;
   for (const auto& result : cameraOne.GetAllUnreadResults()) {
@@ -255,7 +255,7 @@ TEST(PhotonPoseEstimatorTest, ClosestToLastPose) {
       std::make_optional<frc::Transform3d>({})}};
   cameraOne.testResult[0].SetReceiveTimestamp(units::second_t(17));
 
-  photon::PhotonPoseEstimator estimator(aprilTags, {});
+  photon::PhotonPoseEstimator estimator(aprilTags);
 
   std::optional<photon::EstimatedRobotPose> estimatedPose;
   for (const auto& result : cameraOne.GetAllUnreadResults()) {
@@ -326,7 +326,7 @@ TEST(PhotonPoseEstimatorTest, PnpDistanceTrigSolve) {
   frc::Transform3d compoundTestTransform = frc::Transform3d(
       -12_in, -11_in, 3_m, frc::Rotation3d(37_deg, 6_deg, 60_deg));
 
-  photon::PhotonPoseEstimator estimator(aprilTags, compoundTestTransform);
+  photon::PhotonPoseEstimator estimator(aprilTags);
   cameraOne.SetRobotToCamera(compoundTestTransform);
 
   /* real pose of the robot base to test against */
@@ -334,7 +334,7 @@ TEST(PhotonPoseEstimatorTest, PnpDistanceTrigSolve) {
       frc::Pose3d(7.3_m, 4.42_m, 0_m, frc::Rotation3d(0_rad, 0_rad, 2.197_rad));
 
   photon::PhotonPipelineResult result = cameraOneSim.Process(
-      1_ms, realPose.TransformBy(estimator.GetRobotToCameraTransform()),
+      1_ms, realPose.TransformBy(cameraOne.GetRobotToCamera().value()),
       targets);
   cameraOne.testResult = {result};
   cameraOne.testResult[0].SetReceiveTimestamp(17_s);
@@ -360,12 +360,11 @@ TEST(PhotonPoseEstimatorTest, PnpDistanceTrigSolve) {
   frc::Transform3d straightOnTestTransform =
       frc::Transform3d(0_m, 0_m, 3_m, frc::Rotation3d(0_rad, 0_rad, 0_rad));
 
-  estimator.SetRobotToCameraTransform(straightOnTestTransform);
   cameraOne.SetRobotToCamera(straightOnTestTransform);
   realPose = frc::Pose3d(4.81_m, 2.38_m, 0_m,
                          frc::Rotation3d(0_rad, 0_rad, 2.818_rad));
   result = cameraOneSim.Process(
-      1_ms, realPose.TransformBy(estimator.GetRobotToCameraTransform()),
+      1_ms, realPose.TransformBy(cameraOne.GetRobotToCamera().value()),
       targets);
   cameraOne.testResult = {result};
   cameraOne.testResult[0].SetReceiveTimestamp(18_s);
@@ -420,7 +419,7 @@ TEST(PhotonPoseEstimatorTest, AverageBestPoses) {
       std::make_optional<frc::Transform3d>({})}};
   cameraOne.testResult[0].SetReceiveTimestamp(units::second_t(15));
 
-  photon::PhotonPoseEstimator estimator(aprilTags, {});
+  photon::PhotonPoseEstimator estimator(aprilTags);
 
   std::optional<photon::EstimatedRobotPose> estimatedPose;
   for (const auto& result : cameraOne.GetAllUnreadResults()) {
@@ -462,7 +461,7 @@ TEST(PhotonPoseEstimatorTest, MultiTagOnCoprocFallback) {
       std::make_optional<frc::Transform3d>({})}};
   cameraOne.testResult[0].SetReceiveTimestamp(units::second_t(11));
 
-  photon::PhotonPoseEstimator estimator(aprilTags, frc::Transform3d{});
+  photon::PhotonPoseEstimator estimator(aprilTags);
 
   std::optional<photon::EstimatedRobotPose> estimatedPose;
   for (const auto& result : cameraOne.GetAllUnreadResults()) {
@@ -539,8 +538,7 @@ TEST(PhotonPoseEstimatorTest, ConstrainedPnpOneTag) {
   cameraOne.testResult[0].SetReceiveTimestamp(units::second_t(15));
 
   photon::PhotonPoseEstimator estimator(
-      frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2024Crescendo),
-      kRobotToCam);
+      frc::AprilTagFieldLayout::LoadField(frc::AprilTagField::k2024Crescendo));
 
   auto estimatedMultiTagPose =
       estimator.EstimateCoprocMultiTagPose(cameraOne.testResult[0]);

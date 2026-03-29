@@ -173,7 +173,7 @@ class LegacyPhotonPoseEstimatorTest {
                         Optional.of(new Transform3d()));
 
         PhotonPoseEstimator estimator =
-                new PhotonPoseEstimator(aprilTags, PoseStrategy.LOWEST_AMBIGUITY, Transform3d.kZero);
+                new PhotonPoseEstimator(aprilTags, PoseStrategy.LOWEST_AMBIGUITY);
 
         Optional<EstimatedRobotPose> estimatedPose = estimator.update(cameraOne.result);
         Pose3d pose = estimatedPose.get().estimatedPose;
@@ -260,8 +260,7 @@ class LegacyPhotonPoseEstimatorTest {
                         Optional.of(new Transform3d(new Translation3d(0, 0, 4), new Rotation3d())));
 
         PhotonPoseEstimator estimator =
-                new PhotonPoseEstimator(
-                        aprilTags, PoseStrategy.CLOSEST_TO_CAMERA_HEIGHT, Transform3d.kZero);
+                new PhotonPoseEstimator(aprilTags, PoseStrategy.CLOSEST_TO_CAMERA_HEIGHT);
 
         Optional<EstimatedRobotPose> estimatedPose = estimator.update(cameraOne.result);
         Pose3d pose = estimatedPose.get().estimatedPose;
@@ -348,8 +347,7 @@ class LegacyPhotonPoseEstimatorTest {
                         Optional.of(new Transform3d(new Translation3d(0, 0, 0), new Rotation3d())));
 
         PhotonPoseEstimator estimator =
-                new PhotonPoseEstimator(
-                        aprilTags, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, new Transform3d());
+                new PhotonPoseEstimator(aprilTags, PoseStrategy.CLOSEST_TO_REFERENCE_POSE);
         estimator.setReferencePose(new Pose3d(1, 1, 1, new Rotation3d()));
 
         Optional<EstimatedRobotPose> estimatedPose = estimator.update(cameraOne.result);
@@ -437,10 +435,7 @@ class LegacyPhotonPoseEstimatorTest {
                         Optional.of(new Transform3d(new Translation3d(0, 0, 0), new Rotation3d())));
 
         PhotonPoseEstimator estimator =
-                new PhotonPoseEstimator(
-                        aprilTags,
-                        PoseStrategy.CLOSEST_TO_LAST_POSE,
-                        new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()));
+                new PhotonPoseEstimator(aprilTags, PoseStrategy.CLOSEST_TO_LAST_POSE);
 
         estimator.setLastPose(new Pose3d(1, 1, 1, new Rotation3d()));
 
@@ -544,12 +539,10 @@ class LegacyPhotonPoseEstimatorTest {
                         new Rotation3d(
                                 Units.degreesToRadians(37), Units.degreesToRadians(6), Units.degreesToRadians(60)));
 
-        cameraOne.setCameraTransform(compoundTestTransform);
+        cameraOne.setRobotToCamera(compoundTestTransform);
         try (PhotonCameraSim cameraOneSim =
                 new PhotonCameraSim(cameraOne, SimCameraProperties.PERFECT_90DEG())) {
-            var estimator =
-                    new PhotonPoseEstimator(
-                            aprilTags, PoseStrategy.PNP_DISTANCE_TRIG_SOLVE, compoundTestTransform);
+            var estimator = new PhotonPoseEstimator(aprilTags, PoseStrategy.PNP_DISTANCE_TRIG_SOLVE);
 
             /* this is the real pose of the robot base we test against */
             var realPose = new Pose3d(7.3, 4.42, 0, new Rotation3d(0, 0, 2.197));
@@ -571,7 +564,7 @@ class LegacyPhotonPoseEstimatorTest {
             Transform3d straightOnTestTransform = new Transform3d(0, 0, 3, Rotation3d.kZero);
 
             // estimator.setRobotToCameraTransform(straightOnTestTransform);
-            cameraOne.setCameraTransform(straightOnTestTransform);
+            cameraOne.setRobotToCamera(straightOnTestTransform);
 
             /* Pose to compare with */
             realPose = new Pose3d(4.81, 2.38, 0, new Rotation3d(0, 0, 2.818));
@@ -621,10 +614,7 @@ class LegacyPhotonPoseEstimatorTest {
                         Optional.of(new Transform3d(new Translation3d(0, 0, 0), new Rotation3d())));
 
         PhotonPoseEstimator estimator =
-                new PhotonPoseEstimator(
-                        aprilTags,
-                        PoseStrategy.AVERAGE_BEST_TARGETS,
-                        new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()));
+                new PhotonPoseEstimator(aprilTags, PoseStrategy.AVERAGE_BEST_TARGETS);
 
         // Initial state, expect no timestamp
         assertEquals(-1, estimator.poseCacheTimestampSeconds);
@@ -742,10 +732,7 @@ class LegacyPhotonPoseEstimatorTest {
                                 new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()))); // 3 3 3 ambig .4
 
         PhotonPoseEstimator estimator =
-                new PhotonPoseEstimator(
-                        aprilTags,
-                        PoseStrategy.AVERAGE_BEST_TARGETS,
-                        new Transform3d(new Translation3d(0, 0, 0), new Rotation3d()));
+                new PhotonPoseEstimator(aprilTags, PoseStrategy.AVERAGE_BEST_TARGETS);
 
         Optional<EstimatedRobotPose> estimatedPose = estimator.update(cameraOne.result);
         Pose3d pose = estimatedPose.get().estimatedPose;
@@ -810,7 +797,7 @@ class LegacyPhotonPoseEstimatorTest {
                         Optional.empty(),
                         Optional.of(Transform3d.kZero));
         PhotonPoseEstimator estimator =
-                new PhotonPoseEstimator(aprilTags, PoseStrategy.MULTI_TAG_PNP_ON_RIO, Transform3d.kZero);
+                new PhotonPoseEstimator(aprilTags, PoseStrategy.MULTI_TAG_PNP_ON_RIO);
         estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
         Optional<EstimatedRobotPose> estimatedPose = estimator.update(cameraOne.result);
@@ -900,8 +887,7 @@ class LegacyPhotonPoseEstimatorTest {
         PhotonPoseEstimator estimator =
                 new PhotonPoseEstimator(
                         AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo),
-                        PoseStrategy.CONSTRAINED_SOLVEPNP,
-                        kRobotToCam);
+                        PoseStrategy.CONSTRAINED_SOLVEPNP);
 
         estimator.addHeadingData(result.getTimestampSeconds(), Rotation2d.kZero);
 
@@ -920,8 +906,7 @@ class LegacyPhotonPoseEstimatorTest {
         PhotonPoseEstimator estimator =
                 new PhotonPoseEstimator(
                         AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo),
-                        PoseStrategy.CONSTRAINED_SOLVEPNP,
-                        Transform3d.kZero);
+                        PoseStrategy.CONSTRAINED_SOLVEPNP);
         PhotonPipelineResult result = new PhotonPipelineResult();
         var estimate = estimator.update(result);
         assertEquals(estimate, Optional.empty());
