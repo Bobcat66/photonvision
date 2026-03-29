@@ -126,7 +126,7 @@ class PhotonPoseEstimator:
         """
         if cameraResult.getTimestampSeconds() < 0:
             return False
-        
+
         if cameraResult.robotToCamera == None:
             return False
 
