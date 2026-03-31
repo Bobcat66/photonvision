@@ -17,7 +17,6 @@
 
 package org.photonvision.vision.frame;
 
-import edu.wpi.first.math.geometry.Transform3d;
 import org.photonvision.common.logging.LogGroup;
 import org.photonvision.common.logging.Logger;
 import org.photonvision.common.util.math.MathUtils;
@@ -37,23 +36,19 @@ public class Frame implements Releasable {
 
     public final FrameStaticProperties frameStaticProperties;
 
-    public final Transform3d robotToCamera;
-
     public Frame(
             long sequenceID,
             CVMat color,
             CVMat processed,
             FrameThresholdType type,
             long timestampNanos,
-            FrameStaticProperties frameStaticProperties,
-            Transform3d robotToCamera) {
+            FrameStaticProperties frameStaticProperties) {
         this.sequenceID = sequenceID;
         this.colorImage = color;
         this.processedImage = processed;
         this.type = type;
         this.timestampNanos = timestampNanos;
         this.frameStaticProperties = frameStaticProperties;
-        this.robotToCamera = robotToCamera;
 
         logger.trace(
                 () ->
@@ -71,14 +66,7 @@ public class Frame implements Releasable {
             CVMat processed,
             FrameThresholdType processType,
             FrameStaticProperties frameStaticProperties) {
-        this(
-                sequenceID,
-                color,
-                processed,
-                processType,
-                MathUtils.wpiNanoTime(),
-                frameStaticProperties,
-                null);
+        this(sequenceID, color, processed, processType, MathUtils.wpiNanoTime(), frameStaticProperties);
     }
 
     public Frame() {
@@ -88,8 +76,7 @@ public class Frame implements Releasable {
                 new CVMat(),
                 FrameThresholdType.NONE,
                 MathUtils.wpiNanoTime(),
-                new FrameStaticProperties(0, 0, 0, null),
-                null);
+                new FrameStaticProperties(0, 0, 0, null));
     }
 
     public void copyTo(Frame destFrame) {

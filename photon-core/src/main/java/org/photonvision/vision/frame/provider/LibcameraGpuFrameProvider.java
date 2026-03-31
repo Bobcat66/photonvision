@@ -103,8 +103,7 @@ public class LibcameraGpuFrameProvider extends FrameProvider {
                     processedMat,
                     type,
                     MathUtils.wpiNanoTime() - latency,
-                    settables.getFrameStaticProperties().rotate(settables.getRotation()),
-                    settables.getRobotToCamera());
+                    settables.getFrameStaticProperties().rotate(settables.getRotation()));
         }
     }
 

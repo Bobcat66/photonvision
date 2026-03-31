@@ -18,9 +18,7 @@
 package org.photonvision.vision.processes;
 
 import edu.wpi.first.cscore.VideoMode;
-import edu.wpi.first.math.geometry.Transform3d;
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicReference;
 import org.opencv.core.Size;
 import org.photonvision.common.configuration.CameraConfiguration;
 import org.photonvision.common.logging.LogGroup;
@@ -32,8 +30,6 @@ public abstract class VisionSourceSettables {
     protected Logger logger;
 
     private final CameraConfiguration configuration;
-
-    private final AtomicReference<Transform3d> robotToCamera = new AtomicReference<>();
 
     protected VisionSourceSettables(CameraConfiguration configuration) {
         this.configuration = configuration;
@@ -128,14 +124,6 @@ public abstract class VisionSourceSettables {
     public void removeCalibration(Size unrotatedImageSize) {
         configuration.removeCalibration(unrotatedImageSize);
         calculateFrameStaticProps();
-    }
-
-    public void setRobotToCamera(Transform3d robotToCamera) {
-        this.robotToCamera.set(robotToCamera);
-    }
-
-    public Transform3d getRobotToCamera() {
-        return this.robotToCamera.get();
     }
 
     protected void calculateFrameStaticProps() {

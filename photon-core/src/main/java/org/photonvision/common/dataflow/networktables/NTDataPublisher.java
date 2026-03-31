@@ -22,7 +22,6 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTablesJNI;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -206,7 +205,7 @@ public class NTDataPublisher implements CVPipelineResultConsumer {
                         NetworkTablesManager.getInstance().getTimeSinceLastPong(),
                         TrackedTarget.simpleFromTrackedTargets(acceptedResult.targets),
                         acceptedResult.multiTagResult,
-                        Optional.ofNullable(acceptedResult.inputAndOutputFrame.robotToCamera));
+                        acceptedResult.robotToCamera);
 
         // random guess at size of the array
         ts.resultPublisher.set(simplified, 1024);

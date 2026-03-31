@@ -19,7 +19,6 @@ package org.photonvision.vision.camera;
 
 import edu.wpi.first.cscore.UsbCameraInfo;
 import edu.wpi.first.cscore.VideoMode;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.util.PixelFormat;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -46,23 +45,13 @@ public class FileVisionSource extends VisionSource {
                         Path.of(cameraConfiguration.getDevicePath()),
                         cameraConfiguration.FOV,
                         FileFrameProvider.MAX_FPS,
-                        calibration,
-                        this::getRobotToCamera);
+                        calibration);
 
         if (getCameraConfiguration().cameraQuirks == null)
             getCameraConfiguration().cameraQuirks = QuirkyCamera.DefaultCamera;
 
-        // The getRobotToCamera method has a null check, so passing it to the FileFrameProvider should
-        // be safe even before the settables are initialized
         settables =
                 new FileSourceSettables(cameraConfiguration, frameProvider.get().frameStaticProperties);
-    }
-
-    private Transform3d getRobotToCamera() {
-        if (settables == null) {
-            return null;
-        }
-        return settables.getRobotToCamera();
     }
 
     public FileVisionSource(String name, String imagePath, double fov) {

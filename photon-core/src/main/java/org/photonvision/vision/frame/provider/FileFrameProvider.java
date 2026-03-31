@@ -17,11 +17,9 @@
 
 package org.photonvision.vision.frame.provider;
 
-import edu.wpi.first.math.geometry.Transform3d;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.function.Supplier;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.photonvision.common.util.math.MathUtils;
@@ -43,7 +41,6 @@ public class FileFrameProvider extends CpuImageProcessor implements Releasable {
     private final Path path;
     private final int millisDelay;
     private final CVMat originalFrame;
-    private final Supplier<Transform3d> robotToCameraSupplier;
 
     private final FrameStaticProperties properties;
 
@@ -57,20 +54,11 @@ public class FileFrameProvider extends CpuImageProcessor implements Releasable {
      * @param maxFPS The max framerate to provide the image at.
      */
     public FileFrameProvider(Path path, double fov, int maxFPS) {
-        this(path, fov, maxFPS, null, () -> null);
-    }
-
-    public FileFrameProvider(Path path, double fov, CameraCalibrationCoefficients calibration) {
-        this(path, fov, MAX_FPS, calibration, () -> null);
+        this(path, fov, maxFPS, null);
     }
 
     public FileFrameProvider(
-            Path path,
-            double fov,
-            int maxFPS,
-            CameraCalibrationCoefficients calibration,
-            Supplier<Transform3d> robotToCameraSupplier) {
-        this.robotToCameraSupplier = robotToCameraSupplier;
+            Path path, double fov, int maxFPS, CameraCalibrationCoefficients calibration) {
         if (!Files.exists(path))
             throw new RuntimeException("Invalid path for image: " + path.toAbsolutePath());
         this.path = path;
@@ -105,6 +93,10 @@ public class FileFrameProvider extends CpuImageProcessor implements Releasable {
         this(path, fov, MAX_FPS);
     }
 
+    public FileFrameProvider(Path path, double fov, CameraCalibrationCoefficients calibration) {
+        this(path, fov, MAX_FPS, calibration);
+    }
+
     @Override
     public CapturedFrame getInputMat() {
         var out = new CVMat();
@@ -122,8 +114,7 @@ public class FileFrameProvider extends CpuImageProcessor implements Releasable {
         }
 
         lastGetMillis = System.currentTimeMillis();
-        return new CapturedFrame(
-                out, properties, MathUtils.wpiNanoTime(), this.robotToCameraSupplier.get());
+        return new CapturedFrame(out, properties, MathUtils.wpiNanoTime());
     }
 
     @Override
