@@ -52,7 +52,8 @@ public class FileVisionSource extends VisionSource {
         if (getCameraConfiguration().cameraQuirks == null)
             getCameraConfiguration().cameraQuirks = QuirkyCamera.DefaultCamera;
 
-        // The getRobotToCamera method has a null check, so passing it to the FileFrameProvider should be safe even before the settables are initialized
+        // The getRobotToCamera method has a null check, so passing it to the FileFrameProvider should
+        // be safe even before the settables are initialized
         settables =
                 new FileSourceSettables(cameraConfiguration, frameProvider.get().frameStaticProperties);
     }
