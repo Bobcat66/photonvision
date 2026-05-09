@@ -33,6 +33,10 @@ import org.photonvision.utils.PacketUtils;
 // Assume that the base class lives here and we can import it
 import org.photonvision.targeting.*;
 
+// Needed for optional shims
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+
 // WPILib imports (if any)
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.math.geometry.Transform3d;
