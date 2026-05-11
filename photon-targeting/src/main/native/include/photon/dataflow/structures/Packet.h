@@ -244,7 +244,7 @@ concept arithmetic = std::integral<T> || std::floating_point<T>;
 
 // support encoding vectors
 template <typename T>
-  requires(PhotonStructSerializable<T> || arithmetic<T>)
+  requires(PhotonStructSerializable<T>)
 struct SerdeType<std::vector<T>> {
   static std::vector<T> Unpack(Packet& packet) {
     uint8_t len = packet.Unpack<uint8_t>();
@@ -275,7 +275,7 @@ struct SerdeType<std::vector<T>> {
 
 // support encoding optional types
 template <typename T>
-  requires(PhotonStructSerializable<T> || arithmetic<T>)
+  requires(PhotonStructSerializable<T>)
 struct SerdeType<std::optional<T>> {
   static std::optional<T> Unpack(Packet& packet) {
     if (packet.Unpack<uint8_t>() == 1u) {
