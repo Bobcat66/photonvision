@@ -42,7 +42,7 @@ class PacketTest {
 
     @Test
     void pipelineResultSerde() {
-        var ret1 = new PhotonPipelineResult(1, 2, 3, 1024, List.of());
+        var ret1 = new PhotonPipelineResult(1, 2, 3, 1024, List.of(), List.of());
         var p1 = new Packet(10);
         PhotonPipelineResult.photonStruct.pack(p1, ret1);
         var unpackedRet1 = PhotonPipelineResult.photonStruct.unpack(p1);
@@ -96,7 +96,8 @@ class PacketTest {
                                                 new TargetCorner(1, 2),
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
-                                                new TargetCorner(7, 8)))));
+                                                new TargetCorner(7, 8)))),
+                        List.of());
         var p2 = new Packet(10);
         PhotonPipelineResult.photonStruct.pack(p2, ret2);
         var unpackedRet2 = PhotonPipelineResult.photonStruct.unpack(p2);
@@ -151,6 +152,7 @@ class PacketTest {
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
                                                 new TargetCorner(7, 8)))),
+                        List.of(),
                         Optional.of(
                                 new MultiTargetPNPResult(
                                         new PnpResult(

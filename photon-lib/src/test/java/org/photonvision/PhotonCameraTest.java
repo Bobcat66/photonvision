@@ -346,6 +346,7 @@ class PhotonCameraTest {
                                     1, 2, 3, 10 * 1000000 // 10 seconds -> us since last pong
                                     ),
                             List.of(),
+                            List.of(),
                             Optional.empty());
 
             // Loop to hit cases past first iteration

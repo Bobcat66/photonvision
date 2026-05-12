@@ -161,7 +161,8 @@ class PhotonPoseEstimatorTest {
                                                 new TargetCorner(1, 2),
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
-                                                new TargetCorner(7, 8)))));
+                                                new TargetCorner(7, 8)))),
+                        List.of());
 
         PhotonPoseEstimator estimator = new PhotonPoseEstimator(aprilTags, new Transform3d());
 
@@ -246,7 +247,8 @@ class PhotonPoseEstimatorTest {
                                                 new TargetCorner(1, 2),
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
-                                                new TargetCorner(7, 8)))));
+                                                new TargetCorner(7, 8)))),
+                        List.of());
 
         PhotonPoseEstimator estimator =
                 new PhotonPoseEstimator(
@@ -333,7 +335,8 @@ class PhotonPoseEstimatorTest {
                                                 new TargetCorner(1, 2),
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
-                                                new TargetCorner(7, 8)))));
+                                                new TargetCorner(7, 8)))),
+                        List.of());
 
         PhotonPoseEstimator estimator =
                 new PhotonPoseEstimator(
@@ -421,7 +424,8 @@ class PhotonPoseEstimatorTest {
                                                 new TargetCorner(1, 2),
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
-                                                new TargetCorner(7, 8)))));
+                                                new TargetCorner(7, 8)))),
+                        List.of());
 
         PhotonPoseEstimator estimator =
                 new PhotonPoseEstimator(
@@ -501,7 +505,8 @@ class PhotonPoseEstimatorTest {
                                                 new TargetCorner(1, 2),
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
-                                                new TargetCorner(7, 8)))));
+                                                new TargetCorner(7, 8)))),
+                        List.of());
 
         estimatedPose = estimator.estimateClosestToReferencePose(cameraOne.result, pose);
         pose = estimatedPose.get().estimatedPose;
@@ -642,7 +647,8 @@ class PhotonPoseEstimatorTest {
                                                 new TargetCorner(1, 2),
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
-                                                new TargetCorner(7, 8))))); // 3 3 3 ambig .4
+                                                new TargetCorner(7, 8)))), // 3 3 3 ambig .4
+                        List.of());
 
         PhotonPoseEstimator estimator =
                 new PhotonPoseEstimator(
@@ -709,7 +715,8 @@ class PhotonPoseEstimatorTest {
                                                 new TargetCorner(1, 2),
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
-                                                new TargetCorner(7, 8)))));
+                                                new TargetCorner(7, 8)))),
+                        List.of());
         PhotonPoseEstimator estimator = new PhotonPoseEstimator(aprilTags, Transform3d.kZero);
 
         Optional<EstimatedRobotPose> estimatedPose =
@@ -780,6 +787,7 @@ class PhotonPoseEstimatorTest {
                         new PhotonPipelineMetadata(10000, 2000, 1, 100),
                         List.of(
                                 new PhotonTrackedTarget(0, 0, 0, 0, 8, 0, 0, null, null, 0, corners8, corners8)),
+                        List.of(),
                         Optional.of(
                                 new MultiTargetPNPResult(
                                         new PnpResult(

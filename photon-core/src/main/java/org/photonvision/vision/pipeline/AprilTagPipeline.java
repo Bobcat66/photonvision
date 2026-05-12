@@ -17,18 +17,6 @@
 
 package org.photonvision.vision.pipeline;
 
-import edu.wpi.first.apriltag.AprilTagDetection;
-import edu.wpi.first.apriltag.AprilTagDetector;
-import edu.wpi.first.apriltag.AprilTagPoseEstimate;
-import edu.wpi.first.apriltag.AprilTagPoseEstimator.Config;
-import edu.wpi.first.math.geometry.CoordinateSystem;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.BooleanSubscriber;
-import edu.wpi.first.networktables.IntegerArrayPublisher;
-import edu.wpi.first.networktables.IntegerArraySubscriber;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -59,6 +47,9 @@ import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Transform3d;
 import org.wpilib.math.util.Units;
+import org.wpilib.networktables.BooleanSubscriber;
+import org.wpilib.networktables.IntegerArrayPublisher;
+import org.wpilib.networktables.IntegerArraySubscriber;
 import org.wpilib.vision.apriltag.AprilTagDetection;
 import org.wpilib.vision.apriltag.AprilTagDetector;
 import org.wpilib.vision.apriltag.AprilTagPoseEstimate;
@@ -291,9 +282,16 @@ public class AprilTagPipeline extends CVPipeline<CVPipelineResult, AprilTagPipel
     public void release() {
         aprilTagDetectionPipe.release();
         singleTagPoseEstimatorPipe.release();
-        rejectTagIdPublisher.close();
-        rejectTagIdSubscriber.close();
-        overrideCoprocRejectTag.close();
+        // Hack
+        if (rejectTagIdPublisher != null) {
+            rejectTagIdPublisher.close();
+        }
+        if (rejectTagIdSubscriber != null) {
+            rejectTagIdSubscriber.close();
+        }
+        if (overrideCoprocRejectTag != null) {
+            overrideCoprocRejectTag.close();
+        }
         super.release();
     }
 }

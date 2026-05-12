@@ -82,7 +82,8 @@ public class PhotonPipelineResultTest {
                                                 new TargetCorner(1, 2),
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
-                                                new TargetCorner(7, 8)))));
+                                                new TargetCorner(7, 8)))),
+                        List.of());
         b =
                 new PhotonPipelineResult(
                         3,
@@ -131,7 +132,8 @@ public class PhotonPipelineResultTest {
                                                 new TargetCorner(1, 2),
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
-                                                new TargetCorner(7, 8)))));
+                                                new TargetCorner(7, 8)))),
+                        List.of());
         assertEquals(a, b);
 
         a =
@@ -183,6 +185,7 @@ public class PhotonPipelineResultTest {
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
                                                 new TargetCorner(7, 8)))),
+                        List.of(),
                         Optional.of(
                                 new MultiTargetPNPResult(
                                         new PnpResult(
@@ -237,6 +240,7 @@ public class PhotonPipelineResultTest {
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
                                                 new TargetCorner(7, 8)))),
+                        List.of(),
                         Optional.of(
                                 new MultiTargetPNPResult(
                                         new PnpResult(
@@ -295,7 +299,8 @@ public class PhotonPipelineResultTest {
                                                 new TargetCorner(1, 2),
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
-                                                new TargetCorner(7, 8)))));
+                                                new TargetCorner(7, 8)))),
+                        List.of());
         var b =
                 new PhotonPipelineResult(
                         3,
@@ -344,7 +349,8 @@ public class PhotonPipelineResultTest {
                                                 new TargetCorner(1, 2),
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
-                                                new TargetCorner(7, 8)))));
+                                                new TargetCorner(7, 8)))),
+                        List.of());
         assertNotEquals(a, b);
 
         a =
@@ -396,6 +402,7 @@ public class PhotonPipelineResultTest {
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
                                                 new TargetCorner(7, 8)))),
+                        List.of(),
                         Optional.of(
                                 new MultiTargetPNPResult(
                                         new PnpResult(
@@ -450,6 +457,7 @@ public class PhotonPipelineResultTest {
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
                                                 new TargetCorner(7, 8)))),
+                        List.of(),
                         Optional.of(
                                 new MultiTargetPNPResult(
                                         new PnpResult(

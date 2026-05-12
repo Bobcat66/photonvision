@@ -86,7 +86,8 @@ public class PhotonPipelineResultProtoTest {
                                                 new TargetCorner(1, 2),
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
-                                                new TargetCorner(7, 8)))));
+                                                new TargetCorner(7, 8)))),
+                        List.of());
         serializedResult = PhotonPipelineResult.proto.createMessage();
         PhotonPipelineResult.proto.pack(serializedResult, result);
         unpackedResult = PhotonPipelineResult.proto.unpack(serializedResult);
@@ -142,6 +143,7 @@ public class PhotonPipelineResultProtoTest {
                                                 new TargetCorner(3, 4),
                                                 new TargetCorner(5, 6),
                                                 new TargetCorner(7, 8)))),
+                        List.of(),
                         Optional.of(
                                 new MultiTargetPNPResult(
                                         new PnpResult(

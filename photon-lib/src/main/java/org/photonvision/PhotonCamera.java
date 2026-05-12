@@ -24,28 +24,6 @@
 
 package org.photonvision;
 
-import edu.wpi.first.hal.HAL;
-import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.numbers.*;
-import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.BooleanSubscriber;
-import edu.wpi.first.networktables.DoubleArraySubscriber;
-import edu.wpi.first.networktables.IntegerArrayPublisher;
-import edu.wpi.first.networktables.IntegerArraySubscriber;
-import edu.wpi.first.networktables.IntegerEntry;
-import edu.wpi.first.networktables.IntegerPublisher;
-import edu.wpi.first.networktables.IntegerSubscriber;
-import edu.wpi.first.networktables.MultiSubscriber;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.PubSubOption;
-import edu.wpi.first.networktables.StringSubscriber;
-import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.Alert.AlertType;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -65,6 +43,8 @@ import org.wpilib.math.util.Nat;
 import org.wpilib.networktables.BooleanPublisher;
 import org.wpilib.networktables.BooleanSubscriber;
 import org.wpilib.networktables.DoubleArraySubscriber;
+import org.wpilib.networktables.IntegerArrayPublisher;
+import org.wpilib.networktables.IntegerArraySubscriber;
 import org.wpilib.networktables.IntegerEntry;
 import org.wpilib.networktables.IntegerPublisher;
 import org.wpilib.networktables.IntegerSubscriber;
@@ -171,7 +151,7 @@ public class PhotonCamera implements AutoCloseable {
                 new Alert(
                         PHOTON_ALERT_GROUP,
                         "PhotonCamera '" + name + "' is having rejected tags overriden from robot code.",
-                        AlertType.kWarning);
+                        Alert.Level.MEDIUM);
         timesyncAlert = new Alert(PHOTON_ALERT_GROUP, "", Alert.Level.MEDIUM);
         rootPhotonTable = instance.getTable(kTableName);
         this.cameraTable = rootPhotonTable.getSubTable(cameraName);
