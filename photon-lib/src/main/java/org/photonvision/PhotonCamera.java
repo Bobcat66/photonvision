@@ -24,7 +24,6 @@
 
 package org.photonvision;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.Matrix;
@@ -170,7 +169,9 @@ public class PhotonCamera implements AutoCloseable {
                         PHOTON_ALERT_GROUP, "PhotonCamera '" + name + "' is disconnected.", Alert.Level.MEDIUM);
         overrideRejectTagAlert =
                 new Alert(
-                        PHOTON_ALERT_GROUP, "PhotonCamera '" + name + "' is having rejected tags overriden from robot code.", AlertType.kWarning);
+                        PHOTON_ALERT_GROUP,
+                        "PhotonCamera '" + name + "' is having rejected tags overriden from robot code.",
+                        AlertType.kWarning);
         timesyncAlert = new Alert(PHOTON_ALERT_GROUP, "", Alert.Level.MEDIUM);
         rootPhotonTable = instance.getTable(kTableName);
         this.cameraTable = rootPhotonTable.getSubTable(cameraName);
