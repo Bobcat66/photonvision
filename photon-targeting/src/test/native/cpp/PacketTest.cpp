@@ -88,7 +88,8 @@ TEST(PacketTest, PnpResult) {
 
 TEST(PacketTest, PhotonPipelineResult) {
   PhotonPipelineResult result(PhotonPipelineMetadata(0, 0, 1, 2),
-                              std::vector<PhotonTrackedTarget>{}, std::vector<PhotonTrackedTarget>{}, std::nullopt);
+                              std::vector<PhotonTrackedTarget>{},
+                              std::vector<PhotonTrackedTarget>{}, std::nullopt);
 
   Packet p;
   p.Pack<decltype(result)>(result);
@@ -132,8 +133,8 @@ TEST(PacketTest, PhotonPipelineResult) {
                 17.0, 22.33, 2.54},
       std::vector<int16_t>{8, 7, 11, 22, 59, 40}};
 
-  PhotonPipelineResult result2(PhotonPipelineMetadata{0, 0, 1, 1}, targets, std::vector<PhotonTrackedTarget>{},
-                               mtResult);
+  PhotonPipelineResult result2(PhotonPipelineMetadata{0, 0, 1, 1}, targets,
+                               std::vector<PhotonTrackedTarget>{}, mtResult);
 
   Packet p2;
   auto t1 = std::chrono::steady_clock::now();
