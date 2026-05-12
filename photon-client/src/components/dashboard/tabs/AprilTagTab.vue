@@ -52,7 +52,7 @@ const interactiveCols = computed(() =>
       @update:modelValue="(value) => useCameraSettingsStore().changeCurrentPipelineSetting({ blur: value }, false)"
     />
     <pv-input
-      v-model="currentPipelineSettings.rejectTagIds"
+      :model-value="currentPipelineSettings.rejectTagIds.join(',')"
       label="Reject Tag IDs"
       tooltip="Tag IDs to reject for multitag estimation"
       @update:modelValue="
