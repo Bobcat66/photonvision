@@ -242,7 +242,7 @@ jobs:
       matrix:
         include:
          - os: windows-2022
-           tbb_install_cmd: choco install -y intel-tbb --pre
+           tbb_install_cmd: nuget install inteltbb.devel.windows
            artifact-name: Win64
          - os: macos-26
            tbb_install_cmd: |
