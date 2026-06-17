@@ -11,8 +11,8 @@ apply plugin: 'org.wpilib.GradleJni'
 
 ext.licenseFile = file("$rootDir/LICENSE")
 apply from: "${rootDir}/shared/config.gradle"
-apply from: "${rootDir}/shared/javacommon.gradle"
 apply from: "${rootDir}/shared/gtsam.gradle"
+apply from: "${rootDir}/shared/javacommon.gradle"
 
 nativeUtils {
     exportsConfigs {
@@ -51,6 +51,7 @@ model {
                 it.tasks.withType(CppCompile) {
                     it.dependsOn generateProto
                 }
+                project.gtsamArgs(it)
             }
 
 
@@ -81,6 +82,7 @@ model {
 
             binaries.all {
                 lib library: nativeName, linkage: 'shared'
+                project.gtsamArgs(it)
             }
 
             nativeUtils.useRequiredLibrary(it, 'gtsam')
@@ -119,6 +121,7 @@ model {
                 it.tasks.withType(CppCompile) {
                     it.dependsOn generateProto
                 }
+                project.gtsamArgs(it)
             }
 
             nativeUtils.useRequiredLibrary(it, 'gtsam')

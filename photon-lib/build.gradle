@@ -50,9 +50,10 @@ model {
                 if(project.hasProperty('includePhotonTargeting')) {
                     lib project: ':photon-targeting', library: 'photontargeting', linkage: 'shared'
                 }
-                nativeUtils.useRequiredLibrary(it, "gtsam")
+                project.gtsamArgs(it)
             }
 
+            nativeUtils.useRequiredLibrary(it, "gtsam")
             nativeUtils.useRequiredLibrary(it, "wpilib_shared")
             nativeUtils.useRequiredLibrary(it, "apriltag_shared")
             nativeUtils.useRequiredLibrary(it, "opencv_shared")
@@ -89,9 +90,10 @@ model {
                     lib project: ':photon-targeting', library: 'photontargeting', linkage: 'shared'
                     lib project: ':photon-targeting', library: 'photontargetingJNI', linkage: 'shared'
                 }
-                nativeUtils.useRequiredLibrary(it, 'gtsam')
+                project.gtsamArgs(it)
             }
 
+            nativeUtils.useRequiredLibrary(it, "gtsam")
             nativeUtils.useRequiredLibrary(it, "datalog_shared")
             nativeUtils.useRequiredLibrary(it, "cscore_shared")
             nativeUtils.useRequiredLibrary(it, "cameraserver_shared")
