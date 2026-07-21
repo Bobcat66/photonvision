@@ -163,3 +163,7 @@ flake.nix
 flake.lock
 
 /workspace
+
+# pnpm
+.pnpm-store
+.pnpm-store/*

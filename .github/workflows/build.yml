@@ -150,10 +150,6 @@ jobs:
           cache: pnpm
           cache-dependency-path: photon-client/pnpm-lock.yaml
           node-version: 24
-      - name: Install tbb
-        run: |
-          sudo apt-get update -q
-          sudo apt-get install -y libtbb-dev
       - name: Gradle Build
         run: ./gradlew photon-targeting:build photon-core:build photon-server:build -x check
       - name: Gradle Tests and Coverage
@@ -235,19 +231,11 @@ jobs:
       matrix:
         include:
          - os: windows-2022
-           tbb_install_cmd: nuget install inteltbb.devel.windows
            artifact-name: Win64
          - os: macos-26
-           tbb_install_cmd: |
-            brew update
-            brew install tbb
            artifact-name: macOS
          - os: ubuntu-24.04
-           tbb_install_cmd: |
-            sudo apt-get update -q
-            sudo apt-get install -y libtbb-dev
            artifact-name: Linux
-
 
     name: "Photonlib - Build Host - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
