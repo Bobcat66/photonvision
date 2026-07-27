@@ -248,8 +248,6 @@ jobs:
         with:
           java-version: 25
           distribution: temurin
-      - run: ${{ matrix.tbb_install_cmd }}
-        name: Install tbb
       - run: git fetch --tags --force
       - run: ./gradlew photon-targeting:build photon-lib:build
         name: Build with Gradle
@@ -291,10 +289,6 @@ jobs:
       - name: Config Git
         run: |
           git config --global --add safe.directory /__w/photonvision/photonvision
-      - name: Install tbb
-        run: |
-          sudo apt-get update -q
-          sudo apt-get install -y libtbb-dev
       - name: Build PhotonLib
         # We don't need to run tests, since we specify only non-native platforms
         run: ./gradlew photon-targeting:build photon-lib:build ${{ matrix.build-options }} -x test
