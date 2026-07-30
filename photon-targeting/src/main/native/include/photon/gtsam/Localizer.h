@@ -30,10 +30,10 @@
 #include <wpi/units/time.hpp>
 
 #include "gtsam/slam/expressions.h"
-#include "photon/slam/FieldLayout.h"
-#include "photon/slam/gtsam_utils.h"
+#include "photon/gtsam/FieldLayout.h"
+#include "photon/gtsam/gtsam_utils.h"
 
-namespace photon::slam {
+namespace photon::gtsam {
 
 class Localizer {
   using Key = gtsam::Key;
@@ -114,4 +114,4 @@ class Localizer {
   FieldLayout fieldLayout;
 };
 
-}  // namespace photon::slam
+}  // namespace photon::gtsam

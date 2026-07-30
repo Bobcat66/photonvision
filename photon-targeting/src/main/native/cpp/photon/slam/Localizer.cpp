@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "photon/slam/Localizer.h"
+#include "photon/gtsam/Localizer.h"
 
 #include <iostream>
 #include <utility>
@@ -27,7 +27,7 @@
 using namespace gtsam;
 using symbol_shorthand::X;
 
-namespace photon::slam {
+namespace photon::gtsam {
 Localizer::Localizer(FieldLayout fieldLayout)
     : fieldLayout(std::move(fieldLayout)) {
   ISAM2Params parameters;
@@ -472,4 +472,4 @@ const std::vector<wpi::math::Pose3d> Localizer::GetPoseHistory() const {
 
   return ret;
 }
-}  // namespace photon::slam
+}  // namespace photon::gtsam

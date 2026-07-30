@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "photon/slam/FieldLayout.h"
+#include "photon/gtsam/FieldLayout.h"
 
 #include <stdexcept>
 
-#include "photon/slam/gtsam_utils.h"
+#include "photon/gtsam/gtsam_utils.h"
 
 namespace photon::slam {
 
