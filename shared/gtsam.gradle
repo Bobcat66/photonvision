@@ -16,8 +16,8 @@ ext {
     gtsamArgs = { binary ->
         if (binary.toolChain instanceof GccCompatibleToolChain) {
             binary.cppCompiler.define '_ENABLE_EXTENDED_ALIGNED_STORAGE'
-            binary.cppCompiler.define 'GTSAM_USE_TBB'
-            binary.cppCompiler.define 'GTSAM_ALLOCATOR_TBB'
+            // binary.cppCompiler.define 'GTSAM_USE_TBB'
+            // binary.cppCompiler.define 'GTSAM_ALLOCATOR_TBB'
 
             binary.cppCompiler.args.add("-Wno-deprecated-declarations")
             binary.cppCompiler.args.add("-Wno-deprecated-copy")
