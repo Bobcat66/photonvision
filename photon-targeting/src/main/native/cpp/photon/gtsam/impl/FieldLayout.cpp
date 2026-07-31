@@ -19,12 +19,12 @@
 
 #include <stdexcept>
 
-#include "photon/gtsam/gtsam_utils.h"
+#include "photon/gtsam/impl/gtsam_utils.h"
 
-namespace photon::slam {
+namespace pvgtsam_impl {
 
 FieldLayout::FieldLayout(const wpi::apriltag::AprilTagFieldLayout& layout,
-                         const TargetModel& tagModel) {
+                         const photon::TargetModel& tagModel) {
   if (tagModel.GetVertices().size() != 4) {
     throw std::runtime_error(
         "Tag model must have exactly 4 vertices for now, since we assume "
@@ -76,4 +76,4 @@ std::optional<std::array<gtsam::Point3, 4>> FieldLayout::WorldToCorners(
   return worldToCorners;
 }
 
-}  // namespace photon::slam
+}  // namespace pvgtsam_impl

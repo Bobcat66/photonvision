@@ -26,7 +26,8 @@
 #include <wpi/math/geometry/Pose3d.hpp>
 #include <wpi/math/geometry/Transform3d.hpp>
 
-namespace photon::gtsam {
+// TODO: Remove CameraVisionObservation and OdometryObservation, and just use the AddOdometry and AddTagObservation methods directly.
+namespace pvgtsam_impl {
 struct CameraVisionObservation {
   // Tag observation timestamp
   uint64_t timeUs;
@@ -72,4 +73,4 @@ gtsam::Point2_ PredictLandmarkImageLocation(gtsam::Pose3_ worldTbody_fac,
                                             gtsam::Cal3_S2_ cameraCal,
                                             gtsam::Point3 worldPcorner);
 
-}  // namespace photon::gtsam
+}  // namespace pvgtsam_impl

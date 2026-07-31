@@ -20,7 +20,7 @@
 #include <wpi/apriltag/AprilTagFields.hpp>
 
 #include "photon/estimation/TargetModel.h"
-#include "photon/gtsam/Localizer.h"
+#include "photon/gtsam/impl/Localizer.h"
 
 using namespace gtsam;
 
@@ -58,24 +58,24 @@ TEST(LocalizerTest, LatencyCompensate) {
   auto reefscape2025 = wpi::apriltag::AprilTagFieldLayout::LoadField(
       wpi::apriltag::AprilTagField::k2025ReefscapeWelded);
 
-  photon::gtsam::FieldLayout layout(reefscape2025, photon::kAprilTag36h11);
+  pvgtsam_impl::FieldLayout layout(reefscape2025, photon::kAprilTag36h11);
 
-  auto localizer = photon::gtsam::Localizer(layout);
+  auto localizer = pvgtsam_impl::Localizer(layout);
 
   localizer.Reset(Pose3(), posePriorNoise, 5 * 1000);
-  localizer.AddOdometry(photon::gtsam::OdometryObservation{
+  localizer.AddOdometry(pvgtsam_impl::OdometryObservation{
       100 * 1000, Pose3{Rot3{}, Point3{1, 0, 0}}, odometryNoise});
-  localizer.AddOdometry(photon::gtsam::OdometryObservation{
+  localizer.AddOdometry(pvgtsam_impl::OdometryObservation{
       200 * 1000, Pose3{Rot3{}, Point3{1, 0, 0}}, odometryNoise});
-  localizer.AddOdometry(photon::gtsam::OdometryObservation{
+  localizer.AddOdometry(pvgtsam_impl::OdometryObservation{
       300 * 1000, Pose3{Rot3{}, Point3{1, 0, 0}}, odometryNoise});
-  localizer.AddOdometry(photon::gtsam::OdometryObservation{
+  localizer.AddOdometry(pvgtsam_impl::OdometryObservation{
       400 * 1000, Pose3{Rot3{}, Point3{1, 0, 0}}, odometryNoise});
   localizer.Optimize();
   auto pose = localizer.GetLatestWorldToBody();
   pose.print("Pose: ");
 
-  photon::gtsam::CameraVisionObservation obs{240000,
+  pvgtsam_impl::CameraVisionObservation obs{240000,
                                             8,
                                             {
                                                 {414, 166},
@@ -95,7 +95,7 @@ TEST(LocalizerTest, LatencyCompensate) {
   localizer.Print();
 
   // add but don't optimize
-  localizer.AddOdometry(photon::gtsam::OdometryObservation{
+  localizer.AddOdometry(pvgtsam_impl::OdometryObservation{
       500 * 1000, Pose3{Rot3{}, Point3{1, 0, 0}}, odometryNoise});
 
   obs = {460000,

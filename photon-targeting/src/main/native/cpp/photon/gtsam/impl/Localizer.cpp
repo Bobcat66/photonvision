@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "photon/gtsam/Localizer.h"
+#include "photon/gtsam/impl/Localizer.h"
 
 #include <iostream>
 #include <utility>
@@ -27,7 +27,7 @@
 using namespace gtsam;
 using symbol_shorthand::X;
 
-namespace photon::gtsam {
+namespace pvgtsam_impl {
 Localizer::Localizer(FieldLayout fieldLayout)
     : fieldLayout(std::move(fieldLayout)) {
   ISAM2Params parameters;
@@ -72,10 +72,11 @@ void Localizer::Reset(Pose3 wTr, SharedNoiseModel noise, uint64_t timeUs) {
   wTb_latest = wTr;
 }
 
-void Localizer::AddOdometry(OdometryObservation odom) {
-  const Pose3& poseDelta = odom.poseDelta;
-  const SharedNoiseModel& odometryNoise = odom.odometryNoise;
-  uint64_t timeUs = odom.timeUs;
+void Localizer::AddOdometry(
+    const gtsam::Pose3& poseDelta,
+    const gtsam::SharedNoiseModel& odometryNoise, 
+    uint64_t timeUs
+  ) {
 
   Key newStateIdx = X(timeUs);
 
@@ -377,20 +378,19 @@ Key Localizer::GetOrInsertKey(Key newKey, double time) {
   // }
 }
 
-void Localizer::AddTagObservation(CameraVisionObservation obs) {
+void Localizer::AddTagObservation(
+    uint64_t timeUs, int tagID, 
+    const std::vector<gtsam::Point2>& corners,
+    const gtsam::Cal3_S2_& cameraCal,
+    const gtsam::Pose3& robotTcamera,
+    const gtsam::SharedNoiseModel& cameraNoise
+  ) {
   const auto& isamTimestamps = smootherISAM2.timestamps();
-  if (obs.timeUs < isamTimestamps.begin()->second) {
+  if (timeUs < isamTimestamps.begin()->second) {
     std::cerr << "Timestamp is before even isam history - skipping"
               << std::endl;
     return;
   }
-
-  int tagID = obs.tagID;
-  const Cal3_S2_& cameraCal = obs.cameraCal;
-  const Pose3& robotTcamera = obs.robotTcamera;
-  const std::vector<Point2>& corners = obs.corners;
-  const SharedNoiseModel cameraNoise = obs.cameraNoise;
-  const uint64_t timeUs = obs.timeUs;
 
   auto worldPcorners_opt = fieldLayout.WorldToCorners(tagID);
   if (!worldPcorners_opt) {
@@ -472,4 +472,4 @@ const std::vector<wpi::math::Pose3d> Localizer::GetPoseHistory() const {
 
   return ret;
 }
-}  // namespace photon::gtsam
+}  // namespace pvgtsam_impl
