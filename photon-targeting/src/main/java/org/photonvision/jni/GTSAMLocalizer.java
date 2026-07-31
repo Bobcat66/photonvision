@@ -17,11 +17,40 @@
 
 package org.photonvision.jni;
 
+import org.wpilib.vision.apriltag.AprilTagFieldLayout;
+import org.photonvision.estimation.TargetModel;
+import org.wpilib.math.linalg.Vector;
+import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.math.numbers.N6;
+
 public class GTSAMLocalizer {
 
-    public GTSAMLocalizer()
+    private final long handle;
 
-    private final JNIHandle handle;
+    public GTSAMLocalizer(AprilTagFieldLayout field, TargetModel model) {
+        auto tags = layout.getTags();
+        int[] tagIDs = new int[tags.size()];
+        double[] tagPoses = new double[tags.size() * 6];
+        for (int i = 0; i < tags.size(); i++) {
+            tagIDs[i] = tags[i].ID;
+            tagPoses[i * 6] = tags[i].getX();
+            tagPoses[i * 6 + 1] = tags[i].getY();
+            tagPoses[i * 6 + 2] = tags[i].getZ();
+            tagPoses[i * 6 + 3] = tags[i].getRotation().getX();
+            tagPoses[i * 6 + 4] = tags[i].getRotation().getY();
+            tagPoses[i * 6 + 5] = tags[i].getRotation().getZ();
+        }
+        double[] tagVertices = new double[3 * model.vertices.size()];
+        for (int i = 0; i < model.vertices.size(); i++) {
+            tagCorners[i * 3] = model.vertices[i].getX();
+            tagCorners[i * 3 + 1] = model.vertices[i].getY();
+            tagCorners[i * 3 + 2] = model.vertices[i].getZ();
+        }
+        long rawHandle = JNI_Localizer_create(
+            tagIDs, tagPoses, layout.getFieldWidth(), layout.getFieldLength(), 
+        )
+        handle = new JNIHandle(JNI_Localizer_
+    }
 
     // Localizer JNI methods
     private static native long JNI_Localizer_create(
@@ -29,8 +58,7 @@ public class GTSAMLocalizer {
         double[] tagPoses,
         double fieldWidth,
         double fieldLength,
-        double tagWidth,
-        double tagHeight
+        double[] tagCorners
     );
     private static native void JNI_Localizer_destroy(long localizer_handle);
     private static native void JNI_Localizer_Reset(
