@@ -22,10 +22,14 @@ import org.photonvision.estimation.TargetModel;
 import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N6;
+import java.lang.ref.Cleaner;
+import java.lang.ref.Cleaner.Cleanable;
 
 public class GTSAMLocalizer {
 
     private final long handle;
+    private final Cleaner cleaner = Cleaner.create();
+    private final Cleanable cleanable;
 
     public GTSAMLocalizer(AprilTagFieldLayout field, TargetModel model) {
         auto tags = layout.getTags();
@@ -46,10 +50,11 @@ public class GTSAMLocalizer {
             tagCorners[i * 3 + 1] = model.vertices[i].getY();
             tagCorners[i * 3 + 2] = model.vertices[i].getZ();
         }
-        long rawHandle = JNI_Localizer_create(
+        long ptr = JNI_Localizer_create(
             tagIDs, tagPoses, layout.getFieldWidth(), layout.getFieldLength(), 
         )
-        handle = new JNIHandle(JNI_Localizer_
+        cleaner.register(this, () -> JNI_Localizer_destroy(ptr));
+        handle = ptr;
     }
 
     // Localizer JNI methods
