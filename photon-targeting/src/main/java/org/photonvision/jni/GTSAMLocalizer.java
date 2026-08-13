@@ -57,6 +57,10 @@ public class GTSAMLocalizer {
         handle = ptr;
     }
 
+    public void reset(Pose3d wTr, Vector<N6> sigmas, long timeUs) {
+        JNI_Localizer_Reset(handle, new double[6]{wTr.getX(), wTr.getY(), wTr.getZ(), wTr.getRotation().getX(), wTr.getRotation().getY(), wTr.getRotation().getZ()}, sigmas.getData(), timeUs);
+    }
+
     // Localizer JNI methods
     private static native long JNI_Localizer_create(
         int[] tagIDs,
