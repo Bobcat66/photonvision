@@ -19,9 +19,9 @@
 
 #include <stdexcept>
 
-#include "photon/gtsam/impl/gtsam_utils.h"
+#include "photon/gtsam/gtsam_utils.h"
 
-namespace pvgtsam_impl {
+namespace photon::pvgtsam {
 
 FieldLayout::FieldLayout(const wpi::apriltag::AprilTagFieldLayout& layout,
                          const photon::TargetModel& tagModel) {
@@ -76,4 +76,4 @@ std::optional<std::array<gtsam::Point3, 4>> FieldLayout::WorldToCorners(
   return worldToCorners;
 }
 
-}  // namespace pvgtsam_impl
+}  // namespace photon::pvgtsam

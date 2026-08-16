@@ -17,11 +17,10 @@
 
 package org.photonvision.jni;
 
-import org.photonvision.common.dataflow.structures.Packet;
-import org.wpilib.math.geometry.*;
 import java.lang.ref.Cleaner;
 import java.lang.ref.Cleaner.Cleanable;
 import java.util.function.Function;
+import org.wpilib.math.geometry.*;
 
 public class JNIHandle implements AutoCloseable {
     private static final Cleaner cleaner = Cleaner.create();

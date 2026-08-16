@@ -33,7 +33,7 @@
 #include "photon/gtsam/FieldLayout.h"
 #include "photon/gtsam/gtsam_utils.h"
 
-namespace gtsam_impl {
+namespace photon::pvgtsam {
 
 class Localizer {
   using Key = gtsam::Key;
@@ -71,7 +71,7 @@ class Localizer {
   );
 
   inline void AddTagObservation(CameraVisionObservation tagDetection) {
-    addTagObservation(
+    AddTagObservation(
       tagDetection.timeUs, tagDetection.tagID, 
       tagDetection.corners,
       tagDetection.cameraCal, 
@@ -142,4 +142,4 @@ class Localizer {
   FieldLayout fieldLayout;
 };
 
-}  // namespace gtsam_impl
+}  // namespace photon::pvgtsam
