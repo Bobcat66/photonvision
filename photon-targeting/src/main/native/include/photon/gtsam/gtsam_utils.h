@@ -26,8 +26,9 @@
 #include <wpi/math/geometry/Pose3d.hpp>
 #include <wpi/math/geometry/Transform3d.hpp>
 
-// TODO: Remove CameraVisionObservation and OdometryObservation, and just use the AddOdometry and AddTagObservation methods directly.
-namespace photon::pvgtsam { 
+// TODO: Remove CameraVisionObservation and OdometryObservation, and just use
+// the AddOdometry and AddTagObservation methods directly.
+namespace photon::pvgtsam {
 struct CameraVisionObservation {
   // Tag observation timestamp
   uint64_t timeUs;

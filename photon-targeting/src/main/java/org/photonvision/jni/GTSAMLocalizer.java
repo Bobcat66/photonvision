@@ -28,7 +28,6 @@ import org.wpilib.math.numbers.N6;
 import org.wpilib.vision.apriltag.AprilTagFieldLayout;
 
 public class GTSAMLocalizer {
-
     private final long handle;
     private final Cleaner cleaner = Cleaner.create();
     private final Cleanable cleanable;

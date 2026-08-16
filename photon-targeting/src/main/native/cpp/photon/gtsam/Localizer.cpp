@@ -72,12 +72,9 @@ void Localizer::Reset(Pose3 wTr, SharedNoiseModel noise, uint64_t timeUs) {
   wTb_latest = wTr;
 }
 
-void Localizer::AddOdometry(
-    const gtsam::Pose3& poseDelta,
-    const gtsam::SharedNoiseModel& odometryNoise, 
-    uint64_t timeUs
-  ) {
-
+void Localizer::AddOdometry(const gtsam::Pose3& poseDelta,
+                            const gtsam::SharedNoiseModel& odometryNoise,
+                            uint64_t timeUs) {
   Key newStateIdx = X(timeUs);
 
   // Add an odometry pose delta from our last state to our new one
@@ -378,13 +375,11 @@ Key Localizer::GetOrInsertKey(Key newKey, double time) {
   // }
 }
 
-void Localizer::AddTagObservation(
-    uint64_t timeUs, int tagID, 
-    const std::vector<gtsam::Point2>& corners,
-    const gtsam::Cal3_S2_& cameraCal,
-    const gtsam::Pose3& robotTcamera,
-    const gtsam::SharedNoiseModel& cameraNoise
-  ) {
+void Localizer::AddTagObservation(uint64_t timeUs, int tagID,
+                                  const std::vector<gtsam::Point2>& corners,
+                                  const gtsam::Cal3_S2_& cameraCal,
+                                  const gtsam::Pose3& robotTcamera,
+                                  const gtsam::SharedNoiseModel& cameraNoise) {
   const auto& isamTimestamps = smootherISAM2.timestamps();
   if (timeUs < isamTimestamps.begin()->second) {
     std::cerr << "Timestamp is before even isam history - skipping"

@@ -76,16 +76,16 @@ TEST(LocalizerTest, LatencyCompensate) {
   pose.print("Pose: ");
 
   photon::pvgtsam::CameraVisionObservation obs{240000,
-                                            8,
-                                            {
-                                                {414, 166},
-                                                {457, 165},
-                                                {457, 122},
-                                                {412, 122},
-                                            },
-                                            cal,
-                                            Pose3(),
-                                            measurementNoise};
+                                               8,
+                                               {
+                                                   {414, 166},
+                                                   {457, 165},
+                                                   {457, 122},
+                                                   {412, 122},
+                                               },
+                                               cal,
+                                               Pose3(),
+                                               measurementNoise};
 
   // add vision to within isam's history
   localizer.AddTagObservation(obs);

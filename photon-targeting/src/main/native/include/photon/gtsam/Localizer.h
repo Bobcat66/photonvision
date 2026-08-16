@@ -41,9 +41,9 @@ class Localizer {
   using LandmarkMap = std::map<Key, SmartFactor::shared_ptr>;
 
  public:
-  explicit Localizer(
-    const wpi::apriltag::AprilTagFieldLayout& layout,
-    const TargetModel& tagModel) : Localizer(FieldLayout(layout, tagModel)) {}
+  explicit Localizer(const wpi::apriltag::AprilTagFieldLayout& layout,
+                     const TargetModel& tagModel)
+      : Localizer(FieldLayout(layout, tagModel)) {}
 
   explicit Localizer(FieldLayout fieldLayout);
 
@@ -51,33 +51,25 @@ class Localizer {
    * Add a prior factor on the world->robot pose
    */
   void Reset(gtsam::Pose3 wTr, gtsam::SharedNoiseModel noise, uint64_t timeUs);
-  
-  void AddOdometry(
-    const gtsam::Pose3& poseDelta,
-    const gtsam::SharedNoiseModel& odometryNoise, 
-    uint64_t timeUs
-  );
+
+  void AddOdometry(const gtsam::Pose3& poseDelta,
+                   const gtsam::SharedNoiseModel& odometryNoise,
+                   uint64_t timeUs);
 
   inline void AddOdometry(OdometryObservation odom) {
     AddOdometry(odom.poseDelta, odom.odometryNoise, odom.timeUs);
   }
 
-  void AddTagObservation(
-    uint64_t timeUs, int tagID, 
-    const std::vector<gtsam::Point2>& corners,
-    const gtsam::Cal3_S2_& cameraCal,
-    const gtsam::Pose3& robotTcamera,
-    const gtsam::SharedNoiseModel& cameraNoise
-  );
+  void AddTagObservation(uint64_t timeUs, int tagID,
+                         const std::vector<gtsam::Point2>& corners,
+                         const gtsam::Cal3_S2_& cameraCal,
+                         const gtsam::Pose3& robotTcamera,
+                         const gtsam::SharedNoiseModel& cameraNoise);
 
   inline void AddTagObservation(CameraVisionObservation tagDetection) {
-    AddTagObservation(
-      tagDetection.timeUs, tagDetection.tagID, 
-      tagDetection.corners,
-      tagDetection.cameraCal, 
-      tagDetection.robotTcamera, 
-      tagDetection.cameraNoise
-    );
+    AddTagObservation(tagDetection.timeUs, tagDetection.tagID,
+                      tagDetection.corners, tagDetection.cameraCal,
+                      tagDetection.robotTcamera, tagDetection.cameraNoise);
   }
 
   void Optimize();
