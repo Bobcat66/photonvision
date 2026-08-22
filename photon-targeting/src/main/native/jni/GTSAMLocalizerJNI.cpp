@@ -22,19 +22,12 @@
 #include <wpi/apriltag/AprilTag.hpp>
 #include <wpi/apriltag/AprilTagFieldLayout.hpp>
 #include <wpi/units/length.hpp>
+#include <wpi/math/geometry/Pose3d.hpp>
+#include <wpi/math/geometry/Transform3d.hpp>
 
 #include "photon/gtsam/FieldLayout.h"
 #include "photon/gtsam/Localizer.h"
-
-namespace {
-  inline wpi::math::Pose3d jdoublePtrToPose3d(jdouble* ptr) 
-  {
-    return wpi::math::Pose3d{
-        wpi::math::Translation3d(wpi::units::meter_t(ptr[0]), wpi::units::meter_t(ptr[1]),
-                                 wpi::units::meter_t(ptr[2])),
-        wpi::math::Rotation3d(wpi::units::radian_t(ptr[3]), wpi::units::radian_t(ptr[4]), wpi::units::radian_t(ptr[5]))};
-  }
-}
+#include "gtsam_jni_utils.h"
 
 extern "C" {
 
@@ -87,14 +80,14 @@ Java_org_photonvision_jni_GTSAMLocalizer_create
 
   photon::pvgtsam::FieldLayout fieldLayout =
       photon::pvgtsam::FieldLayout(field, tagModel);
-  photon::pvgtsam::Localizer* localizer =
+  photon::pvgtsam::Localizer* localizer_handle =
       new photon::pvgtsam::Localizer(fieldLayout);
 
   env->ReleaseIntArrayElements(tagIDs, tagIDsPtr, 0);
   env->ReleaseDoubleArrayElements(tagPoses, tagPosesPtr, 0);
   env->ReleaseDoubleArrayElements(tagCorners, tagCornersPtr, 0);
 
-  return reinterpret_cast<jlong>(localizer);
+  return reinterpret_cast<jlong>(localizer_handle);
 }
 
 /*
@@ -104,8 +97,25 @@ Java_org_photonvision_jni_GTSAMLocalizer_create
  */
 JNIEXPORT void JNICALL
 Java_org_photonvision_jni_GTSAMLocalizer_destroy
-  (JNIEnv*, jclass, jlong localizer)
+  (JNIEnv*, jclass, jlong localizer_handle)
 {
-  delete reinterpret_cast<photon::pvgtsam::Localizer*>(localizer);
+  delete reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle);
+}
+
+/*
+ * Class:     org_photonvision_jni_GTSAMLocalizer
+ * Method:    Reset
+ * Signature: (J[DJJ)V
+ */
+JNIEXPORT void JNICALL
+Java_org_photonvision_jni_GTSAMLocalizer_Reset
+  (JNIEnv* env, jclass, jlong localizer_handle, jdoubleArray wTrArray, jlong noise_handle, jlong timeUs)
+{
+  jint* wTrPtr = env->GetDoubleArrayElements(wTrArray, nullptr);
+  reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)
+      ->Reset(jdoublePtrToGtsamPose3(wTrPtr),
+              *reinterpret_cast<gtsam::SharedNoiseModel*>(noise_handle),
+              static_cast<uint64_t>(timeUs));
+  env->ReleaseDoubleArrayElements(wTrArray, wTrPtr, 0);
 }
 }  // extern "C"

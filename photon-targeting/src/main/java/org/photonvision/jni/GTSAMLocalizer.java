@@ -27,6 +27,16 @@ import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N6;
 import org.wpilib.vision.apriltag.AprilTagFieldLayout;
 
+/*
+ * serialization format:
+ * Pose3d: [x (m), y (m), z (m), roll (rad), pitch (rad), yaw (rad)]
+ */
+
+/**
+ * A wrapper around the GTSAM localizer implemented in C++.
+ *
+ * <p>This class is not thread-safe. It should only be used from a single thread at a time.
+ */
 public class GTSAMLocalizer {
     private final long handle;
     private final Cleaner cleaner = Cleaner.create();
@@ -137,7 +147,7 @@ public class GTSAMLocalizer {
     private static native void JNI_Localizer_destroy(long localizer_handle);
 
     private static native void JNI_Localizer_Reset(
-            long localizer_handle, double[] wTr, double[] sigmas, long timeUs);
+            long localizer_handle, double[] wTr, long odometryNoise_handle, long timeUs);
 
     private static native void JNI_Localizer_AddOdometry(
             long localizer_handle, double[] poseDelta, long odometryNoise_handle, long timeUs);
