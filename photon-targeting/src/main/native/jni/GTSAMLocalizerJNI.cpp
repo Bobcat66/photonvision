@@ -34,15 +34,6 @@ namespace {
                                  wpi::units::meter_t(ptr[2])),
         wpi::math::Rotation3d(wpi::units::radian_t(ptr[3]), wpi::units::radian_t(ptr[4]), wpi::units::radian_t(ptr[5]))};
   }
-  inline void pose3dToJdoublePtr(const wpi::math::Pose3d& pose, jdouble* ptr) 
-  {
-    ptr[0] = pose.translation().x().to<double>();
-    ptr[1] = pose.translation().y().to<double>();
-    ptr[2] = pose.translation().z().to<double>();
-    ptr[3] = pose.rotation().roll().to<double>();
-    ptr[4] = pose.rotation().pitch().to<double>();
-    ptr[5] = pose.rotation().yaw().to<double>();
-  }
 }
 
 extern "C" {
@@ -113,7 +104,7 @@ Java_org_photonvision_jni_GTSAMLocalizer_create
  */
 JNIEXPORT void JNICALL
 Java_org_photonvision_jni_GTSAMLocalizer_destroy
-  (JNIEnv*, jclass, jlong)
+  (JNIEnv*, jclass, jlong localizer)
 {
   delete reinterpret_cast<photon::pvgtsam::Localizer*>(localizer);
 }
