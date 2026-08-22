@@ -26,6 +26,25 @@
 #include "photon/gtsam/FieldLayout.h"
 #include "photon/gtsam/Localizer.h"
 
+namespace {
+  inline wpi::math::Pose3d jdoublePtrToPose3d(jdouble* ptr) 
+  {
+    return wpi::math::Pose3d{
+        wpi::math::Translation3d(wpi::units::meter_t(ptr[0]), wpi::units::meter_t(ptr[1]),
+                                 wpi::units::meter_t(ptr[2])),
+        wpi::math::Rotation3d(wpi::units::radian_t(ptr[3]), wpi::units::radian_t(ptr[4]), wpi::units::radian_t(ptr[5]))};
+  }
+  inline void pose3dToJdoublePtr(const wpi::math::Pose3d& pose, jdouble* ptr) 
+  {
+    ptr[0] = pose.translation().x().to<double>();
+    ptr[1] = pose.translation().y().to<double>();
+    ptr[2] = pose.translation().z().to<double>();
+    ptr[3] = pose.rotation().roll().to<double>();
+    ptr[4] = pose.rotation().pitch().to<double>();
+    ptr[5] = pose.rotation().yaw().to<double>();
+  }
+}
+
 extern "C" {
 
 /*
@@ -41,12 +60,15 @@ Java_org_photonvision_jni_GTSAMLocalizer_create
   jsize tagIDsLength = env->GetArrayLength(tagIDs);
   jsize tagCornersLength = env->GetArrayLength(tagCorners);
 
+  jint* tagIDsPtr = env->GetIntArrayElements(tagIDs, nullptr);
+  jdouble* tagPosesPtr = env->GetDoubleArrayElements(tagPoses, nullptr);
+  jdouble* tagCornersPtr = env->GetDoubleArrayElements(tagCorners, nullptr);
+
   std::vector<wpi::apriltag::AprilTag> tags;
   // TODO: Verify tag poses length is 6 * tagIDsLength
   for (jsize i = 0; i < tagIDsLength; ++i) {
-    jint tagID = env->GetIntArrayElements(tagIDs, nullptr)[i];
-    jdouble* tagPosePtr =
-        env->GetDoubleArrayElements(tagPoses, nullptr) + i * 6;
+    jint tagID = tagIDsPtr[i];
+    jdouble* tagPosePtr = tagPosesPtr + i * 6;
 
     wpi::math::Pose3d pose{
         wpi::math::Translation3d(wpi::units::meter_t(tagPosePtr[0]),
@@ -56,7 +78,7 @@ Java_org_photonvision_jni_GTSAMLocalizer_create
                               wpi::units::radian_t(tagPosePtr[4]),
                               wpi::units::radian_t(tagPosePtr[5]))};
 
-    tags.emplace_back(tagID, pose);
+    tags.emplace_back(tagID, jdoublePtrToPose3d(tagPosePtr));
   }
 
   wpi::apriltag::AprilTagFieldLayout field(
@@ -64,7 +86,7 @@ Java_org_photonvision_jni_GTSAMLocalizer_create
 
   std::vector<wpi::math::Translation3d> verts;
   for (jsize i = 0; i < tagCornersLength; i += 3) {
-    jdouble* cornerPtr = env->GetDoubleArrayElements(tagCorners, nullptr) + i;
+    jdouble* cornerPtr = tagCornersPtr + i;
     verts.emplace_back(wpi::units::meter_t(cornerPtr[0]),
                        wpi::units::meter_t(cornerPtr[1]),
                        wpi::units::meter_t(cornerPtr[2]));
@@ -76,7 +98,23 @@ Java_org_photonvision_jni_GTSAMLocalizer_create
       photon::pvgtsam::FieldLayout(field, tagModel);
   photon::pvgtsam::Localizer* localizer =
       new photon::pvgtsam::Localizer(fieldLayout);
+
+  env->ReleaseIntArrayElements(tagIDs, tagIDsPtr, 0);
+  env->ReleaseDoubleArrayElements(tagPoses, tagPosesPtr, 0);
+  env->ReleaseDoubleArrayElements(tagCorners, tagCornersPtr, 0);
+
   return reinterpret_cast<jlong>(localizer);
 }
 
+/*
+ * Class: org_photonvision_jni_GTSAMLocalizer
+ * Method: destroy
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL
+Java_org_photonvision_jni_GTSAMLocalizer_destroy
+  (JNIEnv*, jclass, jlong)
+{
+  delete reinterpret_cast<photon::pvgtsam::Localizer*>(localizer);
+}
 }  // extern "C"
