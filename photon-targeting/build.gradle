@@ -93,6 +93,7 @@ model {
             nativeUtils.useRequiredLibrary(it, "ntcore_shared")
             nativeUtils.useRequiredLibrary(it, "cscore_shared")
             nativeUtils.useRequiredLibrary(it, "opencv_shared")
+            nativeUtils.useRequiredLibrary(it, "apriltag_shared")
         }
     }
     testSuites {
