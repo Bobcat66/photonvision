@@ -119,3 +119,15 @@ Java_org_photonvision_jni_GTSAMLocalizer_Reset
   env->ReleaseDoubleArrayElements(wTrArray, wTrPtr, 0);
 }
 }  // extern "C"
+
+/*
+ * Class:     org_photonvision_jni_GTSAMLocalizer
+ * Method:    Optimize
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL
+Java_org_photonvision_jni_GTSAMLocalizer_Optimize
+  (JNIEnv*, jclass, jlong localizer_handle)
+{
+  reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)->Optimize();
+}
