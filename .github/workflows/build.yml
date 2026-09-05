@@ -239,6 +239,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: [validation]
     steps:
+      - name: Build TBB
+        run: ./scripts/build_tbb.sh 2022.1.0-1 /usr/local
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0

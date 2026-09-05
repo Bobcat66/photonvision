@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Usage: install_tbb.sh <version> [prefix]
 
+# We need this because we need a specific version of TBB (2022.1.0-1) for the thirdparty GTSAM to work
+
 # Claude slop
 
 set -euo pipefail
