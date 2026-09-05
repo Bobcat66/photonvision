@@ -68,7 +68,7 @@ public class GTSAMLocalizer {
         handle = ptr;
     }
 
-    public void reset(Pose3d wTr, Vector<N6> sigmas, long timeUs) {
+    public void reset(Pose3d wTr, long noiseHandle, long timeUs) {
         JNI_Localizer_Reset(
                 handle,
                 new double[] {
@@ -79,7 +79,7 @@ public class GTSAMLocalizer {
                     wTr.getRotation().getY(),
                     wTr.getRotation().getZ()
                 },
-                sigmas.getData(),
+                noiseHandle,
                 timeUs);
     }
 
