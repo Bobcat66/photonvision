@@ -131,3 +131,19 @@ Java_org_photonvision_jni_GTSAMLocalizer_Optimize
 {
   reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)->Optimize();
 }
+
+/*
+ * Class:     org_photonvision_jni_GTSAMLocalizer
+ * Method:    GetLatestWorldToBody
+ * Signature: (J)[D
+ */
+JNIEXPORT jdoubleArray JNICALL
+Java_org_photonvision_jni_GTSAMLocalizer_GetLatestWorldToBody
+  (JNIEnv* env, jclass, jlong localizer_handle)
+{
+  gtsam::Pose3 latestWorldToBody =
+      reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)->GetLatestWorldToBody();
+  // Todo: serialize and return through JNI
+  jdoubleArray result = env->NewDoubleArray(6);
+  return result; // Placeholder I hate JNI
+}

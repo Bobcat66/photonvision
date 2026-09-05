@@ -38,3 +38,18 @@ inline gtsam::Pose3 jdoublePtrToGtsamPose3(jdouble* ptr)
 {
     return gtsam::Pose3{gtsam::Rot3::Ypr(ptr[5], ptr[4], ptr[3]), gtsam::Point3(ptr[0], ptr[1], ptr[2])};
 }
+inline jdouble* gtsamPose3ToJdoublePtr(const gtsam::Pose3& pose) 
+{
+    jdouble* ptr = new jdouble[6];
+    gtsam::Point3 t = pose.translation();
+    gtsam::Rot3 r = pose.rotation();
+    ptr[0] = t.x();
+    ptr[1] = t.y();
+    ptr[2] = t.z();
+    double roll, pitch, yaw;
+    r.ypr(yaw, pitch, roll);
+    ptr[3] = roll;
+    ptr[4] = pitch;
+    ptr[5] = yaw;
+    return ptr;
+}
