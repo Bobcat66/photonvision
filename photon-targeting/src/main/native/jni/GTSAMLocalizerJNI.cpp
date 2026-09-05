@@ -21,13 +21,13 @@
 #include <org_photonvision_jni_GTSAMLocalizer.h>
 #include <wpi/apriltag/AprilTag.hpp>
 #include <wpi/apriltag/AprilTagFieldLayout.hpp>
-#include <wpi/units/length.hpp>
 #include <wpi/math/geometry/Pose3d.hpp>
 #include <wpi/math/geometry/Transform3d.hpp>
+#include <wpi/units/length.hpp>
 
+#include "gtsam_jni_utils.h"
 #include "photon/gtsam/FieldLayout.h"
 #include "photon/gtsam/Localizer.h"
-#include "gtsam_jni_utils.h"
 
 extern "C" {
 
@@ -91,8 +91,8 @@ Java_org_photonvision_jni_GTSAMLocalizer_create
 }
 
 /*
- * Class: org_photonvision_jni_GTSAMLocalizer
- * Method: destroy
+ * Class:     org_photonvision_jni_GTSAMLocalizer
+ * Method:    destroy
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
@@ -109,7 +109,8 @@ Java_org_photonvision_jni_GTSAMLocalizer_destroy
  */
 JNIEXPORT void JNICALL
 Java_org_photonvision_jni_GTSAMLocalizer_Reset
-  (JNIEnv* env, jclass, jlong localizer_handle, jdoubleArray wTrArray, jlong noise_handle, jlong timeUs)
+  (JNIEnv* env, jclass, jlong localizer_handle, jdoubleArray wTrArray,
+   jlong noise_handle, jlong timeUs)
 {
   jint* wTrPtr = env->GetDoubleArrayElements(wTrArray, nullptr);
   reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)
@@ -142,8 +143,9 @@ Java_org_photonvision_jni_GTSAMLocalizer_GetLatestWorldToBody
   (JNIEnv* env, jclass, jlong localizer_handle)
 {
   gtsam::Pose3 latestWorldToBody =
-      reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)->GetLatestWorldToBody();
+      reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)
+          ->GetLatestWorldToBody();
   // Todo: serialize and return through JNI
   jdoubleArray result = env->NewDoubleArray(6);
-  return result; // Placeholder I hate JNI
+  return result;  // Placeholder I hate JNI
 }

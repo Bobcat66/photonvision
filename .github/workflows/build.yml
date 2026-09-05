@@ -239,8 +239,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: [validation]
     steps:
-      - name: Build TBB
-        run: ./scripts/build_tbb.sh 2022.1.0-1 /usr/local
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
@@ -249,6 +247,8 @@ jobs:
           java-version: 25
           distribution: temurin
       - run: git fetch --tags --force
+      - name: Build TBB
+        run: ./scripts/build_tbb.sh 2022.1.0-1 /usr/local
       - run: ./gradlew photon-targeting:build photon-lib:build
         name: Build with Gradle
       - run: ./gradlew photon-lib:publish photon-targeting:publish
