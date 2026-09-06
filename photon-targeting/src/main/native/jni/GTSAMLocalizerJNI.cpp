@@ -112,7 +112,7 @@ Java_org_photonvision_jni_GTSAMLocalizer_Reset
   (JNIEnv* env, jclass, jlong localizer_handle, jdoubleArray wTrArray,
    jlong noise_handle, jlong timeUs)
 {
-  jint* wTrPtr = env->GetDoubleArrayElements(wTrArray, nullptr);
+  jdouble* wTrPtr = env->GetDoubleArrayElements(wTrArray, nullptr);
   reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)
       ->Reset(jdoublePtrToGtsamPose3(wTrPtr),
               *reinterpret_cast<gtsam::SharedNoiseModel*>(noise_handle),

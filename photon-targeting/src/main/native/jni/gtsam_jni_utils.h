@@ -52,10 +52,9 @@ inline jdouble* gtsamPose3ToJdoublePtr(const gtsam::Pose3& pose) {
   ptr[0] = t.x();
   ptr[1] = t.y();
   ptr[2] = t.z();
-  double roll, pitch, yaw;
-  r.ypr(yaw, pitch, roll);
-  ptr[3] = roll;
-  ptr[4] = pitch;
-  ptr[5] = yaw;
+  auto vec_r = r.rpy();
+  ptr[3] = vec_r(0);
+  ptr[4] = vec_r(1);
+  ptr[5] = vec_r(2);
   return ptr;
 }
