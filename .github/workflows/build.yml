@@ -248,7 +248,7 @@ jobs:
           distribution: temurin
       - run: git fetch --tags --force
       - name: Build TBB
-        run chmod +x ./scripts/build_tbb.sh
+        run: chmod +x ./scripts/build_tbb.sh
         run: ./scripts/build_tbb.sh 2022.1.0-1 /usr/local
       - run: ./gradlew photon-targeting:build photon-lib:build
         name: Build with Gradle
