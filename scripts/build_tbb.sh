@@ -16,5 +16,5 @@ curl -fsSL "$URL" | tar xz -C "$PREFIX" --strip-components=1
 
 LIBDIR=/opt/tbb/lib/intel64/gcc4.8    # the actual arch/compiler subfolder, not lib/ itself
 
-echo "$LIBDIR" | tee /etc/ld.so.conf.d/tbb.conf
+echo "$LIBDIR" | sudo tee /etc/ld.so.conf.d/tbb.conf
 sudo ldconfig
