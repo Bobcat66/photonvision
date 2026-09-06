@@ -6,14 +6,14 @@
 # Claude slop
 
 set -euo pipefail
- 
+
 VERSION="${1#v}"
 PREFIX="${2:-/opt/tbb}"
 URL="https://github.com/uxlfoundation/oneTBB/releases/download/v${VERSION}/oneapi-tbb-${VERSION}-lin.tgz"
- 
+
 mkdir -p "$PREFIX"
 curl -fsSL "$URL" | tar xz -C "$PREFIX" --strip-components=1
- 
+
 LIBDIR=/opt/tbb/lib/intel64/gcc4.8    # the actual arch/compiler subfolder, not lib/ itself
 
 echo "$LIBDIR" | tee /etc/ld.so.conf.d/tbb.conf
