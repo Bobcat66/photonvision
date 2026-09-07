@@ -241,6 +241,9 @@ jobs:
            tbb_command: |
             chmod +x ./scripts/build_tbb.sh
             sudo ./scripts/build_tbb.sh 2022.1.0 /usr/local
+            echo "LIBRARY_PATH=/opt/tbb/lib/intel64/gcc4.8" >> "$GITHUB_ENV"
+            echo "LD_LIBRARY_PATH=/opt/tbb/lib/intel64/gcc4.8" >> "$GITHUB_ENV"
+            echo "CPLUS_INCLUDE_PATH=/opt/tbb/include" >> "$GITHUB_ENV"
 
     name: "Photonlib - Build Host - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
