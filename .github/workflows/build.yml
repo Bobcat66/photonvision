@@ -235,7 +235,7 @@ jobs:
            artifact-name: macOS
            tbb_command: |
             chmod +x ./scripts/build_tbb.zsh
-            ./scripts/build_tbb.zsh 2022.1.0 /usr/local
+            sudo ./scripts/build_tbb.zsh 2022.1.0 /usr/local
          - os: ubuntu-24.04
            artifact-name: Linux
            tbb_command: |
