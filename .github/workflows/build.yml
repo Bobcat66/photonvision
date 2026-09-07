@@ -150,6 +150,13 @@ jobs:
           cache: pnpm
           cache-dependency-path: photon-client/pnpm-lock.yaml
           node-version: 24
+      - run: |
+          chmod +x ./scripts/build_tbb.sh
+          sudo ./scripts/build_tbb.sh 2022.1.0 /usr/local
+          echo "LIBRARY_PATH=/opt/tbb/lib/intel64/gcc4.8" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=/opt/tbb/lib/intel64/gcc4.8" >> "$GITHUB_ENV"
+          echo "CPLUS_INCLUDE_PATH=/opt/tbb/include" >> "$GITHUB_ENV"
+        name: Install TBB
       - name: Generate Java/cpp Serde Tests
         working-directory: photon-serde
         run: |
@@ -258,7 +265,7 @@ jobs:
           distribution: temurin
       - run: git fetch --tags --force
       - run: ${{ matrix.tbb_command }}
-        name: Build TBB
+        name: Install TBB
       - run: ./gradlew photon-targeting:build photon-lib:build
         name: Build with Gradle
       - run: ./gradlew photon-lib:publish photon-targeting:publish
