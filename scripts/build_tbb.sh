@@ -13,8 +13,10 @@ URL="https://github.com/uxlfoundation/oneTBB/releases/download/v${VERSION}/oneap
 
 mkdir -p "$PREFIX"
 curl -fsSL "$URL" | tar xz -C "$PREFIX" --strip-components=1
+( cd "$PREFIX/lib" && ln -sf intel64/gcc4.8/*.so* . )
 
 LIBDIR=/opt/tbb/lib/intel64/gcc4.8    # the actual arch/compiler subfolder, not lib/ itself
 
 echo "$LIBDIR" | sudo tee /etc/ld.so.conf.d/tbb.conf
 sudo ldconfig
+
