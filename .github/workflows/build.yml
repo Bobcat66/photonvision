@@ -230,13 +230,14 @@ jobs:
         include:
          - os: windows-2022
            artifact-name: Win64
-           tbb_command: ./scripts/build_tbb.sh 2022.1.0 C:/tbb
+           tbb_command: ./scripts/build_tbb.bat 2022.1.0 C:/tbb
          - os: macos-26
            artifact-name: macOS
            tbb_command: ./scripts/build_tbb.zsh 2022.1.0 /usr/local
          - os: ubuntu-24.04
            artifact-name: Linux
-           tbb_command: chmod +x ./scripts/build_tbb.sh && \
+           tbb_command: |
+            chmod +x ./scripts/build_tbb.sh
             ./scripts/build_tbb.sh 2022.1.0 /usr/local
 
     name: "Photonlib - Build Host - ${{ matrix.artifact-name }}"

@@ -23,6 +23,7 @@ ext {
             binary.cppCompiler.args.add("-Wno-deprecated-copy")
             binary.cppCompiler.args.add("-Wno-redundant-move")
             binary.cppCompiler.args.add("-Wno-undef")
+            // Chopped
             binary.linker.args.add("-ltbb")
             binary.linker.args.add("-ltbbmalloc")
         }
