@@ -230,10 +230,14 @@ jobs:
         include:
          - os: windows-2022
            artifact-name: Win64
+           tbb_command: ./scripts/build_tbb.sh 2022.1.0 C:/tbb
          - os: macos-26
            artifact-name: macOS
+           tbb_command: ./scripts/build_tbb.zsh 2022.1.0 /usr/local
          - os: ubuntu-24.04
            artifact-name: Linux
+           tbb_command: chmod +x ./scripts/build_tbb.sh && \
+            ./scripts/build_tbb.sh 2022.1.0 /usr/local
 
     name: "Photonlib - Build Host - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
@@ -247,8 +251,8 @@ jobs:
           java-version: 25
           distribution: temurin
       - run: git fetch --tags --force
-      - run: chmod +x ./scripts/build_tbb.sh
-      - run: sudo ./scripts/build_tbb.sh 2022.1.0 /usr/local
+      - run: ${{ matrix.tbb_command }}
+        name: Build TBB
       - run: ./gradlew photon-targeting:build photon-lib:build
         name: Build with Gradle
       - run: ./gradlew photon-lib:publish photon-targeting:publish
