@@ -24,6 +24,9 @@ ext {
             binary.cppCompiler.args.add("-Wno-redundant-move")
             binary.cppCompiler.args.add("-Wno-undef")
             // Chopped
+            binary.linker.args.add("-Wl,--start-group")
+            binary.linker.args.add("-lgtsam")
+            binary.linker.args.add("-Wl,--end-group")
             binary.linker.args.add("-ltbb")
             binary.linker.args.add("-ltbbmalloc")
         }
