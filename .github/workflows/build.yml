@@ -171,8 +171,8 @@ jobs:
       #- name: Linker Debugging (REMOVE)
       #  run: ./gradlew photon-targeting:linkPhotontargetingTestLinuxx86-64DebugGoogleTestExe --info
       - name: Gradle Build
-        run: ./gradlew photon-targeting:build photon-core:build photon-server:build -x check --info
-      - name: Dump linker inputs on failure
+        run: ./gradlew photon-targeting:build photon-core:build photon-server:build -x check
+      - name: Dump linker inputs on failure (REMOVE)
         if: failure()
         run: |
           find . -path "*/build/tmp/link*" -name "options.txt" -print -exec grep -Hi "gtsam\|metis\|tbb" {} \;

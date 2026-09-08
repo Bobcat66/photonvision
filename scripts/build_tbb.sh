@@ -19,4 +19,3 @@ LIBDIR=/opt/tbb/lib/intel64/gcc4.8    # the actual arch/compiler subfolder, not 
 
 echo "$LIBDIR" | sudo tee /etc/ld.so.conf.d/tbb.conf
 sudo ldconfig
-
