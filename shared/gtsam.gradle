@@ -26,10 +26,7 @@ ext {
             // Chopped
             binary.linker.args.add("-ltbb")
             binary.linker.args.add("-ltbbmalloc")
-            binary.linker.withArguments({ List<String> args ->
-                args.add(0, "-Wl,--start-group")
-                args.add("-Wl,--end-group")
-            } as Action)
+            
         }
     }
 }
