@@ -58,7 +58,7 @@ model {
                 }
             }
 
-
+            nativeUtils.useRequiredLibrary(it, 'gtsam')
             // deliberate duplicate: forces a second linker pass over gtsam/metis/etc so ld
             // resolves symbols the packaged archive order leaves dangling on pass 1
             // Hack lol
