@@ -168,8 +168,8 @@ jobs:
         with:
           name: photon-serde-tests-javacpp
           path: photon-serde-tests/src/
-      - name: Linker Debugging (REMOVE)
-        run: ./gradlew photon-targeting:linkPhotontargetingTestLinuxx86-64DebugGoogleTestExe --info
+      #- name: Linker Debugging (REMOVE)
+      #  run: ./gradlew photon-targeting:linkPhotontargetingTestLinuxx86-64DebugGoogleTestExe --info
       - name: Gradle Build
         run: ./gradlew photon-targeting:build photon-core:build photon-server:build -x check
       - name: Gradle Tests and Coverage
