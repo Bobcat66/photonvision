@@ -151,15 +151,25 @@ jobs:
           cache-dependency-path: photon-client/pnpm-lock.yaml
           node-version: 24
       - run: |
-          chmod +x ./scripts/build_tbb.sh
-          sudo ./scripts/build_tbb.sh 2022.1.0 /usr/local
+          chmod +x ./scripts/install_tbb.sh
+          sudo ./scripts/install_tbb.sh 2022.1.0 /usr/local
           echo "LIBRARY_PATH=/opt/tbb/lib/intel64/gcc4.8" >> "$GITHUB_ENV"
           echo "LD_LIBRARY_PATH=/opt/tbb/lib/intel64/gcc4.8" >> "$GITHUB_ENV"
           echo "CPLUS_INCLUDE_PATH=/opt/tbb/include" >> "$GITHUB_ENV"
         name: Install TBB
-      - name: Locate TBB CMake config
+      - name: CMake find tbb test (DEBUGGING - REMOVE)
         run: |
-          find /usr/local /opt/tbb -iname "TBBConfig.cmake" -o -iname "tbb-config.cmake" -o -iname "*TBB*Config*.cmake" 2>/dev/null
+          mkdir -p /tmp/tbbcheck && cd /tmp/tbbcheck
+          cat > CMakeLists.txt <<'EOF'
+          cmake_minimum_required(VERSION 3.25)
+          project(tbbcheck)
+          find_package(TBB 4.4 COMPONENTS tbb tbbmalloc REQUIRED)
+          message(STATUS "TBB found at: ${TBB_DIR}")
+          message(STATUS "TBB version: ${TBB_VERSION}")
+          get_target_property(TBB_LOC TBB::tbb IMPORTED_LOCATION_RELEASE)
+          message(STATUS "TBB::tbb location: ${TBB_LOC}")
+          EOF
+          cmake -S . -B build
       - name: Generate Java/cpp Serde Tests
         working-directory: photon-serde
         run: |
@@ -246,17 +256,17 @@ jobs:
         include:
          - os: windows-2022
            artifact-name: Win64
-           tbb_command: ./scripts/build_tbb.bat 2022.1.0 C:/tbb
+           tbb_command: ./scripts/install_tbb.bat 2022.1.0 C:/tbb
          - os: macos-26
            artifact-name: macOS
            tbb_command: |
-            chmod +x ./scripts/build_tbb.zsh
-            sudo ./scripts/build_tbb.zsh 2022.1.0 /usr/local
+            chmod +x ./scripts/install_tbb.zsh
+            sudo ./scripts/install_tbb.zsh 2022.1.0 /usr/local
          - os: ubuntu-24.04
            artifact-name: Linux
            tbb_command: |
-            chmod +x ./scripts/build_tbb.sh
-            sudo ./scripts/build_tbb.sh 2022.1.0 /usr/local
+            chmod +x ./scripts/install_tbb.sh
+            sudo ./scripts/install_tbb.sh 2022.1.0 /usr/local
             echo "LIBRARY_PATH=/opt/tbb/lib/intel64/gcc4.8" >> "$GITHUB_ENV"
             echo "LD_LIBRARY_PATH=/opt/tbb/lib/intel64/gcc4.8" >> "$GITHUB_ENV"
             echo "CPLUS_INCLUDE_PATH=/opt/tbb/include" >> "$GITHUB_ENV"
