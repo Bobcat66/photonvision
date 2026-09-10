@@ -26,7 +26,6 @@ ext {
             // Chopped
             binary.linker.args.add("-ltbb")
             binary.linker.args.add("-ltbbmalloc")
-
         }
     }
 }
