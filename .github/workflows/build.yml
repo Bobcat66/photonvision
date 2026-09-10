@@ -259,10 +259,9 @@ jobs:
            tbb_command: ./scripts/install_tbb.bat 2022.1.0 C:/tbb
          - os: macos-26
            artifact-name: macOS
-           tbb_command: 
-           #tbb_command: |
-           # chmod +x ./scripts/install_tbb.zsh
-           # sudo ./scripts/install_tbb.zsh 2022.1.0 /usr/local
+           tbb_command: |
+            chmod +x ./scripts/install_tbb.zsh
+            sudo ./scripts/install_tbb.zsh 2022.1.0 /usr/local
          - os: ubuntu-24.04
            artifact-name: Linux
            tbb_command: |
