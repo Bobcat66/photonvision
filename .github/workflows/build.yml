@@ -157,6 +157,9 @@ jobs:
           echo "LD_LIBRARY_PATH=/opt/tbb/lib/intel64/gcc4.8" >> "$GITHUB_ENV"
           echo "CPLUS_INCLUDE_PATH=/opt/tbb/include" >> "$GITHUB_ENV"
         name: Install TBB
+      - name: Locate TBB CMake config
+        run: |
+          find /usr/local /opt/tbb -iname "TBBConfig.cmake" -o -iname "tbb-config.cmake" -o -iname "*TBB*Config*.cmake" 2>/dev/null
       - name: Generate Java/cpp Serde Tests
         working-directory: photon-serde
         run: |
