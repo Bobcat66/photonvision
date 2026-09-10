@@ -53,9 +53,11 @@ model {
                 }
                 project.gtsamArgs(it)
                 // DEBUGGING
+                /*
                 if (it.toolChain instanceof GccCompatibleToolChain) {
                     it.linker.args.add("-Wl,--no-undefined")
                 }
+                */
             }
 
             nativeUtils.useRequiredLibrary(it, 'gtsam')
@@ -91,9 +93,11 @@ model {
                 lib library: nativeName, linkage: 'shared'
                 project.gtsamArgs(it)
                 // DEBUGGING
+                /*
                 if (it.toolChain instanceof GccCompatibleToolChain) {
                     it.linker.args.add("-Wl,--no-undefined")
                 }
+                */
             }
 
             nativeUtils.useRequiredLibrary(it, 'gtsam')
