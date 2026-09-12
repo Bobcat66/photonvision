@@ -150,26 +150,6 @@ jobs:
           cache: pnpm
           cache-dependency-path: photon-client/pnpm-lock.yaml
           node-version: 24
-      - run: |
-          chmod +x ./scripts/install_tbb.sh
-          sudo ./scripts/install_tbb.sh 2022.1.0 /usr/local
-          echo "LIBRARY_PATH=/opt/tbb/lib/intel64/gcc4.8" >> "$GITHUB_ENV"
-          echo "LD_LIBRARY_PATH=/opt/tbb/lib/intel64/gcc4.8" >> "$GITHUB_ENV"
-          echo "CPLUS_INCLUDE_PATH=/opt/tbb/include" >> "$GITHUB_ENV"
-        name: Install TBB
-      - name: CMake find tbb test (DEBUGGING - REMOVE)
-        run: |
-          mkdir -p /tmp/tbbcheck && cd /tmp/tbbcheck
-          cat > CMakeLists.txt <<'EOF'
-          cmake_minimum_required(VERSION 3.25)
-          project(tbbcheck)
-          find_package(TBB 4.4 COMPONENTS tbb tbbmalloc REQUIRED)
-          message(STATUS "TBB found at: ${TBB_DIR}")
-          message(STATUS "TBB version: ${TBB_VERSION}")
-          get_target_property(TBB_LOC TBB::tbb IMPORTED_LOCATION_RELEASE)
-          message(STATUS "TBB::tbb location: ${TBB_LOC}")
-          EOF
-          cmake -S . -B build
       - name: Generate Java/cpp Serde Tests
         working-directory: photon-serde
         run: |
@@ -185,10 +165,6 @@ jobs:
       #  run: ./gradlew photon-targeting:linkPhotontargetingTestLinuxx86-64DebugGoogleTestExe --info
       - name: Gradle Build
         run: ./gradlew photon-targeting:build photon-core:build photon-server:build -x check
-      - name: Dump linker inputs on failure (REMOVE)
-        if: failure()
-        run: |
-          find . -path "*/build/tmp/link*" -name "options.txt" -print -exec grep -Hi "gtsam\|metis\|tbb" {} \;
       - name: Gradle Tests and Coverage
         run: ./gradlew test jacocoTestReport --stacktrace
   build-offline-docs:
@@ -256,20 +232,10 @@ jobs:
         include:
          - os: windows-2022
            artifact-name: Win64
-           tbb_command: ./scripts/install_tbb.bat 2022.1.0 C:/tbb
          - os: macos-26
            artifact-name: macOS
-           tbb_command: |
-            chmod +x ./scripts/install_tbb.zsh
-            sudo ./scripts/install_tbb.zsh 2022.1.0 /usr/local
          - os: ubuntu-24.04
            artifact-name: Linux
-           tbb_command: |
-            chmod +x ./scripts/install_tbb.sh
-            sudo ./scripts/install_tbb.sh 2022.1.0 /usr/local
-            echo "LIBRARY_PATH=/opt/tbb/lib/intel64/gcc4.8" >> "$GITHUB_ENV"
-            echo "LD_LIBRARY_PATH=/opt/tbb/lib/intel64/gcc4.8" >> "$GITHUB_ENV"
-            echo "CPLUS_INCLUDE_PATH=/opt/tbb/include" >> "$GITHUB_ENV"
 
     name: "Photonlib - Build Host - ${{ matrix.artifact-name }}"
     runs-on: ${{ matrix.os }}
@@ -283,8 +249,6 @@ jobs:
           java-version: 25
           distribution: temurin
       - run: git fetch --tags --force
-      - run: ${{ matrix.tbb_command }}
-        name: Install TBB
       - run: ./gradlew photon-targeting:build photon-lib:build
         name: Build with Gradle
       - run: ./gradlew photon-lib:publish photon-targeting:publish
