@@ -14,3 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+#include <org_photonvision_jni_GTSAMLocalizer.h>
+#include <wpi/apriltag/AprilTag.hpp>
+#include <wpi/apriltag/AprilTagFieldLayout.hpp>
+#include <wpi/math/geometry/Pose3d.hpp>
+#include <wpi/math/geometry/Transform3d.hpp>
+#include <wpi/units/length.hpp>
+
+extern "C" {
+/*
+ * Class:     org_photonvision_jni_GTSAMLocalizer
+ * Method:    create
+ * Signature: ([I[DDD[D)J
+ */
+JNIEXPORT jlong JNICALL
+Java_org_photonvision_jni_GTSAMExtras_CreateGaussianNoiseModel(JNIEnv* env, jclass, jdoublearray covariances, jboolean smart) 
+{
+  // Not implemented yet
+}
+
+/*
+ * Class:     org_photonvision_jni_GTSAMExtras
+ * Method:    DestroyGaussianNoiseModel
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL
+Java_org_photonvision_jni_GTSAMExtras_DestroyGaussianNoiseModel(JNIEnv* env, jclass, jlong handle) 
+{
+  delete reinterpret_cast<gtsam::noiseModel::Gaussian*>(handle);
+}
