@@ -149,3 +149,42 @@ Java_org_photonvision_jni_GTSAMLocalizer_GetLatestWorldToBody
   jdoubleArray result = env->NewDoubleArray(6);
   return result;  // Placeholder I hate JNI
 }
+
+/*
+ * Class:     org_photonvision_jni_GTSAMLocalizer
+ * Method:    GetLatestTimestamp
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL
+Java_org_photonvision_jni_GTSAMLocalizer_GetLatestTimestamp
+  (JNIEnv*, jclass, jlong localizer_handle)
+{
+  return reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)
+      ->GetLatestTimestamp();
+}
+
+/*
+ * Class:     org_photonvision_jni_GTSAMLocalizer
+ * Method:    GetLastOdomTime
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL
+Java_org_photonvision_jni_GTSAMLocalizer_GetLastOdomTime
+  (JNIEnv*, jclass, jlong localizer_handle)
+{
+  return reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)
+      ->GetLastOdomTime();
+}
+
+/*
+ * Class:     org_photonvision_jni_GTSAMLocalizer
+ * Method:    GetLatestPoseNoise
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL
+Java_org_photonvision_jni_GTSAMLocalizer_GetLatestPoseNoise
+  (JNIEnv*, jclass, jlong localizer_handle)
+{
+  return reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)
+      ->GetLatestPoseNoise();
+}
