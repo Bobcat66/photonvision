@@ -39,7 +39,7 @@ import org.wpilib.vision.apriltag.AprilTagFieldLayout;
  */
 public class GTSAMLocalizer {
     private final long handle;
-    private final Cleaner cleaner = Cleaner.create();
+    private static final Cleaner cleaner = Cleaner.create();
     private final Cleanable cleanable;
 
     public GTSAMLocalizer(AprilTagFieldLayout layout, TargetModel model) {
@@ -62,14 +62,13 @@ public class GTSAMLocalizer {
             tagCorners[i * 3 + 2] = model.vertices.get(i).getZ();
         }
         long ptr =
-                JNI_Localizer_create(
-                        tagIDs, tagPoses, layout.getFieldWidth(), layout.getFieldLength(), tagCorners);
-        cleanable = cleaner.register(this, () -> JNI_Localizer_destroy(ptr));
+                createJNI(tagIDs, tagPoses, layout.getFieldWidth(), layout.getFieldLength(), tagCorners);
+        cleanable = cleaner.register(this, () -> destroyJNI(ptr));
         handle = ptr;
     }
 
     public void reset(Pose3d wTr, long noiseHandle, long timeUs) {
-        JNI_Localizer_Reset(
+        ResetJNI(
                 handle,
                 new double[] {
                     wTr.getX(),
@@ -84,7 +83,7 @@ public class GTSAMLocalizer {
     }
 
     public void addOdometry(Pose3d poseDelta, long odometryNoise_handle, long timeUs) {
-        JNI_Localizer_AddOdometry(
+        AddOdometryJNI(
                 handle,
                 new double[] {
                     poseDelta.getX(),
@@ -105,7 +104,7 @@ public class GTSAMLocalizer {
             double[] cameraCal,
             Pose3d robotTcamera,
             long cameraNoise_handle) {
-        JNI_Localizer_AddTagObservation(
+        AddTagObservationJNI(
                 handle,
                 timeUs,
                 tagID,
@@ -123,36 +122,36 @@ public class GTSAMLocalizer {
     }
 
     public void optimize() {
-        JNI_Localizer_Optimize(handle);
+        OptimizeJNI(handle);
     }
 
     public Pose3d getLatestWorldToBody() {
-        double[] pose = JNI_Localizer_GetLatestWorldToBody(handle);
+        double[] pose = GetLatestWorldToBodyJNI(handle);
         return new Pose3d(pose[0], pose[1], pose[2], new Rotation3d(pose[3], pose[4], pose[5]));
     }
 
     public long getLastOdomTime() {
-        return JNI_Localizer_GetLastOdomTime(handle);
+        return GetLastOdomTimeJNI(handle);
     }
 
-    public Vector<N6> getLatestPoseNoise() {
-        double[] noise = JNI_Localizer_GetLatestPoseNoise(handle);
+    public Vector<N6> getPoseComponentStdDevs() {
+        double[] noise = GetPoseComponentStdDevsJNI(handle);
         return VecBuilder.fill(noise[0], noise[1], noise[2], noise[3], noise[4], noise[5]);
     }
 
     // Localizer JNI methods
-    private static native long JNI_Localizer_create(
+    private static native long createJNI(
             int[] tagIDs, double[] tagPoses, double fieldWidth, double fieldLength, double[] tagCorners);
 
-    private static native void JNI_Localizer_destroy(long localizer_handle);
+    private static native void destroyJNI(long localizer_handle);
 
-    private static native void JNI_Localizer_Reset(
+    private static native void ResetJNI(
             long localizer_handle, double[] wTr, long odometryNoise_handle, long timeUs);
 
-    private static native void JNI_Localizer_AddOdometry(
+    private static native void AddOdometryJNI(
             long localizer_handle, double[] poseDelta, long odometryNoise_handle, long timeUs);
 
-    private static native void JNI_Localizer_AddTagObservation(
+    private static native void AddTagObservationJNI(
             long localizer_handle,
             long timeUs,
             int tagID,
@@ -161,11 +160,11 @@ public class GTSAMLocalizer {
             double[] robotTcamera,
             long cameraNoise_handle);
 
-    private static native void JNI_Localizer_Optimize(long localizer);
+    private static native void OptimizeJNI(long localizer);
 
-    private static native double[] JNI_Localizer_GetLatestWorldToBody(long localizer_handle);
+    private static native double[] GetLatestWorldToBodyJNI(long localizer_handle);
 
-    private static native long JNI_Localizer_GetLastOdomTime(long localizer_handle);
+    private static native long GetLastOdomTimeJNI(long localizer_handle);
 
-    private static native double[] JNI_Localizer_GetLatestPoseNoise(long localizer_handle);
+    private static native double[] GetPoseComponentStdDevsJNI(long localizer_handle);
 }

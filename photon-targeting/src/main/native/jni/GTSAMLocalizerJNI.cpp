@@ -37,7 +37,7 @@ extern "C" {
  * Signature: ([I[DDD[D)J
  */
 JNIEXPORT jlong JNICALL
-Java_org_photonvision_jni_GTSAMLocalizer_create
+Java_org_photonvision_jni_GTSAMLocalizer_createJNI
   (JNIEnv* env, jclass, jintArray tagIDs, jdoubleArray tagPoses,
    jdouble fieldWidth, jdouble fieldLength, jdoubleArray tagCorners)
 {
@@ -96,7 +96,7 @@ Java_org_photonvision_jni_GTSAMLocalizer_create
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_org_photonvision_jni_GTSAMLocalizer_destroy
+Java_org_photonvision_jni_GTSAMLocalizer_destroyJNI
   (JNIEnv*, jclass, jlong localizer_handle)
 {
   delete reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle);
@@ -108,7 +108,7 @@ Java_org_photonvision_jni_GTSAMLocalizer_destroy
  * Signature: (J[DJJ)V
  */
 JNIEXPORT void JNICALL
-Java_org_photonvision_jni_GTSAMLocalizer_Reset
+Java_org_photonvision_jni_GTSAMLocalizer_ResetJNI
   (JNIEnv* env, jclass, jlong localizer_handle, jdoubleArray wTrArray,
    jlong noise_handle, jlong timeUs)
 {
@@ -127,7 +127,7 @@ Java_org_photonvision_jni_GTSAMLocalizer_Reset
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_org_photonvision_jni_GTSAMLocalizer_Optimize
+Java_org_photonvision_jni_GTSAMLocalizer_OptimizeJNI
   (JNIEnv*, jclass, jlong localizer_handle)
 {
   reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)->Optimize();
@@ -139,7 +139,7 @@ Java_org_photonvision_jni_GTSAMLocalizer_Optimize
  * Signature: (J)[D
  */
 JNIEXPORT jdoubleArray JNICALL
-Java_org_photonvision_jni_GTSAMLocalizer_GetLatestWorldToBody
+Java_org_photonvision_jni_GTSAMLocalizer_GetLatestWorldToBodyJNI
   (JNIEnv* env, jclass, jlong localizer_handle)
 {
   gtsam::Pose3 latestWorldToBody =
@@ -152,24 +152,11 @@ Java_org_photonvision_jni_GTSAMLocalizer_GetLatestWorldToBody
 
 /*
  * Class:     org_photonvision_jni_GTSAMLocalizer
- * Method:    GetLatestTimestamp
- * Signature: (J)J
- */
-JNIEXPORT jlong JNICALL
-Java_org_photonvision_jni_GTSAMLocalizer_GetLatestTimestamp
-  (JNIEnv*, jclass, jlong localizer_handle)
-{
-  return reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)
-      ->GetLatestTimestamp();
-}
-
-/*
- * Class:     org_photonvision_jni_GTSAMLocalizer
  * Method:    GetLastOdomTime
  * Signature: (J)J
  */
 JNIEXPORT jlong JNICALL
-Java_org_photonvision_jni_GTSAMLocalizer_GetLastOdomTime
+Java_org_photonvision_jni_GTSAMLocalizer_GetLastOdomTimeJNI
   (JNIEnv*, jclass, jlong localizer_handle)
 {
   return reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)
@@ -181,10 +168,15 @@ Java_org_photonvision_jni_GTSAMLocalizer_GetLastOdomTime
  * Method:    GetLatestPoseNoise
  * Signature: (J)J
  */
-JNIEXPORT jlong JNICALL
-Java_org_photonvision_jni_GTSAMLocalizer_GetLatestPoseNoise
-  (JNIEnv*, jclass, jlong localizer_handle)
+JNIEXPORT jdoubleArray JNICALL
+Java_org_photonvision_jni_GTSAMLocalizer_GetPoseComponentStdDevsJNI
+  (JNIEnv* env, jclass, jlong localizer_handle)
 {
-  return reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)
-      ->GetLatestPoseNoise();
+  auto stdDevs = reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)
+      ->GetPoseComponentStdDevs();
+  // Todo: serialize and return through JNI
+  jdoubleArray out = env->NewDoubleArray(6);
+  if (out == nullptr) return nullptr;             // OOM; a Java exception is already pending
+  env->SetDoubleArrayRegion(out, 0, 6, stdDevs.data());
+  return out;
 }

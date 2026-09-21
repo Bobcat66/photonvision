@@ -15,23 +15,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <cstdint>
+
 #include <org_photonvision_jni_GTSAMLocalizer.h>
 #include <wpi/apriltag/AprilTag.hpp>
 #include <wpi/apriltag/AprilTagFieldLayout.hpp>
 #include <wpi/math/geometry/Pose3d.hpp>
 #include <wpi/math/geometry/Transform3d.hpp>
 #include <wpi/units/length.hpp>
+#include <gtsam/linear/NoiseModel.h>
+#include <Eigen/Dense>
 
 extern "C" {
 /*
- * Class:     org_photonvision_jni_GTSAMLocalizer
- * Method:    create
- * Signature: ([I[DDD[D)J
+ * Class:     org_photonvision_jni_GTSAMExtras
+ * Method:    CreateGaussianNoiseModel
+ * Signature: (IDZ)J
  */
 JNIEXPORT jlong JNICALL
-Java_org_photonvision_jni_GTSAMExtras_CreateGaussianNoiseModel(JNIEnv* env, jclass, jdoublearray covariances, jboolean smart) 
+Java_org_photonvision_jni_GTSAMExtras_CreateGaussianNoiseModelJNI
+  (JNIEnv* env, jclass, jint matsize, jdoubleArray covariances)
 {
-  // Not implemented yet
+  jdouble* covariancesPtr = env->GetDoubleArrayElements(covariances, nullptr);
+  Eigen::MatrixXd covarianceMatrix = Eigen::Map<Eigen::MatrixXd>(covariancesPtr, matsize, matsize);
+  gtsam::noiseModel::Gaussian::shared_ptr noiseModel =
+      gtsam::noiseModel::Gaussian::Covariance(covarianceMatrix);
+  env->ReleaseDoubleArrayElements(covariances, covariancesPtr, 0);
+  return reinterpret_cast<jlong>(new gtsam::noiseModel::Gaussian::shared_ptr(noiseModel));
 }
 
 /*
@@ -40,7 +50,9 @@ Java_org_photonvision_jni_GTSAMExtras_CreateGaussianNoiseModel(JNIEnv* env, jcla
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_org_photonvision_jni_GTSAMExtras_DestroyGaussianNoiseModel(JNIEnv* env, jclass, jlong handle) 
+Java_org_photonvision_jni_GTSAMExtras_DestroyGaussianNoiseModelJNI
+  (JNIEnv* env, jclass, jlong handle)
 {
-  delete reinterpret_cast<gtsam::noiseModel::Gaussian*>(handle);
+  delete reinterpret_cast<gtsam::noiseModel::Gaussian::shared_ptr*>(handle);
+}
 }
