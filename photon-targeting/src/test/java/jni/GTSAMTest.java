@@ -16,6 +16,9 @@
  */
 
 // Claude slop wheeeeeeeeeee
+
+// This isn't actually a test for the correctness of GTSAMLocalizer, its just to make sure the JNI layer works
+// The actual gtsamlocalizer tests are C++
 package jni;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
