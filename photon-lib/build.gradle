@@ -24,6 +24,12 @@ nativeUtils {
     }
 }
 
+// Needed for gcc 16 compatibility
+nativeUtils.platformConfigs.named('linuxx86-64').configure {
+    it.cppCompiler.args.add("-Wno-error=maybe-uninitialized")
+    it.cCompiler.args.add("-Wno-error=maybe-uninitialized")
+}
+
 model {
     components {
         "${nativeName}"(NativeLibrarySpec) {

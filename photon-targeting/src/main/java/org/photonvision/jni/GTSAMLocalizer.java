@@ -82,7 +82,7 @@ public class GTSAMLocalizer {
                 timeUs);
     }
 
-    public void addOdometry(Pose3d poseDelta, long odometryNoise_handle, long timeUs) {
+    public void addOdometry(Pose3d poseDelta, GTSAMExtras.NoiseModel odometryNoise, long timeUs) {
         AddOdometryJNI(
                 handle,
                 new double[] {
@@ -93,7 +93,7 @@ public class GTSAMLocalizer {
                     poseDelta.getRotation().getY(),
                     poseDelta.getRotation().getZ()
                 },
-                odometryNoise_handle,
+                odometryNoise.getHandle(),
                 timeUs);
     }
 
@@ -103,7 +103,7 @@ public class GTSAMLocalizer {
             double[] corners,
             double[] cameraCal,
             Pose3d robotTcamera,
-            long cameraNoise_handle) {
+            GTSAMExtras.NoiseModel cameraNoise) {
         AddTagObservationJNI(
                 handle,
                 timeUs,
@@ -118,7 +118,7 @@ public class GTSAMLocalizer {
                     robotTcamera.getRotation().getY(),
                     robotTcamera.getRotation().getZ()
                 },
-                cameraNoise_handle);
+                cameraNoise.getHandle());
     }
 
     public void optimize() {
