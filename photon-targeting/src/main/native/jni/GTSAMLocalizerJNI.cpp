@@ -33,7 +33,7 @@ extern "C" {
 
 /*
  * Class:     org_photonvision_jni_GTSAMLocalizer
- * Method:    create
+ * Method:    createJNI
  * Signature: ([I[DDD[D)J
  */
 JNIEXPORT jlong JNICALL
@@ -92,7 +92,7 @@ Java_org_photonvision_jni_GTSAMLocalizer_createJNI
 
 /*
  * Class:     org_photonvision_jni_GTSAMLocalizer
- * Method:    destroy
+ * Method:    destroyJNI
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
@@ -104,7 +104,7 @@ Java_org_photonvision_jni_GTSAMLocalizer_destroyJNI
 
 /*
  * Class:     org_photonvision_jni_GTSAMLocalizer
- * Method:    Reset
+ * Method:    ResetJNI
  * Signature: (J[DJJ)V
  */
 JNIEXPORT void JNICALL
@@ -123,7 +123,7 @@ Java_org_photonvision_jni_GTSAMLocalizer_ResetJNI
 
 /*
  * Class:     org_photonvision_jni_GTSAMLocalizer
- * Method:    Optimize
+ * Method:    OptimizeJNI
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
@@ -135,7 +135,7 @@ Java_org_photonvision_jni_GTSAMLocalizer_OptimizeJNI
 
 /*
  * Class:     org_photonvision_jni_GTSAMLocalizer
- * Method:    GetLatestWorldToBody
+ * Method:    GetLatestWorldToBodyJNI
  * Signature: (J)[D
  */
 JNIEXPORT jdoubleArray JNICALL
@@ -152,7 +152,7 @@ Java_org_photonvision_jni_GTSAMLocalizer_GetLatestWorldToBodyJNI
 
 /*
  * Class:     org_photonvision_jni_GTSAMLocalizer
- * Method:    GetLastOdomTime
+ * Method:    GetLastOdomTimeJNI
  * Signature: (J)J
  */
 JNIEXPORT jlong JNICALL
@@ -165,18 +165,19 @@ Java_org_photonvision_jni_GTSAMLocalizer_GetLastOdomTimeJNI
 
 /*
  * Class:     org_photonvision_jni_GTSAMLocalizer
- * Method:    GetLatestPoseNoise
- * Signature: (J)J
+ * Method:    GetPoseComponentStdDevsJNI
+ * Signature: (J)[D
  */
 JNIEXPORT jdoubleArray JNICALL
 Java_org_photonvision_jni_GTSAMLocalizer_GetPoseComponentStdDevsJNI
   (JNIEnv* env, jclass, jlong localizer_handle)
 {
   auto stdDevs = reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)
-      ->GetPoseComponentStdDevs();
+                     ->GetPoseComponentStdDevs();
   // Todo: serialize and return through JNI
   jdoubleArray out = env->NewDoubleArray(6);
-  if (out == nullptr) return nullptr;             // OOM; a Java exception is already pending
+  if (out == nullptr)
+    return nullptr;  // OOM; a Java exception is already pending
   env->SetDoubleArrayRegion(out, 0, 6, stdDevs.data());
   return out;
 }

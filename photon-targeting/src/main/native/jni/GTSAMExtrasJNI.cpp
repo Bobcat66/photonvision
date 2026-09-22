@@ -17,36 +17,38 @@
 
 #include <cstdint>
 
+#include <Eigen/Dense>
+#include <gtsam/linear/NoiseModel.h>
 #include <org_photonvision_jni_GTSAMLocalizer.h>
 #include <wpi/apriltag/AprilTag.hpp>
 #include <wpi/apriltag/AprilTagFieldLayout.hpp>
 #include <wpi/math/geometry/Pose3d.hpp>
 #include <wpi/math/geometry/Transform3d.hpp>
 #include <wpi/units/length.hpp>
-#include <gtsam/linear/NoiseModel.h>
-#include <Eigen/Dense>
 
 extern "C" {
 /*
  * Class:     org_photonvision_jni_GTSAMExtras
- * Method:    CreateGaussianNoiseModel
- * Signature: (IDZ)J
+ * Method:    CreateGaussianNoiseModelJNI
+ * Signature: (I[D)J
  */
 JNIEXPORT jlong JNICALL
 Java_org_photonvision_jni_GTSAMExtras_CreateGaussianNoiseModelJNI
   (JNIEnv* env, jclass, jint matsize, jdoubleArray covariances)
 {
   jdouble* covariancesPtr = env->GetDoubleArrayElements(covariances, nullptr);
-  Eigen::MatrixXd covarianceMatrix = Eigen::Map<Eigen::MatrixXd>(covariancesPtr, matsize, matsize);
+  Eigen::MatrixXd covarianceMatrix =
+      Eigen::Map<Eigen::MatrixXd>(covariancesPtr, matsize, matsize);
   gtsam::noiseModel::Gaussian::shared_ptr noiseModel =
       gtsam::noiseModel::Gaussian::Covariance(covarianceMatrix);
   env->ReleaseDoubleArrayElements(covariances, covariancesPtr, 0);
-  return reinterpret_cast<jlong>(new gtsam::noiseModel::Gaussian::shared_ptr(noiseModel));
+  return reinterpret_cast<jlong>(
+      new gtsam::noiseModel::Gaussian::shared_ptr(noiseModel));
 }
 
 /*
  * Class:     org_photonvision_jni_GTSAMExtras
- * Method:    DestroyGaussianNoiseModel
+ * Method:    DestroyGaussianNoiseModelJNI
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
@@ -55,4 +57,4 @@ Java_org_photonvision_jni_GTSAMExtras_DestroyGaussianNoiseModelJNI
 {
   delete reinterpret_cast<gtsam::noiseModel::Gaussian::shared_ptr*>(handle);
 }
-}
+}  // extern "C"

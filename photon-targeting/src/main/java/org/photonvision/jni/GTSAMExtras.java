@@ -23,7 +23,6 @@ import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.util.Num;
 
 public class GTSAMExtras {
-
     public static final class NoiseModel implements AutoCloseable {
         private final long handle;
         private static final Cleaner cleaner = Cleaner.create();
