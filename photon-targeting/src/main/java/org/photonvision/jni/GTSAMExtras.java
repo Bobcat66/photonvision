@@ -20,6 +20,8 @@ package org.photonvision.jni;
 import java.lang.ref.Cleaner;
 import java.lang.ref.Cleaner.Cleanable;
 import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.linalg.Vector;
+import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Num;
 
 public class GTSAMExtras {
@@ -52,6 +54,25 @@ public class GTSAMExtras {
         // memory order tomfoolery
         long handle = CreateGaussianNoiseModelJNI(covariances_t.getNumRows(), covariances_t.getData());
         return new NoiseModel(handle, () -> DestroyGaussianNoiseModelJNI(handle));
+    }
+
+    public static <S extends Num> NoiseModel CreateDiagonalNoiseModel(Vector<S> sigmas) {
+        var covariances_t =
+                sigmas
+                        .diag()
+                        .transpose(); // this will change the matrix to column-major order, which is what GTSAM
+        // expects. We do not mathematically transpose the matrix, this is purely
+        // memory order tomfoolery
+        long handle = CreateGaussianNoiseModelJNI(covariances_t.getNumRows(), covariances_t.getData());
+        return new NoiseModel(handle, () -> DestroyGaussianNoiseModelJNI(handle));
+    }
+
+    public static <S extends Num> NoiseModel CreateIsotropicNoiseModel(Nat<S> dim, double sigma) {
+        var sigmas = new Vector(dim);
+        for (int i = 0; i < dim.getNum(); i++) {
+            sigmas.set(i, 0, sigma);
+        }
+        return CreateDiagonalNoiseModel(sigmas);
     }
 
     // This returns a handle to a gaussian noise model, built from a covariance matrix. the covariance
