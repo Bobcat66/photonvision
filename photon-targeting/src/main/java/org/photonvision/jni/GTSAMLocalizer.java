@@ -20,12 +20,12 @@ package org.photonvision.jni;
 import java.lang.ref.Cleaner;
 import java.lang.ref.Cleaner.Cleanable;
 import org.photonvision.estimation.TargetModel;
+import org.wpilib.fields.Field;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N6;
-import org.wpilib.vision.apriltag.AprilTagFieldLayout;
 
 /*
  * serialization format:
@@ -42,18 +42,18 @@ public class GTSAMLocalizer {
     private static final Cleaner cleaner = Cleaner.create();
     private final Cleanable cleanable;
 
-    public GTSAMLocalizer(AprilTagFieldLayout layout, TargetModel model) {
+    public GTSAMLocalizer(Field layout, TargetModel model) {
         var tags = layout.getTags();
         int[] tagIDs = new int[tags.size()];
         double[] tagPoses = new double[tags.size() * 6];
         for (int i = 0; i < tags.size(); i++) {
-            tagIDs[i] = tags.get(i).ID;
-            tagPoses[i * 6] = tags.get(i).pose.getX();
-            tagPoses[i * 6 + 1] = tags.get(i).pose.getY();
-            tagPoses[i * 6 + 2] = tags.get(i).pose.getZ();
-            tagPoses[i * 6 + 3] = tags.get(i).pose.getRotation().getX();
-            tagPoses[i * 6 + 4] = tags.get(i).pose.getRotation().getY();
-            tagPoses[i * 6 + 5] = tags.get(i).pose.getRotation().getZ();
+            tagIDs[i] = tags.get(i).getID();
+            tagPoses[i * 6] = tags.get(i).getPose().getX();
+            tagPoses[i * 6 + 1] = tags.get(i).getPose().getY();
+            tagPoses[i * 6 + 2] = tags.get(i).getPose().getZ();
+            tagPoses[i * 6 + 3] = tags.get(i).getPose().getRotation().getX();
+            tagPoses[i * 6 + 4] = tags.get(i).getPose().getRotation().getY();
+            tagPoses[i * 6 + 5] = tags.get(i).getPose().getRotation().getZ();
         }
         double[] tagCorners = new double[3 * model.vertices.size()];
         for (int i = 0; i < model.vertices.size(); i++) {

@@ -15,103 +15,104 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <gtest/gtest.h>
-#include <wpi/apriltag/AprilTagFieldLayout.hpp>
-#include <wpi/apriltag/AprilTagFields.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <wpi/fields/Field.hpp>
+#include <wpi/fields/fields.hpp>
+#include <wpi/fields/FieldTag.hpp>
+#include <wpi/fields/frc/2025-reefscape.hpp>
 
 #include "photon/estimation/TargetModel.h"
 #include "photon/gtsam/Localizer.h"
 
 using namespace gtsam;
 
-TEST(LocalizerTest, LatencyCompensate) {
+TEST_CASE("LocalizerTest.LatencyCompensate", "[LocalizerTest]") {
   /*
   We want:
   x in [0,-1,0]
   y in [0,0,-1]
   z in [1,0,0]
   */
-  const Pose3 bodyPcamera{Rot3(0, 0, 1, -1, 0, 0, 0, -1, 0),
+const Pose3 bodyPcamera{Rot3(0, 0, 1, -1, 0, 0, 0, -1, 0),
                           Point3{0.5, 0, 0.5}};
 
   // Cal3_S2 K(90, 960, 720);
-  Cal3_S2 K(1000, 1000, 0, 960 / 2, 720 / 2);
+Cal3_S2 K(1000, 1000, 0, 960 / 2, 720 / 2);
 
   // setup noise using fake numbers
   // Pixel noise, in u,v coordinates
-  auto measurementNoise = noiseModel::Isotropic::Sigma(2, 2.0);
+auto measurementNoise = noiseModel::Isotropic::Sigma(2, 2.0);
 
   // Noise on the prior factor we use to anchor the first pose.
   // TODO: If we initialize with enough measurements, we might be able to
   // delete this prior?
-  Vector6 sigmas;
-  sigmas << Vector3::Constant(0.1), Vector3::Constant(0.3);
-  auto posePriorNoise = noiseModel::Diagonal::Sigmas(sigmas);
+Vector6 sigmas;
+sigmas << Vector3::Constant(0.1), Vector3::Constant(0.3);
+auto posePriorNoise = noiseModel::Diagonal::Sigmas(sigmas);
 
   // odometry noise
-  Vector6 odomSigma;
-  odomSigma << Vector3::Constant(0.001), Vector3::Constant(0.05);
-  auto odometryNoise = noiseModel::Diagonal::Sigmas(odomSigma);
+Vector6 odomSigma;
+odomSigma << Vector3::Constant(0.001), Vector3::Constant(0.05);
+auto odometryNoise = noiseModel::Diagonal::Sigmas(odomSigma);
 
-  Cal3_S2_ cal(K);
+Cal3_S2_ cal(K);
 
-  auto reefscape2025 = wpi::apriltag::AprilTagFieldLayout::LoadField(
-      wpi::apriltag::AprilTagField::k2025ReefscapeWelded);
+auto reefscape2025 = wpi::fields::GetField(wpi::fields::FieldId::FRC_2025_REEFSCAPE_WELDED);
 
-  photon::pvgtsam::FieldLayout layout(reefscape2025, photon::kAprilTag36h11);
+photon::pvgtsam::FieldLayout layout(reefscape2025, photon::kAprilTag36h11);
 
-  auto localizer = photon::pvgtsam::Localizer(layout);
+auto localizer = photon::pvgtsam::Localizer(layout);
 
-  localizer.Reset(Pose3(), posePriorNoise, 5 * 1000);
-  localizer.AddOdometry(photon::pvgtsam::OdometryObservation{
-      100 * 1000, Pose3{Rot3{}, Point3{1, 0, 0}}, odometryNoise});
-  localizer.AddOdometry(photon::pvgtsam::OdometryObservation{
-      200 * 1000, Pose3{Rot3{}, Point3{1, 0, 0}}, odometryNoise});
-  localizer.AddOdometry(photon::pvgtsam::OdometryObservation{
-      300 * 1000, Pose3{Rot3{}, Point3{1, 0, 0}}, odometryNoise});
-  localizer.AddOdometry(photon::pvgtsam::OdometryObservation{
-      400 * 1000, Pose3{Rot3{}, Point3{1, 0, 0}}, odometryNoise});
-  localizer.Optimize();
-  auto pose = localizer.GetLatestWorldToBody();
-  pose.print("Pose: ");
+localizer.Reset(Pose3(), posePriorNoise, 5 * 1000);
+localizer.AddOdometry(photon::pvgtsam::OdometryObservation{
+100 * 1000, Pose3{Rot3{}, Point3{1, 0, 0}}, odometryNoise});
+localizer.AddOdometry(photon::pvgtsam::OdometryObservation{
+200 * 1000, Pose3{Rot3{}, Point3{1, 0, 0}}, odometryNoise});
+localizer.AddOdometry(photon::pvgtsam::OdometryObservation{
+300 * 1000, Pose3{Rot3{}, Point3{1, 0, 0}}, odometryNoise});
+localizer.AddOdometry(photon::pvgtsam::OdometryObservation{
+400 * 1000, Pose3{Rot3{}, Point3{1, 0, 0}}, odometryNoise});
+localizer.Optimize();
+auto pose = localizer.GetLatestWorldToBody();
+pose.print("Pose: ");
 
-  photon::pvgtsam::CameraVisionObservation obs{240000,
-                                               8,
+photon::pvgtsam::CameraVisionObservation obs{240000,
+8,
                                                {
                                                    {414, 166},
                                                    {457, 165},
                                                    {457, 122},
                                                    {412, 122},
                                                },
-                                               cal,
-                                               Pose3(),
+cal,
+Pose3(),
                                                measurementNoise};
 
   // add vision to within isam's history
-  localizer.AddTagObservation(obs);
+localizer.AddTagObservation(obs);
 
-  localizer.Optimize();
-  pose = localizer.GetLatestWorldToBody();
-  localizer.Print();
+localizer.Optimize();
+pose = localizer.GetLatestWorldToBody();
+localizer.Print();
 
   // add but don't optimize
-  localizer.AddOdometry(photon::pvgtsam::OdometryObservation{
-      500 * 1000, Pose3{Rot3{}, Point3{1, 0, 0}}, odometryNoise});
+localizer.AddOdometry(photon::pvgtsam::OdometryObservation{
+500 * 1000, Pose3{Rot3{}, Point3{1, 0, 0}}, odometryNoise});
 
-  obs = {460000,
-         8,
+obs = {460000,
+8,
          {
              {414, 166},
              {457, 165},
              {457, 122},
              {412, 122},
          },
-         cal,
-         Pose3(),
+cal,
+Pose3(),
          measurementNoise};
 
-  localizer.AddTagObservation(obs);
-  localizer.Optimize();
-  pose = localizer.GetLatestWorldToBody();
-  localizer.Print();
+localizer.AddTagObservation(obs);
+localizer.Optimize();
+pose = localizer.GetLatestWorldToBody();
+localizer.Print();
 }

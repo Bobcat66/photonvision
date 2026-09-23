@@ -19,8 +19,8 @@
 #include <vector>
 
 #include <org_photonvision_jni_GTSAMLocalizer.h>
-#include <wpi/apriltag/AprilTag.hpp>
-#include <wpi/apriltag/AprilTagFieldLayout.hpp>
+#include <wpi/fields/FieldTag.hpp>
+#include <wpi/fields/Field.hpp>
 #include <wpi/math/geometry/Pose3d.hpp>
 #include <wpi/math/geometry/Transform3d.hpp>
 #include <wpi/units/length.hpp>
@@ -48,7 +48,7 @@ Java_org_photonvision_jni_GTSAMLocalizer_createJNI
   jdouble* tagPosesPtr = env->GetDoubleArrayElements(tagPoses, nullptr);
   jdouble* tagCornersPtr = env->GetDoubleArrayElements(tagCorners, nullptr);
 
-  std::vector<wpi::apriltag::AprilTag> tags;
+  std::vector<wpi::fields::FieldTag> tags;
   // TODO: Verify tag poses length is 6 * tagIDsLength
   for (jsize i = 0; i < tagIDsLength; ++i) {
     jint tagID = tagIDsPtr[i];
@@ -65,8 +65,8 @@ Java_org_photonvision_jni_GTSAMLocalizer_createJNI
     tags.emplace_back(tagID, jdoublePtrToPose3d(tagPosePtr));
   }
 
-  wpi::apriltag::AprilTagFieldLayout field(
-      tags, wpi::units::meter_t(fieldWidth), wpi::units::meter_t(fieldLength));
+  wpi::fields::Field field("Photon Field", "2067", "Recycle Rush 2",std::nullopt, wpi::units::meter_t(fieldLength), wpi::units::meter_t(fieldWidth), "FRC", 
+      tags);
 
   std::vector<wpi::math::Translation3d> verts;
   for (jsize i = 0; i < tagCornersLength; i += 3) {

@@ -390,7 +390,7 @@ void Localizer::AddTagObservation(uint64_t timeUs, int tagID,
   auto worldPcorners_opt = fieldLayout.WorldToCorners(tagID);
   if (!worldPcorners_opt) {
     // todo return bad thing
-    fmt::println("Could not find tag {} in our map!", tagID);
+    // fmt::println("Could not find tag {} in our map!", tagID); fmt doesn't work anymore for some reason? I blame wpilib
     return;
   }
   auto worldPcorners = worldPcorners_opt.value();

@@ -23,7 +23,7 @@
 
 #include <gtsam/geometry/Cal3_S2.h>
 #include <gtsam/geometry/Pose3.h>
-#include <wpi/apriltag/AprilTagFieldLayout.hpp>
+#include <wpi/fields/Field.hpp>
 
 #include "photon/estimation/TargetModel.h"
 
@@ -32,7 +32,7 @@ namespace photon::pvgtsam {
 class FieldLayout {
  public:
   FieldLayout(
-      const wpi::apriltag::AprilTagFieldLayout& layout,
+      const wpi::fields::Field& layout,
       const TargetModel& tagModel);  // Will throw if the the tag model does not
                                      // have exactly 4 vertices or is not planar
 

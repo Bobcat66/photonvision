@@ -24,25 +24,23 @@
 
 #pragma once
 
-#include "photon/gtsam/Localizer.h"
 #include <wpilib/math/linalg/Vector.h>
+
+#include "photon/gtsam/Localizer.h"
 
 namespace photon {
 class PhotonLocalizer {
  public:
   explicit PhotonLocalizer(const wpi::apriltag::AprilTagFieldLayout& layout,
-                           const TargetModel& tagModel
-                           double visionNoisePx,
+                           const TargetModel& tagModel double visionNoisePx,
                            Vector<N6> odomNoise);
   explicit PhotonLocalizer(const wpi::apriltag::AprilTagFieldLayout& layout,
                            const TargetModel& tagModel);
 
-  void Reset
-  
+ void Reset
 
- private:
-  Localizer localizer;
+     private : Localizer localizer;
   gtsam::SharedNoiseModel pixelNoise;
   gtsam::SharedNoiseModel odomNoise;
 }
-}
+}  // namespace photon

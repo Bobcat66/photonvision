@@ -23,7 +23,7 @@
 
 namespace photon::pvgtsam {
 
-FieldLayout::FieldLayout(const wpi::apriltag::AprilTagFieldLayout& layout,
+FieldLayout::FieldLayout(const wpi::fields::Field& layout,
                          const photon::TargetModel& tagModel) {
   if (tagModel.GetVertices().size() != 4) {
     throw std::runtime_error(

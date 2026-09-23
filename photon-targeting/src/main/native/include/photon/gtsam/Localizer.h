@@ -41,7 +41,7 @@ class Localizer {
   using LandmarkMap = std::map<Key, SmartFactor::shared_ptr>;
 
  public:
-  explicit Localizer(const wpi::apriltag::AprilTagFieldLayout& layout,
+  explicit Localizer(const wpi::fields::Field& layout,
                      const TargetModel& tagModel)
       : Localizer(FieldLayout(layout, tagModel)) {}
 
@@ -78,7 +78,7 @@ class Localizer {
   //   smootherISAM2.getFactors().saveGraph(os);
   // }
   inline void Print(const std::string_view prefix = "") {
-    fmt::println("{}", prefix);
+    // fmt::println("{}", prefix); TODO: fmt doesn't work anymore for some reason? I blame wpilib
     smootherISAM2.print();
     smootherISAM2.getISAM2().getFactorsUnsafe().print();
     smootherISAM2.calculateEstimate().print("Current estimate:");
