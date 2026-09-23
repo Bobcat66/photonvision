@@ -78,7 +78,8 @@ class Localizer {
   //   smootherISAM2.getFactors().saveGraph(os);
   // }
   inline void Print(const std::string_view prefix = "") {
-    // fmt::println("{}", prefix); TODO: fmt doesn't work anymore for some reason? I blame wpilib
+    // fmt::println("{}", prefix); TODO: fmt doesn't work anymore for some
+    // reason? I blame wpilib
     smootherISAM2.print();
     smootherISAM2.getISAM2().getFactorsUnsafe().print();
     smootherISAM2.calculateEstimate().print("Current estimate:");
@@ -105,7 +106,7 @@ class Localizer {
 
   // Claude Slop - For testing only, remove before shipping
   Key ClaudeInsertIntoSmoother(Key lower, Key upper, Key newKey,
-                                  double newTime);
+                               double newTime);
 
   Key GetOrInsertKey(Key newKey, double time);
 

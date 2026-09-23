@@ -170,9 +170,10 @@ Key Localizer::InsertIntoSmoother(Key lower, Key upper, Key newKey,
   return 0;
 }
 
-// Claude slop, FOR TESTING ONLY - Remove before shipping. If ts works, figure out why and fix the real insertintosmoother function
+// Claude slop, FOR TESTING ONLY - Remove before shipping. If ts works, figure
+// out why and fix the real insertintosmoother function
 Key Localizer::ClaudeInsertIntoSmoother(Key lower, Key upper, Key newKey,
-                                  double newTime) {
+                                        double newTime) {
   const auto& isam = smootherISAM2.getISAM2();
   const VariableIndex& variableIndex = isam.getVariableIndex();
   const NonlinearFactorGraph& currentFactors = isam.getFactorsUnsafe();
@@ -222,10 +223,10 @@ Key Localizer::ClaudeInsertIntoSmoother(Key lower, Key upper, Key newKey,
     // (equivalently: deltaLowerToMid.inverse() * delta)
 
     factorsToRemove.push_back(idx);
-    graph.emplace_shared<BetweenFactor<Pose3>>(lower, newKey,
-                                               deltaLowerToMid, noise);
-    graph.emplace_shared<BetweenFactor<Pose3>>(newKey, upper,
-                                               deltaMidToHigh, noise);
+    graph.emplace_shared<BetweenFactor<Pose3>>(lower, newKey, deltaLowerToMid,
+                                               noise);
+    graph.emplace_shared<BetweenFactor<Pose3>>(newKey, upper, deltaMidToHigh,
+                                               noise);
 
     const Pose3 worldTLower = smootherISAM2.calculateEstimate<Pose3>(lower);
     currentEstimate.insert(newKey, worldTLower * deltaLowerToMid);
@@ -275,8 +276,8 @@ Key Localizer::GetOrInsertKey(Key newKey, double time) {
     if (time - isamEntryBefore->second < kSnapUs) return isamEntryBefore->first;
     if (isamEntryAfter->second - time < kSnapUs) return isamEntryAfter->first;
 
-    return ClaudeInsertIntoSmoother(isamEntryBefore->first, isamEntryAfter->first,
-                              newKey, time);
+    return ClaudeInsertIntoSmoother(isamEntryBefore->first,
+                                    isamEntryAfter->first, newKey, time);
   }
 
   KeyTimeMap::iterator notAddedAfter = newTimestamps.upper_bound(newKey);
@@ -469,7 +470,8 @@ void Localizer::AddTagObservation(uint64_t timeUs, int tagID,
   auto worldPcorners_opt = fieldLayout.WorldToCorners(tagID);
   if (!worldPcorners_opt) {
     // todo return bad thing
-    // fmt::println("Could not find tag {} in our map!", tagID); fmt doesn't work anymore for some reason? I blame wpilib
+    // fmt::println("Could not find tag {} in our map!", tagID); fmt doesn't
+    // work anymore for some reason? I blame wpilib
     return;
   }
   auto worldPcorners = worldPcorners_opt.value();

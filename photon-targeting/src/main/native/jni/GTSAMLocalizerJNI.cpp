@@ -19,8 +19,8 @@
 #include <vector>
 
 #include <org_photonvision_jni_GTSAMLocalizer.h>
-#include <wpi/fields/FieldTag.hpp>
 #include <wpi/fields/Field.hpp>
+#include <wpi/fields/FieldTag.hpp>
 #include <wpi/math/geometry/Pose3d.hpp>
 #include <wpi/math/geometry/Transform3d.hpp>
 #include <wpi/units/length.hpp>
@@ -65,8 +65,9 @@ Java_org_photonvision_jni_GTSAMLocalizer_createJNI
     tags.emplace_back(tagID, jdoublePtrToPose3d(tagPosePtr));
   }
 
-  wpi::fields::Field field("Photon Field", "2067", "Recycle Rush 2",std::nullopt, wpi::units::meter_t(fieldLength), wpi::units::meter_t(fieldWidth), "FRC", 
-      tags);
+  wpi::fields::Field field("Photon Field", "2067", "Recycle Rush 2",
+                           std::nullopt, wpi::units::meter_t(fieldLength),
+                           wpi::units::meter_t(fieldWidth), "FRC", tags);
 
   std::vector<wpi::math::Translation3d> verts;
   for (jsize i = 0; i < tagCornersLength; i += 3) {
