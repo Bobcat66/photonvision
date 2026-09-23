@@ -78,8 +78,7 @@ data_types = yaml_to_dict("message_data_types.yaml")
 
 # Helper to check if we need to use our own decoder
 def is_intrinsic_type(type_str: str):
-    ret = type_str in data_types.keys()
-    return ret
+    return type_str in data_types
 
 
 # Deal with shimmed types
@@ -167,7 +166,7 @@ def get_message_by_name(message_db: list[MessageType], message_name: str):
             message for message in message_db if message["name"] == message_name
         )
     except StopIteration as e:
-        raise Exception("Could not find " + message_name) from e
+        raise ValueError("Could not find " + message_name) from e
 
 
 def get_field_by_name(message: MessageType, field_name: str):
@@ -274,7 +273,7 @@ def get_struct_schema_str(message: MessageType, message_db: list[MessageType]):
             and "vla" in field
             and field["vla"]
         ):
-            raise Exception(f"Field {field} must be optional OR vla!")
+            raise ValueError(f"Field {field} must be optional OR vla!")
 
         typestr = get_fully_defined_field_name(field, message_db)
 
@@ -305,6 +304,7 @@ def generate_photon_messages(cpp_java_root, py_root, template_root):
     env.filters["is_intrinsic"] = is_intrinsic_type
     env.filters["is_shimmed"] = get_shimmed_filter(messages)
     env.filters["is_test"] = lambda _x: False  # no test messages in this pass
+    env.filters["type_ref"] = lambda type_name: f"targeting.{type_name}"
 
     # add our custom types
     extended_data_types = data_types.copy()
@@ -377,26 +377,22 @@ def generate_photon_messages(cpp_java_root, py_root, template_root):
                 messages, name
             )
 
-            nested_photon_types = set(
-                [
-                    field["type"]
-                    for field in message["fields"]
-                    if (
-                        not is_intrinsic_type(field["type"])
-                        and not get_shimmed_filter(messages)(field["type"])
-                    )
-                ]
-            )
-            nested_wpilib_types = set(
-                [
-                    field["type"]
-                    for field in message["fields"]
-                    if (
-                        not is_intrinsic_type(field["type"])
-                        and get_shimmed_filter(messages)(field["type"])
-                    )
-                ]
-            )
+            nested_photon_types = {
+                field["type"]
+                for field in message["fields"]
+                if (
+                    not is_intrinsic_type(field["type"])
+                    and not get_shimmed_filter(messages)(field["type"])
+                )
+            }
+            nested_wpilib_types = {
+                field["type"]
+                for field in message["fields"]
+                if (
+                    not is_intrinsic_type(field["type"])
+                    and get_shimmed_filter(messages)(field["type"])
+                )
+            }
 
             output_file = output_folder / output_name
             output_file.write_text(
@@ -437,6 +433,11 @@ def generate_tests(cpp_java_test_root, py_test_root, template_root):
     env.filters["is_intrinsic"] = is_intrinsic_type
     env.filters["is_shimmed"] = get_shimmed_filter(message_db)
     env.filters["is_test"] = get_test_filter(message_db)
+    env.filters["type_ref"] = lambda type_name: (
+        type_name
+        if get_test_filter(message_db)(type_name)
+        else f"targeting.{type_name}"
+    )
 
     # add our custom types
     extended_data_types = data_types.copy()
@@ -547,26 +548,22 @@ def generate_tests(cpp_java_test_root, py_test_root, template_root):
                 message_db, name
             )
 
-            nested_photon_types = set(
-                [
-                    field["type"]
-                    for field in test_message["fields"]
-                    if (
-                        not is_intrinsic_type(field["type"])
-                        and not get_shimmed_filter(message_db)(field["type"])
-                    )
-                ]
-            )
-            nested_wpilib_types = set(
-                [
-                    field["type"]
-                    for field in test_message["fields"]
-                    if (
-                        not is_intrinsic_type(field["type"])
-                        and get_shimmed_filter(message_db)(field["type"])
-                    )
-                ]
-            )
+            nested_photon_types = {
+                field["type"]
+                for field in test_message["fields"]
+                if (
+                    not is_intrinsic_type(field["type"])
+                    and not get_shimmed_filter(message_db)(field["type"])
+                )
+            }
+            nested_wpilib_types = {
+                field["type"]
+                for field in test_message["fields"]
+                if (
+                    not is_intrinsic_type(field["type"])
+                    and get_shimmed_filter(message_db)(field["type"])
+                )
+            }
 
             output_file = output_folder / output_name
             output_file.write_text(
