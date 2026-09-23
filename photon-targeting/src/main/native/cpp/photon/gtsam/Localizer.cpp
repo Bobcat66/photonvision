@@ -170,6 +170,78 @@ Key Localizer::InsertIntoSmoother(Key lower, Key upper, Key newKey,
   return 0;
 }
 
+// Claude slop, FOR TESTING ONLY - Remove before shipping. If ts works, figure out why and fix the real insertintosmoother function
+Key Localizer::ClaudeInsertIntoSmoother(Key lower, Key upper, Key newKey,
+                                  double newTime) {
+  const auto& isam = smootherISAM2.getISAM2();
+  const VariableIndex& variableIndex = isam.getVariableIndex();
+  const NonlinearFactorGraph& currentFactors = isam.getFactorsUnsafe();
+
+  // Fix 1: check BOTH keys
+  const auto lowerIt = variableIndex.find(lower);
+  const auto upperIt = variableIndex.find(upper);
+  if (lowerIt == variableIndex.end() || upperIt == variableIndex.end()) {
+    throw std::runtime_error("InsertIntoSmoother: key missing from ISAM");
+  }
+
+  for (const FactorIndex idx : lowerIt->second) {
+    // Only factors touching both keys
+    if (std::find(upperIt->second.begin(), upperIt->second.end(), idx) ==
+        upperIt->second.end()) {
+      continue;
+    }
+
+    // Fix 4: correct bounds check, plus skip empty (reused) slots
+    if (idx >= currentFactors.size() || !currentFactors[idx]) continue;
+
+    // Fix 3: make sure it's the odometry edge, not a marginal factor
+    auto edge =
+        std::dynamic_pointer_cast<BetweenFactor<Pose3>>(currentFactors[idx]);
+    if (!edge || edge->key1() != lower || edge->key2() != upper) continue;
+
+    // Fix 7: don't split the same edge twice before Optimize()
+    if (std::find(factorsToRemove.begin(), factorsToRemove.end(), idx) !=
+        factorsToRemove.end()) {
+      throw std::runtime_error("InsertIntoSmoother: edge already being split");
+    }
+
+    // Fraction from timestamps, not key arithmetic
+    const auto& ts = smootherISAM2.timestamps();
+    const double tLower = ts.at(lower);
+    const double tUpper = ts.at(upper);
+    const double t = (newTime - tLower) / (tUpper - tLower);
+
+    // Read motion + noise from the edge itself (no side map needed)
+    const Pose3& delta = edge->measured();
+    const SharedNoiseModel& noise = edge->noiseModel();
+
+    // Fix 2: second half is the REMAINDER of the motion
+    const Vector6 totalTwist = Pose3::Logmap(delta);
+    const Pose3 deltaLowerToMid = Pose3::Expmap(totalTwist * t);
+    const Pose3 deltaMidToHigh = Pose3::Expmap(totalTwist * (1.0 - t));
+    // (equivalently: deltaLowerToMid.inverse() * delta)
+
+    factorsToRemove.push_back(idx);
+    graph.emplace_shared<BetweenFactor<Pose3>>(lower, newKey,
+                                               deltaLowerToMid, noise);
+    graph.emplace_shared<BetweenFactor<Pose3>>(newKey, upper,
+                                               deltaMidToHigh, noise);
+
+    const Pose3 worldTLower = smootherISAM2.calculateEstimate<Pose3>(lower);
+    currentEstimate.insert(newKey, worldTLower * deltaLowerToMid);
+    newTimestamps[newKey] = newTime;
+
+    // Keep the side map consistent if other code still reads it
+    twistsFromPreviousKey[newKey] = deltaLowerToMid;
+    twistsFromPreviousKey[upper] = deltaMidToHigh;
+
+    return newKey;
+  }
+
+  // Fix 5: fail loudly instead of returning key 0
+  throw std::runtime_error("InsertIntoSmoother: no odometry edge found");
+}
+
 using KeyTimeConstIt = FixedLagSmoother::KeyTimestampMap::const_iterator;
 static KeyTimeConstIt FindCloser(KeyTimeConstIt left, KeyTimeConstIt right,
                                  double time) {
@@ -197,7 +269,14 @@ Key Localizer::GetOrInsertKey(Key newKey, double time) {
   if (isamEntryAfter != isamTimestamps.end() &&
       isamEntryBefore->second < time) {
     // must be fully within isam
-    return FindCloser(isamEntryBefore, isamEntryAfter, time)->first;
+    // return FindCloser(isamEntryBefore, isamEntryAfter, time)->first;
+    // Fully within ISAM: split the odometry edge instead of snapping
+    constexpr double kSnapUs = 2000;  // don't create near-zero-length edges
+    if (time - isamEntryBefore->second < kSnapUs) return isamEntryBefore->first;
+    if (isamEntryAfter->second - time < kSnapUs) return isamEntryAfter->first;
+
+    return ClaudeInsertIntoSmoother(isamEntryBefore->first, isamEntryAfter->first,
+                              newKey, time);
   }
 
   KeyTimeMap::iterator notAddedAfter = newTimestamps.upper_bound(newKey);

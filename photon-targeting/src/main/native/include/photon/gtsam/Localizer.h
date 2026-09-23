@@ -103,6 +103,10 @@ class Localizer {
   Key InsertIntoSmoother(Key lower, Key upper, Key newKey, double newTime,
                          gtsam::SharedNoiseModel odometryNoise);
 
+  // Claude Slop - For testing only, remove before shipping
+  Key ClaudeInsertIntoSmoother(Key lower, Key upper, Key newKey,
+                                  double newTime);
+
   Key GetOrInsertKey(Key newKey, double time);
 
   // New factor graph to add to our smoother at the next call to Optimize()
