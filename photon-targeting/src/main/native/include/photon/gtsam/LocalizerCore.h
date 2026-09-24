@@ -35,17 +35,17 @@
 
 namespace photon::pvgtsam {
 
-class Localizer {
+class LocalizerCore {
   using Key = gtsam::Key;
   using SmartFactor = gtsam::SmartProjectionPoseFactor<gtsam::Cal3_S2>;
   using LandmarkMap = std::map<Key, SmartFactor::shared_ptr>;
 
  public:
-  explicit Localizer(const wpi::fields::Field& layout,
+  explicit LocalizerCore(const wpi::fields::Field& layout,
                      const TargetModel& tagModel)
-      : Localizer(FieldLayout(layout, tagModel)) {}
+      : LocalizerCore(FieldLayout(layout, tagModel)) {}
 
-  explicit Localizer(FieldLayout fieldLayout);
+  explicit LocalizerCore(FieldLayout fieldLayout);
 
   /**
    * Add a prior factor on the world->robot pose
