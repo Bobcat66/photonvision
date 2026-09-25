@@ -86,7 +86,6 @@ model {
             // resolves symbols the packaged archive order leaves dangling on pass 1
             // Hack lol
             nativeUtils.useRequiredLibrary(it, 'gtsam')
-            nativeUtils.useRequiredLibrary(it, "wpilib_shared")
             nativeUtils.useRequiredLibrary(it, "wpiutil_shared")
             nativeUtils.useRequiredLibrary(it, "datalog_shared")
             nativeUtils.useRequiredLibrary(it, "wpimath_shared")
@@ -128,7 +127,6 @@ model {
             // resolves symbols the packaged archive order leaves dangling on pass 1
             // Hack lol
             nativeUtils.useRequiredLibrary(it, 'gtsam')
-            nativeUtils.useRequiredLibrary(it, "wpilib_shared")
             nativeUtils.useRequiredLibrary(it, "wpiutil_shared")
             nativeUtils.useRequiredLibrary(it, "datalog_shared")
             nativeUtils.useRequiredLibrary(it, "wpimath_shared")

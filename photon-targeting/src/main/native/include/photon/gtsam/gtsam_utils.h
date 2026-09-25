@@ -19,6 +19,7 @@
 #include <array>
 #include <utility>
 #include <vector>
+#include <variant>
 
 #include <gtsam/geometry/Pose3.h>
 #include <gtsam/linear/NoiseModel.h>
@@ -52,6 +53,23 @@ struct OdometryObservation {
   uint64_t timeUs;
   gtsam::Pose3 poseDelta;
   gtsam::SharedNoiseModel odometryNoise;
+};
+
+enum class DataSubmissionType {
+  Reset,
+  Odometry,
+  TagObservation
+};
+
+struct ResetData {
+  gtsam::Pose3 wTr;
+  gtsam::SharedNoiseModel noise;
+  uint64_t timeUs;
+};
+
+struct DataSubmission {
+    DataSubmissionType type;
+    std::variant<ResetData, OdometryObservation, CameraVisionObservation> data;
 };
 
 template <typename T>

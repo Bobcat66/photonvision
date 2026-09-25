@@ -19,7 +19,7 @@
 
 #include <Eigen/Dense>
 #include <gtsam/linear/NoiseModel.h>
-#include <org_photonvision_jni_GTSAMLocalizer.h>
+#include <org_photonvision_jni_GTSAMLocalizerCore.h>
 #include <wpi/fields/Field.hpp>
 #include <wpi/fields/FieldTag.hpp>
 #include <wpi/math/geometry/Pose3d.hpp>

@@ -33,16 +33,16 @@ import org.wpilib.math.numbers.N6;
  */
 
 /**
- * A wrapper around the GTSAM localizer implemented in C++.
+ * A wrapper around the GTSAM LocalizerCore implemented in C++.
  *
  * <p>This class is not thread-safe. It should only be used from a single thread at a time.
  */
-public class GTSAMLocalizer {
+public class GTSAMLocalizerCore {
     private final long handle;
     private static final Cleaner cleaner = Cleaner.create();
     private final Cleanable cleanable;
 
-    public GTSAMLocalizer(Field layout, TargetModel model) {
+    public GTSAMLocalizerCore(Field layout, TargetModel model) {
         var tags = layout.getTags();
         int[] tagIDs = new int[tags.size()];
         double[] tagPoses = new double[tags.size() * 6];
@@ -139,20 +139,20 @@ public class GTSAMLocalizer {
         return VecBuilder.fill(noise[0], noise[1], noise[2], noise[3], noise[4], noise[5]);
     }
 
-    // Localizer JNI methods
+    // LocalizerCore JNI methods
     private static native long createJNI(
             int[] tagIDs, double[] tagPoses, double fieldWidth, double fieldLength, double[] tagCorners);
 
-    private static native void destroyJNI(long localizer_handle);
+    private static native void destroyJNI(long LocalizerCore_handle);
 
     private static native void ResetJNI(
-            long localizer_handle, double[] wTr, long odometryNoise_handle, long timeUs);
+            long LocalizerCore_handle, double[] wTr, long odometryNoise_handle, long timeUs);
 
     private static native void AddOdometryJNI(
-            long localizer_handle, double[] poseDelta, long odometryNoise_handle, long timeUs);
+            long LocalizerCore_handle, double[] poseDelta, long odometryNoise_handle, long timeUs);
 
     private static native void AddTagObservationJNI(
-            long localizer_handle,
+            long LocalizerCore_handle,
             long timeUs,
             int tagID,
             double[] corners,
@@ -160,11 +160,11 @@ public class GTSAMLocalizer {
             double[] robotTcamera,
             long cameraNoise_handle);
 
-    private static native void OptimizeJNI(long localizer);
+    private static native void OptimizeJNI(long LocalizerCore);
 
-    private static native double[] GetLatestWorldToBodyJNI(long localizer_handle);
+    private static native double[] GetLatestWorldToBodyJNI(long LocalizerCore_handle);
 
-    private static native long GetLastOdomTimeJNI(long localizer_handle);
+    private static native long GetLastOdomTimeJNI(long LocalizerCore_handle);
 
-    private static native double[] GetPoseComponentStdDevsJNI(long localizer_handle);
+    private static native double[] GetPoseComponentStdDevsJNI(long LocalizerCore_handle);
 }

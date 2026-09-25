@@ -22,11 +22,11 @@
 #include <wpi/fields/frc/2025-reefscape.hpp>
 
 #include "photon/estimation/TargetModel.h"
-#include "photon/gtsam/Localizer.h"
+#include "photon/gtsam/LocalizerCore.h"
 
 using namespace gtsam;
 
-TEST_CASE("LocalizerTest.LatencyCompensate", "[LocalizerTest]") {
+TEST_CASE("LocalizerCoreTest.LatencyCompensate", "[LocalizerCoreTest]") {
   /*
   We want:
   x in [0,-1,0]
@@ -62,19 +62,19 @@ TEST_CASE("LocalizerTest.LatencyCompensate", "[LocalizerTest]") {
 
   photon::pvgtsam::FieldLayout layout(reefscape2025, photon::kAprilTag36h11);
 
-  auto localizer = photon::pvgtsam::Localizer(layout);
+  auto LocalizerCore = photon::pvgtsam::LocalizerCore(layout);
 
-  localizer.Reset(Pose3(), posePriorNoise, 5 * 1000);
-  localizer.AddOdometry(photon::pvgtsam::OdometryObservation{
+  LocalizerCore.Reset(photon::pvgtsam::ResetData{Pose3(), posePriorNoise, 5 * 1000});
+  LocalizerCore.AddOdometry(photon::pvgtsam::OdometryObservation{
       100 * 1000, Pose3{Rot3{}, Point3{1, 0, 0}}, odometryNoise});
-  localizer.AddOdometry(photon::pvgtsam::OdometryObservation{
+  LocalizerCore.AddOdometry(photon::pvgtsam::OdometryObservation{
       200 * 1000, Pose3{Rot3{}, Point3{1, 0, 0}}, odometryNoise});
-  localizer.AddOdometry(photon::pvgtsam::OdometryObservation{
+  LocalizerCore.AddOdometry(photon::pvgtsam::OdometryObservation{
       300 * 1000, Pose3{Rot3{}, Point3{1, 0, 0}}, odometryNoise});
-  localizer.AddOdometry(photon::pvgtsam::OdometryObservation{
+  LocalizerCore.AddOdometry(photon::pvgtsam::OdometryObservation{
       400 * 1000, Pose3{Rot3{}, Point3{1, 0, 0}}, odometryNoise});
-  localizer.Optimize();
-  auto pose = localizer.GetLatestWorldToBody();
+  LocalizerCore.Optimize();
+  auto pose = LocalizerCore.GetLatestWorldToBody();
   pose.print("Pose: ");
 
   photon::pvgtsam::CameraVisionObservation obs{240000,
@@ -90,14 +90,14 @@ TEST_CASE("LocalizerTest.LatencyCompensate", "[LocalizerTest]") {
                                                measurementNoise};
 
   // add vision to within isam's history
-  localizer.AddTagObservation(obs);
+  LocalizerCore.AddTagObservation(obs);
 
-  localizer.Optimize();
-  pose = localizer.GetLatestWorldToBody();
-  localizer.Print();
+  LocalizerCore.Optimize();
+  pose = LocalizerCore.GetLatestWorldToBody();
+  //LocalizerCore.Print();
 
   // add but don't optimize
-  localizer.AddOdometry(photon::pvgtsam::OdometryObservation{
+  LocalizerCore.AddOdometry(photon::pvgtsam::OdometryObservation{
       500 * 1000, Pose3{Rot3{}, Point3{1, 0, 0}}, odometryNoise});
 
   obs = {460000,
@@ -112,8 +112,8 @@ TEST_CASE("LocalizerTest.LatencyCompensate", "[LocalizerTest]") {
          Pose3(),
          measurementNoise};
 
-  localizer.AddTagObservation(obs);
-  localizer.Optimize();
-  pose = localizer.GetLatestWorldToBody();
-  localizer.Print();
+  LocalizerCore.AddTagObservation(obs);
+  LocalizerCore.Optimize();
+  pose = LocalizerCore.GetLatestWorldToBody();
+  // LocalizerCore.Print(); // TODO: Re-add print
 }

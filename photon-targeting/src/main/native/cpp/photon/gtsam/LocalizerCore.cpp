@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "photon/gtsam/Localizer.h"
+#include "photon/gtsam/LocalizerCore.h"
 
 #include <iostream>
 #include <utility>
@@ -28,7 +28,7 @@ using namespace gtsam;
 using symbol_shorthand::X;
 
 namespace photon::pvgtsam {
-Localizer::Localizer(FieldLayout fieldLayout)
+LocalizerCore::LocalizerCore(FieldLayout fieldLayout)
     : fieldLayout(std::move(fieldLayout)) {
   ISAM2Params parameters;
   // parameters.relinearizeThreshold = 0.01;
@@ -49,12 +49,12 @@ Localizer::Localizer(FieldLayout fieldLayout)
   // Optimize();
 }
 
-void Localizer::Reset(Pose3 wTr, SharedNoiseModel noise, uint64_t timeUs) {
+void LocalizerCore::Reset(ResetData data) {
   // Anchor graph using initial pose. I subtract one to make sure that we dont
   // add this time to the estimate map twice
-  timeUs -= 1;
+  data.timeUs -= 1;
 
-  currStateIdx = X(timeUs);
+  currStateIdx = X(data.timeUs);
 
   smootherISAM2 = IncrementalFixedLagSmoother(smootherISAM2.smootherLag(),
                                               smootherISAM2.params());
@@ -65,34 +65,39 @@ void Localizer::Reset(Pose3 wTr, SharedNoiseModel noise, uint64_t timeUs) {
   factorsToRemove.clear();
   twistsFromPreviousKey.clear();
 
-  graph.addPrior(currStateIdx, wTr, noise);
-  currentEstimate.insert(currStateIdx, wTr);
-  newTimestamps[currStateIdx] = timeUs;
+  graph.addPrior(currStateIdx, data.wTr, data.noise);
+  currentEstimate.insert(currStateIdx, data.wTr);
+  newTimestamps[currStateIdx] = data.timeUs;
 
-  wTb_latest = wTr;
+  wTb_latest = data.wTr;
 }
 
-void Localizer::AddOdometry(const gtsam::Pose3& poseDelta,
-                            const gtsam::SharedNoiseModel& odometryNoise,
-                            uint64_t timeUs) {
-  Key newStateIdx = X(timeUs);
+void LocalizerCore::SubmitReset(ResetData data) {
+  Accept(DataSubmission{DataSubmissionType::Reset,data});
+}
+void LocalizerCore::AddOdometry(OdometryObservation odom) {
+  Key newStateIdx = X(odom.timeUs);
 
   // Add an odometry pose delta from our last state to our new one
   graph.emplace_shared<BetweenFactor<Pose3>>(currStateIdx, newStateIdx,
-                                             poseDelta, odometryNoise);
+                                             odom.poseDelta, odom.odometryNoise);
 
   // And get initial guess just by composing previous pose
-  wTb_latest = wTb_latest.transformPoseFrom(poseDelta);
+  wTb_latest = wTb_latest.transformPoseFrom(odom.poseDelta);
   currentEstimate.insert(newStateIdx, wTb_latest);
 
-  newTimestamps[newStateIdx] = timeUs;
-  twistsFromPreviousKey[newStateIdx] = poseDelta;
-  latestOdomTime = timeUs;
+  newTimestamps[newStateIdx] = odom.timeUs;
+  twistsFromPreviousKey[newStateIdx] = odom.poseDelta;
+  latestOdomTime = odom.timeUs;
 
   currStateIdx = newStateIdx;
 }
 
-Key Localizer::InsertIntoSmoother(Key lower, Key upper, Key newKey,
+void LocalizerCore::SubmitOdometry(OdometryObservation odom) {
+  Accept(DataSubmission{DataSubmissionType::Odometry,odom});
+}
+
+Key LocalizerCore::InsertIntoSmoother(Key lower, Key upper, Key newKey,
                                   double newTime,
                                   SharedNoiseModel odometryNoise) {
   /**
@@ -172,7 +177,7 @@ Key Localizer::InsertIntoSmoother(Key lower, Key upper, Key newKey,
 
 // Claude slop, FOR TESTING ONLY - Remove before shipping. If ts works, figure
 // out why and fix the real insertintosmoother function
-Key Localizer::ClaudeInsertIntoSmoother(Key lower, Key upper, Key newKey,
+Key LocalizerCore::ClaudeInsertIntoSmoother(Key lower, Key upper, Key newKey,
                                         double newTime) {
   const auto& isam = smootherISAM2.getISAM2();
   const VariableIndex& variableIndex = isam.getVariableIndex();
@@ -255,7 +260,7 @@ static KeyTimeConstIt FindCloser(KeyTimeConstIt left, KeyTimeConstIt right,
   }
 }
 
-Key Localizer::GetOrInsertKey(Key newKey, double time) {
+Key LocalizerCore::GetOrInsertKey(Key newKey, double time) {
   using KeyTimeMap = FixedLagSmoother::KeyTimestampMap;
 
   const KeyTimeMap& isamTimestamps = smootherISAM2.timestamps();
@@ -455,19 +460,15 @@ Key Localizer::GetOrInsertKey(Key newKey, double time) {
   // }
 }
 
-void Localizer::AddTagObservation(uint64_t timeUs, int tagID,
-                                  const std::vector<gtsam::Point2>& corners,
-                                  const gtsam::Cal3_S2_& cameraCal,
-                                  const gtsam::Pose3& robotTcamera,
-                                  const gtsam::SharedNoiseModel& cameraNoise) {
+void LocalizerCore::AddTagObservation(CameraVisionObservation obs) {
   const auto& isamTimestamps = smootherISAM2.timestamps();
-  if (timeUs < isamTimestamps.begin()->second) {
+  if (obs.timeUs < isamTimestamps.begin()->second) {
     std::cerr << "Timestamp is before even isam history - skipping"
               << std::endl;
     return;
   }
 
-  auto worldPcorners_opt = fieldLayout.WorldToCorners(tagID);
+  auto worldPcorners_opt = fieldLayout.WorldToCorners(obs.tagID);
   if (!worldPcorners_opt) {
     // todo return bad thing
     // fmt::println("Could not find tag {} in our map!", tagID); fmt doesn't
@@ -476,25 +477,30 @@ void Localizer::AddTagObservation(uint64_t timeUs, int tagID,
   }
   auto worldPcorners = worldPcorners_opt.value();
 
-  Key newKey = X(timeUs);
+  Key newKey = X(obs.timeUs);
 
   // Find where we should attach our new factors to
-  Key stateAtTime = GetOrInsertKey(newKey, timeUs);
+  Key stateAtTime = GetOrInsertKey(newKey, obs.timeUs);
 
   for (size_t i = 0; i < 4; i++) {
     // corner in image space
-    Point2 measurement = corners[i];
+    Point2 measurement = obs.corners[i];
 
     // current world->body pose
     const Pose3_ worldTbody_fac(stateAtTime);
     const auto prediction = PredictLandmarkImageLocation(
-        worldTbody_fac, robotTcamera, cameraCal, worldPcorners[i]);
+        worldTbody_fac, obs.robotTcamera, obs.cameraCal, worldPcorners[i]);
 
-    graph.addExpressionFactor(prediction, measurement, cameraNoise);
+    graph.addExpressionFactor(prediction, measurement, obs.cameraNoise);
   }
 }
 
-void Localizer::Optimize() {
+void LocalizerCore::SubmitTagObservation(CameraVisionObservation obs) {
+  Accept(DataSubmission{DataSubmissionType::TagObservation,obs});
+}
+
+void LocalizerCore::Optimize() {
+  std::lock_guard lock(isam_mtx);
   // fmt::println("Adding {} factors!", graph.size());
   // graph.print("New factors: ");
   // currentEstimate.print("New estimates: ");
@@ -512,16 +518,63 @@ void Localizer::Optimize() {
   wTb_latest = smootherISAM2.calculateEstimate<Pose3>(currStateIdx);
 }
 
-Matrix Localizer::GetLatestMarginals() const {
+void LocalizerCore::Accept(DataSubmission submission) {
+  std::lock_guard<std::mutex> lock(data_mtx);
+  submissionQueue.push(std::move(submission));
+}
+
+void LocalizerCore::Process(const DataSubmission& submission) {
+  switch (submission.type) {
+    case DataSubmissionType::Reset: {
+      const ResetData& data = std::get<ResetData>(submission.data);
+      Reset(data);
+      break;
+    }
+    case DataSubmissionType::Odometry: {
+      const OdometryObservation& odom =
+          std::get<OdometryObservation>(submission.data);
+      AddOdometry(odom);
+      break;
+    }
+    case DataSubmissionType::TagObservation: {
+      const CameraVisionObservation& obs =
+          std::get<CameraVisionObservation>(submission.data);
+      AddTagObservation(obs);
+      break;
+    }
+  }
+}
+
+void LocalizerCore::Step() {
+  {
+    std::lock_guard<std::mutex> data_lock(data_mtx);
+    std::lock_guard<std::mutex> isam_lock(isam_mtx);
+    while (!submissionQueue.empty()) {
+      DataSubmission submission = std::move(submissionQueue.front());
+      submissionQueue.pop();
+      Process(submission);
+    }
+  }
+  Optimize();
+}
+
+gtsam::Pose3 LocalizerCore::GetLatestWorldToBody() const {
+  std::lock_guard lock(isam_mtx);
+  return wTb_latest;
+}
+
+Matrix LocalizerCore::GetLatestMarginals() const {
+  std::lock_guard lock(isam_mtx);
   return smootherISAM2.marginalCovariance(GetCurrStateIdx());
 }
 
-Vector6 Localizer::GetPoseComponentStdDevs() const {
+Vector6 LocalizerCore::GetPoseComponentStdDevs() const {
   Matrix marginals = GetLatestMarginals();
   return marginals.diagonal().cwiseSqrt();
 }
 
-const std::vector<wpi::math::Pose3d> Localizer::GetPoseHistory() const {
+std::vector<wpi::math::Pose3d> LocalizerCore::GetPoseHistory() const {
+  std::lock_guard lock(isam_mtx);
   // Plot all history, so grab the whole estimate
   Values result = smootherISAM2.calculateEstimate();
 

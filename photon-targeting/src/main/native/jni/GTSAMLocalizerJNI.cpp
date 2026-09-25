@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-#include <org_photonvision_jni_GTSAMLocalizer.h>
+#include <org_photonvision_jni_GTSAMLocalizerCore.h>
 #include <wpi/fields/Field.hpp>
 #include <wpi/fields/FieldTag.hpp>
 #include <wpi/math/geometry/Pose3d.hpp>
@@ -27,17 +27,17 @@
 
 #include "gtsam_jni_utils.h"
 #include "photon/gtsam/FieldLayout.h"
-#include "photon/gtsam/Localizer.h"
+#include "photon/gtsam/LocalizerCore.h"
 
 extern "C" {
 
 /*
- * Class:     org_photonvision_jni_GTSAMLocalizer
+ * Class:     org_photonvision_jni_GTSAMLocalizerCore
  * Method:    createJNI
  * Signature: ([I[DDD[D)J
  */
 JNIEXPORT jlong JNICALL
-Java_org_photonvision_jni_GTSAMLocalizer_createJNI
+Java_org_photonvision_jni_GTSAMLocalizerCore_createJNI
   (JNIEnv* env, jclass, jintArray tagIDs, jdoubleArray tagPoses,
    jdouble fieldWidth, jdouble fieldLength, jdoubleArray tagCorners)
 {
@@ -81,70 +81,70 @@ Java_org_photonvision_jni_GTSAMLocalizer_createJNI
 
   photon::pvgtsam::FieldLayout fieldLayout =
       photon::pvgtsam::FieldLayout(field, tagModel);
-  photon::pvgtsam::Localizer* localizer_handle =
-      new photon::pvgtsam::Localizer(fieldLayout);
+  photon::pvgtsam::LocalizerCore* LocalizerCore_handle =
+      new photon::pvgtsam::LocalizerCore(fieldLayout);
 
   env->ReleaseIntArrayElements(tagIDs, tagIDsPtr, 0);
   env->ReleaseDoubleArrayElements(tagPoses, tagPosesPtr, 0);
   env->ReleaseDoubleArrayElements(tagCorners, tagCornersPtr, 0);
 
-  return reinterpret_cast<jlong>(localizer_handle);
+  return reinterpret_cast<jlong>(LocalizerCore_handle);
 }
 
 /*
- * Class:     org_photonvision_jni_GTSAMLocalizer
+ * Class:     org_photonvision_jni_GTSAMLocalizerCore
  * Method:    destroyJNI
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_org_photonvision_jni_GTSAMLocalizer_destroyJNI
-  (JNIEnv*, jclass, jlong localizer_handle)
+Java_org_photonvision_jni_GTSAMLocalizerCore_destroyJNI
+  (JNIEnv*, jclass, jlong LocalizerCore_handle)
 {
-  delete reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle);
+  delete reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle);
 }
 
 /*
- * Class:     org_photonvision_jni_GTSAMLocalizer
+ * Class:     org_photonvision_jni_GTSAMLocalizerCore
  * Method:    ResetJNI
  * Signature: (J[DJJ)V
  */
 JNIEXPORT void JNICALL
-Java_org_photonvision_jni_GTSAMLocalizer_ResetJNI
-  (JNIEnv* env, jclass, jlong localizer_handle, jdoubleArray wTrArray,
+Java_org_photonvision_jni_GTSAMLocalizerCore_ResetJNI
+  (JNIEnv* env, jclass, jlong LocalizerCore_handle, jdoubleArray wTrArray,
    jlong noise_handle, jlong timeUs)
 {
   jdouble* wTrPtr = env->GetDoubleArrayElements(wTrArray, nullptr);
-  reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)
-      ->Reset(jdoublePtrToGtsamPose3(wTrPtr),
+  reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)
+      ->Reset(photon::pvgtsam::ResetData{jdoublePtrToGtsamPose3(wTrPtr),
               *reinterpret_cast<gtsam::SharedNoiseModel*>(noise_handle),
-              static_cast<uint64_t>(timeUs));
+              static_cast<uint64_t>(timeUs)});
   env->ReleaseDoubleArrayElements(wTrArray, wTrPtr, 0);
 }
 }  // extern "C"
 
 /*
- * Class:     org_photonvision_jni_GTSAMLocalizer
+ * Class:     org_photonvision_jni_GTSAMLocalizerCore
  * Method:    OptimizeJNI
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL
-Java_org_photonvision_jni_GTSAMLocalizer_OptimizeJNI
-  (JNIEnv*, jclass, jlong localizer_handle)
+Java_org_photonvision_jni_GTSAMLocalizerCore_OptimizeJNI
+  (JNIEnv*, jclass, jlong LocalizerCore_handle)
 {
-  reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)->Optimize();
+  reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)->Optimize();
 }
 
 /*
- * Class:     org_photonvision_jni_GTSAMLocalizer
+ * Class:     org_photonvision_jni_GTSAMLocalizerCore
  * Method:    GetLatestWorldToBodyJNI
  * Signature: (J)[D
  */
 JNIEXPORT jdoubleArray JNICALL
-Java_org_photonvision_jni_GTSAMLocalizer_GetLatestWorldToBodyJNI
-  (JNIEnv* env, jclass, jlong localizer_handle)
+Java_org_photonvision_jni_GTSAMLocalizerCore_GetLatestWorldToBodyJNI
+  (JNIEnv* env, jclass, jlong LocalizerCore_handle)
 {
   gtsam::Pose3 latestWorldToBody =
-      reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)
+      reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)
           ->GetLatestWorldToBody();
   // Todo: serialize and return through JNI
   jdoubleArray result = env->NewDoubleArray(6);
@@ -152,28 +152,28 @@ Java_org_photonvision_jni_GTSAMLocalizer_GetLatestWorldToBodyJNI
 }
 
 /*
- * Class:     org_photonvision_jni_GTSAMLocalizer
+ * Class:     org_photonvision_jni_GTSAMLocalizerCore
  * Method:    GetLastOdomTimeJNI
  * Signature: (J)J
  */
 JNIEXPORT jlong JNICALL
-Java_org_photonvision_jni_GTSAMLocalizer_GetLastOdomTimeJNI
-  (JNIEnv*, jclass, jlong localizer_handle)
+Java_org_photonvision_jni_GTSAMLocalizerCore_GetLastOdomTimeJNI
+  (JNIEnv*, jclass, jlong LocalizerCore_handle)
 {
-  return reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)
+  return reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)
       ->GetLastOdomTime();
 }
 
 /*
- * Class:     org_photonvision_jni_GTSAMLocalizer
+ * Class:     org_photonvision_jni_GTSAMLocalizerCore
  * Method:    GetPoseComponentStdDevsJNI
  * Signature: (J)[D
  */
 JNIEXPORT jdoubleArray JNICALL
-Java_org_photonvision_jni_GTSAMLocalizer_GetPoseComponentStdDevsJNI
-  (JNIEnv* env, jclass, jlong localizer_handle)
+Java_org_photonvision_jni_GTSAMLocalizerCore_GetPoseComponentStdDevsJNI
+  (JNIEnv* env, jclass, jlong LocalizerCore_handle)
 {
-  auto stdDevs = reinterpret_cast<photon::pvgtsam::Localizer*>(localizer_handle)
+  auto stdDevs = reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)
                      ->GetPoseComponentStdDevs();
   // Todo: serialize and return through JNI
   jdoubleArray out = env->NewDoubleArray(6);

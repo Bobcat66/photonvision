@@ -33,6 +33,11 @@
 #include "photon/gtsam/FieldLayout.h"
 #include "photon/gtsam/gtsam_utils.h"
 
+#include <mutex>
+#include <queue>
+#include <atomic>
+#include <variant>
+
 namespace photon::pvgtsam {
 
 class LocalizerCore {
@@ -48,35 +53,46 @@ class LocalizerCore {
   explicit LocalizerCore(FieldLayout fieldLayout);
 
   /**
-   * Add a prior factor on the world->robot pose
+   * Add a prior factor on the world->robot pose. Not threadsafe, use SubmitReset instead when multithreading
    */
-  void Reset(gtsam::Pose3 wTr, gtsam::SharedNoiseModel noise, uint64_t timeUs);
+  void Reset(ResetData data);
 
-  void AddOdometry(const gtsam::Pose3& poseDelta,
-                   const gtsam::SharedNoiseModel& odometryNoise,
-                   uint64_t timeUs);
+  /**
+   * Threadsafe way to reset
+   */
+  void SubmitReset(ResetData data);
 
-  inline void AddOdometry(OdometryObservation odom) {
-    AddOdometry(odom.poseDelta, odom.odometryNoise, odom.timeUs);
-  }
+  /**
+   * Not threadsafe, use SubmitOdometry instead when multithreading
+   */
+  void AddOdometry(OdometryObservation odom);
 
-  void AddTagObservation(uint64_t timeUs, int tagID,
-                         const std::vector<gtsam::Point2>& corners,
-                         const gtsam::Cal3_S2_& cameraCal,
-                         const gtsam::Pose3& robotTcamera,
-                         const gtsam::SharedNoiseModel& cameraNoise);
+  /**
+   * Threadsafe way to submit odometry
+   */
+  void SubmitOdometry(OdometryObservation odom);
 
-  inline void AddTagObservation(CameraVisionObservation tagDetection) {
-    AddTagObservation(tagDetection.timeUs, tagDetection.tagID,
-                      tagDetection.corners, tagDetection.cameraCal,
-                      tagDetection.robotTcamera, tagDetection.cameraNoise);
-  }
+  /**
+   * Not threadsafe, use SubmitTagObservation instead when multithreading
+   */
+  void AddTagObservation(CameraVisionObservation obs);
 
+  void SubmitTagObservation(CameraVisionObservation obs);
+
+  /**
+   * Not threadsafe, use Step() instead when multithreading
+   */
   void Optimize();
+  
+  /**
+   * The main loop function. When multithreading, this function should be called in the worker thread
+   */
+  void Step();
 
   // inline void ExportGraph(std::ostream& os) {
   //   smootherISAM2.getFactors().saveGraph(os);
-  // }
+  // 
+  /*
   inline void Print(const std::string_view prefix = "") {
     // fmt::println("{}", prefix); TODO: fmt doesn't work anymore for some
     // reason? I blame wpilib
@@ -84,17 +100,18 @@ class LocalizerCore {
     smootherISAM2.getISAM2().getFactorsUnsafe().print();
     smootherISAM2.calculateEstimate().print("Current estimate:");
   }
+    */
 
   inline Key GetCurrStateIdx() const { return currStateIdx; }
   inline uint64_t GetLastOdomTime() const { return latestOdomTime; }
 
-  inline const gtsam::Pose3 GetLatestWorldToBody() const { return wTb_latest; }
+  gtsam::Pose3 GetLatestWorldToBody() const;
 
   gtsam::Matrix GetLatestMarginals() const;
   // standard deviations on rx ry rz tx ty tz
   gtsam::Vector6 GetPoseComponentStdDevs() const;
 
-  const std::vector<wpi::math::Pose3d> GetPoseHistory() const;
+  std::vector<wpi::math::Pose3d> GetPoseHistory() const;
 
  protected:
   /**
@@ -109,6 +126,9 @@ class LocalizerCore {
                                double newTime);
 
   Key GetOrInsertKey(Key newKey, double time);
+
+  void Accept(DataSubmission submission);
+  void Process(const DataSubmission& submission);
 
   // New factor graph to add to our smoother at the next call to Optimize()
   gtsam::ExpressionFactorGraph graph{};
@@ -137,6 +157,11 @@ class LocalizerCore {
   Key currStateIdx;
 
   FieldLayout fieldLayout;
+
+  mutable std::mutex data_mtx;
+  mutable std::mutex isam_mtx;
+
+  std::queue<DataSubmission> submissionQueue;
 };
 
 }  // namespace photon::pvgtsam
