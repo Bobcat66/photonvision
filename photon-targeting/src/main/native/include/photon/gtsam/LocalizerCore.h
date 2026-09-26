@@ -92,15 +92,18 @@ class LocalizerCore {
   // inline void ExportGraph(std::ostream& os) {
   //   smootherISAM2.getFactors().saveGraph(os);
   // 
-  /*
+  
+  /**
+   * Should be safe to run multithreaded? Use at your own risk
+   */
   inline void Print(const std::string_view prefix = "") {
     // fmt::println("{}", prefix); TODO: fmt doesn't work anymore for some
     // reason? I blame wpilib
+    std::lock_guard lock(isam_mtx);
     smootherISAM2.print();
     smootherISAM2.getISAM2().getFactorsUnsafe().print();
     smootherISAM2.calculateEstimate().print("Current estimate:");
   }
-    */
 
   inline Key GetCurrStateIdx() const { return currStateIdx; }
   inline uint64_t GetLastOdomTime() const { return latestOdomTime; }

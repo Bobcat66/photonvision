@@ -94,7 +94,7 @@ TEST_CASE("LocalizerCoreTest.LatencyCompensate", "[LocalizerCoreTest]") {
 
   LocalizerCore.Optimize();
   pose = LocalizerCore.GetLatestWorldToBody();
-  //LocalizerCore.Print();
+  LocalizerCore.Print();
 
   // add but don't optimize
   LocalizerCore.AddOdometry(photon::pvgtsam::OdometryObservation{
@@ -115,5 +115,5 @@ TEST_CASE("LocalizerCoreTest.LatencyCompensate", "[LocalizerCoreTest]") {
   LocalizerCore.AddTagObservation(obs);
   LocalizerCore.Optimize();
   pose = LocalizerCore.GetLatestWorldToBody();
-  // LocalizerCore.Print(); // TODO: Re-add print
+  LocalizerCore.Print();
 }

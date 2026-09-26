@@ -97,6 +97,8 @@ public class GTSAMLocalizerCore {
                 timeUs);
     }
 
+
+
     public void addTagObservation(
             long timeUs,
             int tagID,
@@ -147,8 +149,14 @@ public class GTSAMLocalizerCore {
 
     private static native void ResetJNI(
             long LocalizerCore_handle, double[] wTr, long odometryNoise_handle, long timeUs);
+    
+    private static native void SubmitResetJNI(
+            long LocalizerCore_handle, double[] wTr, long odometryNoise_handle, long timeUs);
 
     private static native void AddOdometryJNI(
+            long LocalizerCore_handle, double[] poseDelta, long odometryNoise_handle, long timeUs);
+    
+    private static native void SubmitOdometryJNI(
             long LocalizerCore_handle, double[] poseDelta, long odometryNoise_handle, long timeUs);
 
     private static native void AddTagObservationJNI(
@@ -160,7 +168,18 @@ public class GTSAMLocalizerCore {
             double[] robotTcamera,
             long cameraNoise_handle);
 
+    private static native void SubmitTagObservationJNI(
+            long LocalizerCore_handle,
+            long timeUs,
+            int tagID,
+            double[] corners,
+            double[] cameraCal,
+            double[] robotTcamera,
+            long cameraNoise_handle);
+
     private static native void OptimizeJNI(long LocalizerCore);
+
+    private static native void StepJNI(long LocalizerCore);
 
     private static native double[] GetLatestWorldToBodyJNI(long LocalizerCore_handle);
 
