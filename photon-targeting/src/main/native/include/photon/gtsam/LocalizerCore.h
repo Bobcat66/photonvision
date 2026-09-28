@@ -17,7 +17,11 @@
 
 #pragma once
 
+#include <atomic>
 #include <map>
+#include <mutex>
+#include <queue>
+#include <variant>
 #include <vector>
 
 #include <gtsam/geometry/Cal3_S2.h>
@@ -33,11 +37,6 @@
 #include "photon/gtsam/FieldLayout.h"
 #include "photon/gtsam/gtsam_utils.h"
 
-#include <mutex>
-#include <queue>
-#include <atomic>
-#include <variant>
-
 namespace photon::pvgtsam {
 
 class LocalizerCore {
@@ -47,13 +46,14 @@ class LocalizerCore {
 
  public:
   explicit LocalizerCore(const wpi::fields::Field& layout,
-                     const TargetModel& tagModel)
+                         const TargetModel& tagModel)
       : LocalizerCore(FieldLayout(layout, tagModel)) {}
 
   explicit LocalizerCore(FieldLayout fieldLayout);
 
   /**
-   * Add a prior factor on the world->robot pose. Not threadsafe, use SubmitReset instead when multithreading
+   * Add a prior factor on the world->robot pose. Not threadsafe, use
+   * SubmitReset instead when multithreading
    */
   void Reset(ResetData data);
 
@@ -83,16 +83,17 @@ class LocalizerCore {
    * Not threadsafe, use Step() instead when multithreading
    */
   void Optimize();
-  
+
   /**
-   * The main loop function. When multithreading, this function should be called in the worker thread
+   * The main loop function. When multithreading, this function should be called
+   * in the worker thread
    */
   void Step();
 
   // inline void ExportGraph(std::ostream& os) {
   //   smootherISAM2.getFactors().saveGraph(os);
-  // 
-  
+  //
+
   /**
    * Should be safe to run multithreaded? Use at your own risk
    */

@@ -27,7 +27,7 @@
 #include <wpi/units/length.hpp>
 
 extern "C" {
-/**
+/*
  * Class:     org_photonvision_jni_GTSAMExtras
  * Method:    CreateGaussianNoiseModelJNI
  * Signature: (I[D)J
@@ -46,7 +46,7 @@ Java_org_photonvision_jni_GTSAMExtras_CreateGaussianNoiseModelJNI
       new gtsam::noiseModel::Gaussian::shared_ptr(noiseModel));
 }
 
-/**
+/*
  * Class:     org_photonvision_jni_GTSAMExtras
  * Method:    DestroyGaussianNoiseModelJNI
  * Signature: (J)V

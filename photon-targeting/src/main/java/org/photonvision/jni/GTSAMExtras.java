@@ -25,13 +25,13 @@ import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Num;
 
 public class GTSAMExtras {
-    public static final class NoiseModel implements AutoCloseable {
+    public static final class JNIHandle implements AutoCloseable {
         private final long handle;
         private static final Cleaner cleaner = Cleaner.create();
         private final Cleanable cleanable;
 
         // This class should only be constructed inside GTSAMExtras
-        private NoiseModel(long handle, Runnable cleanup) {
+        private Handle(long handle, Runnable cleanup) {
             this.handle = handle;
             this.cleanable = cleaner.register(this, cleanup);
         }
@@ -46,36 +46,37 @@ public class GTSAMExtras {
         }
     }
 
-    public static <S extends Num> NoiseModel CreateGaussianNoiseModel(Matrix<S, S> covariances) {
-        var covariances_t =
+    // NoiseModel
+    public static final class NoiseModel extends JNIHandle {
+        public static <S extends Num> NoiseModel Gaussian(Matrix<S, S> covariances) {
+            var covariances_t =
                 covariances
                         .transpose(); // this will change the matrix to column-major order, which is what GTSAM
-        // expects. We do not mathematically transpose the matrix, this is purely
-        // memory order tomfoolery
-        long handle = CreateGaussianNoiseModelJNI(covariances_t.getNumRows(), covariances_t.getData());
-        return new NoiseModel(handle, () -> DestroyGaussianNoiseModelJNI(handle));
-    }
-
-    public static <S extends Num> NoiseModel CreateDiagonalNoiseModel(Vector<S> sigmas) {
-        var covariances_t =
-                sigmas
-                        .getStorage()
-                        .diag()
-                        .transpose(); // this will change the matrix to column-major order, which is what GTSAM
-        // expects. We do not mathematically transpose the matrix, this is purely
-        // memory order tomfoolery
-        // We need to do this because EJML stores SimpleMatrix in row-major order
-        long handle =
-                CreateGaussianNoiseModelJNI(sigmas.getNumRows(), covariances_t.getDDRM().getData());
-        return new NoiseModel(handle, () -> DestroyGaussianNoiseModelJNI(handle));
-    }
-
-    public static <S extends Num> NoiseModel CreateIsotropicNoiseModel(Nat<S> dim, double sigma) {
-        var sigmas = new Vector(dim);
-        for (int i = 0; i < dim.getNum(); i++) {
-            sigmas.set(i, 0, sigma);
+            // expects. We do not mathematically transpose the matrix, this is purely
+            // memory order tomfoolery
+            long handle = CreateGaussianNoiseModelJNI(covariances_t.getNumRows(), covariances_t.getData());
+            return new NoiseModel(handle, () -> DestroyGaussianNoiseModelJNI(handle));
         }
-        return CreateDiagonalNoiseModel(sigmas);
+        public static <S extends Num> NoiseModel Diagonal(Vector<S> sigmas) {
+            var covariances_t =
+                    sigmas
+                            .getStorage()
+                            .diag()
+                            .transpose(); // this will change the matrix to column-major order, which is what GTSAM
+            // expects. We do not mathematically transpose the matrix, this is purely
+            // memory order tomfoolery
+            // We need to do this because EJML stores SimpleMatrix in row-major order
+            long handle =
+                    CreateGaussianNoiseModelJNI(sigmas.getNumRows(), covariances_t.getDDRM().getData());
+            return new NoiseModel(handle, () -> DestroyGaussianNoiseModelJNI(handle));
+        }
+        public static <S extends Num> NoiseModel Isotropic(Nat<S> dim, double sigma) {
+            var sigmas = new Vector(dim);
+            for (int i = 0; i < dim.getNum(); i++) {
+                sigmas.set(i, 0, sigma);
+            }
+            return Diagonal(sigmas);
+        }
     }
 
     // This returns a handle to a gaussian noise model, built from a covariance matrix. the covariance
@@ -84,5 +85,17 @@ public class GTSAMExtras {
     // of length matsize * matsize
     private static native long CreateGaussianNoiseModelJNI(int matsize, double[] covariances);
 
-    private static native long DestroyGaussianNoiseModelJNI(long handle);
+    private static native void DestroyGaussianNoiseModelJNI(long handle);
+
+    // Cal3S2
+    public static final class Cal3S2 extends JNIHandle {
+        public static Cal3S2 FromDoubles(double fx, double fy, double s, double u0, double v0) {
+            long handle = CreateCal3S2JNI(fx,fy,s,u0,v0);
+            return new Cal3S2(handle, () -> DestroyCal3S2JNI(handle));
+        }
+    }
+
+    private static native long CreateCal3S2JNI(double fx, double fy, double s, double u0, double v0);
+
+    private static native void DestroyCal3S2JNI(long handle);
 }

@@ -64,7 +64,8 @@ TEST_CASE("LocalizerCoreTest.LatencyCompensate", "[LocalizerCoreTest]") {
 
   auto LocalizerCore = photon::pvgtsam::LocalizerCore(layout);
 
-  LocalizerCore.Reset(photon::pvgtsam::ResetData{Pose3(), posePriorNoise, 5 * 1000});
+  LocalizerCore.Reset(
+      photon::pvgtsam::ResetData{Pose3(), posePriorNoise, 5 * 1000});
   LocalizerCore.AddOdometry(photon::pvgtsam::OdometryObservation{
       100 * 1000, Pose3{Rot3{}, Point3{1, 0, 0}}, odometryNoise});
   LocalizerCore.AddOdometry(photon::pvgtsam::OdometryObservation{

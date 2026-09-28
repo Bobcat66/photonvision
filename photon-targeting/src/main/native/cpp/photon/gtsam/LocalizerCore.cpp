@@ -73,14 +73,14 @@ void LocalizerCore::Reset(ResetData data) {
 }
 
 void LocalizerCore::SubmitReset(ResetData data) {
-  Accept(DataSubmission{DataSubmissionType::Reset,data});
+  Accept(DataSubmission{DataSubmissionType::Reset, data});
 }
 void LocalizerCore::AddOdometry(OdometryObservation odom) {
   Key newStateIdx = X(odom.timeUs);
 
   // Add an odometry pose delta from our last state to our new one
-  graph.emplace_shared<BetweenFactor<Pose3>>(currStateIdx, newStateIdx,
-                                             odom.poseDelta, odom.odometryNoise);
+  graph.emplace_shared<BetweenFactor<Pose3>>(
+      currStateIdx, newStateIdx, odom.poseDelta, odom.odometryNoise);
 
   // And get initial guess just by composing previous pose
   wTb_latest = wTb_latest.transformPoseFrom(odom.poseDelta);
@@ -94,12 +94,12 @@ void LocalizerCore::AddOdometry(OdometryObservation odom) {
 }
 
 void LocalizerCore::SubmitOdometry(OdometryObservation odom) {
-  Accept(DataSubmission{DataSubmissionType::Odometry,odom});
+  Accept(DataSubmission{DataSubmissionType::Odometry, odom});
 }
 
 Key LocalizerCore::InsertIntoSmoother(Key lower, Key upper, Key newKey,
-                                  double newTime,
-                                  SharedNoiseModel odometryNoise) {
+                                      double newTime,
+                                      SharedNoiseModel odometryNoise) {
   /**
    * Goal: find the FactorIndex that connects our lower/upper key, and replace
    * it with 2 new factors and an intermediatestate
@@ -178,7 +178,7 @@ Key LocalizerCore::InsertIntoSmoother(Key lower, Key upper, Key newKey,
 // Claude slop, FOR TESTING ONLY - Remove before shipping. If ts works, figure
 // out why and fix the real insertintosmoother function
 Key LocalizerCore::ClaudeInsertIntoSmoother(Key lower, Key upper, Key newKey,
-                                        double newTime) {
+                                            double newTime) {
   const auto& isam = smootherISAM2.getISAM2();
   const VariableIndex& variableIndex = isam.getVariableIndex();
   const NonlinearFactorGraph& currentFactors = isam.getFactorsUnsafe();
@@ -496,7 +496,7 @@ void LocalizerCore::AddTagObservation(CameraVisionObservation obs) {
 }
 
 void LocalizerCore::SubmitTagObservation(CameraVisionObservation obs) {
-  Accept(DataSubmission{DataSubmissionType::TagObservation,obs});
+  Accept(DataSubmission{DataSubmissionType::TagObservation, obs});
 }
 
 void LocalizerCore::Optimize() {

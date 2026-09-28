@@ -97,13 +97,11 @@ public class GTSAMLocalizerCore {
                 timeUs);
     }
 
-
-
     public void addTagObservation(
             long timeUs,
             int tagID,
             double[] corners,
-            double[] cameraCal,
+            GTSAMExtras.Cal3S2 cameraCal,
             Pose3d robotTcamera,
             GTSAMExtras.NoiseModel cameraNoise) {
         AddTagObservationJNI(
@@ -111,7 +109,7 @@ public class GTSAMLocalizerCore {
                 timeUs,
                 tagID,
                 corners,
-                cameraCal,
+                cameraCal.getHandle(),
                 new double[] {
                     robotTcamera.getX(),
                     robotTcamera.getY(),
@@ -149,13 +147,13 @@ public class GTSAMLocalizerCore {
 
     private static native void ResetJNI(
             long LocalizerCore_handle, double[] wTr, long odometryNoise_handle, long timeUs);
-    
+
     private static native void SubmitResetJNI(
             long LocalizerCore_handle, double[] wTr, long odometryNoise_handle, long timeUs);
 
     private static native void AddOdometryJNI(
             long LocalizerCore_handle, double[] poseDelta, long odometryNoise_handle, long timeUs);
-    
+
     private static native void SubmitOdometryJNI(
             long LocalizerCore_handle, double[] poseDelta, long odometryNoise_handle, long timeUs);
 
@@ -164,22 +162,22 @@ public class GTSAMLocalizerCore {
             long timeUs,
             int tagID,
             double[] corners,
-            double[] cameraCal,
+            long cameraCal_handle,
             double[] robotTcamera,
             long cameraNoise_handle);
 
     private static native void SubmitTagObservationJNI(
-            long LocalizerCore_handle,
+            long LocalizerCore_handle, std::vector<wpi::math::Translation3d> verts;
             long timeUs,
             int tagID,
             double[] corners,
-            double[] cameraCal,
+            long cameraCal_handle,
             double[] robotTcamera,
             long cameraNoise_handle);
 
-    private static native void OptimizeJNI(long LocalizerCore);
+    private static native void OptimizeJNI(long LocalizerCore_handle);
 
-    private static native void StepJNI(long LocalizerCore);
+    private static native void StepJNI(long LocalizerCore_handle);
 
     private static native double[] GetLatestWorldToBodyJNI(long LocalizerCore_handle);
 

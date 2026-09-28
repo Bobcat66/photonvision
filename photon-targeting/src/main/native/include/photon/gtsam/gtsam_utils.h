@@ -18,8 +18,8 @@
 #pragma once
 #include <array>
 #include <utility>
-#include <vector>
 #include <variant>
+#include <vector>
 
 #include <gtsam/geometry/Pose3.h>
 #include <gtsam/linear/NoiseModel.h>
@@ -55,11 +55,7 @@ struct OdometryObservation {
   gtsam::SharedNoiseModel odometryNoise;
 };
 
-enum class DataSubmissionType {
-  Reset,
-  Odometry,
-  TagObservation
-};
+enum class DataSubmissionType { Reset, Odometry, TagObservation };
 
 struct ResetData {
   gtsam::Pose3 wTr;
@@ -68,8 +64,8 @@ struct ResetData {
 };
 
 struct DataSubmission {
-    DataSubmissionType type;
-    std::variant<ResetData, OdometryObservation, CameraVisionObservation> data;
+  DataSubmissionType type;
+  std::variant<ResetData, OdometryObservation, CameraVisionObservation> data;
 };
 
 template <typename T>

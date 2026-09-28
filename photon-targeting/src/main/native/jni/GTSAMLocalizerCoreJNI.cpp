@@ -31,7 +31,7 @@
 
 extern "C" {
 
-/**
+/*
  * Class:     org_photonvision_jni_GTSAMLocalizerCore
  * Method:    createJNI
  * Signature: ([I[DDD[D)J
@@ -91,7 +91,7 @@ Java_org_photonvision_jni_GTSAMLocalizerCore_createJNI
   return reinterpret_cast<jlong>(LocalizerCore_handle);
 }
 
-/**
+/*
  * Class:     org_photonvision_jni_GTSAMLocalizerCore
  * Method:    destroyJNI
  * Signature: (J)V
@@ -100,10 +100,11 @@ JNIEXPORT void JNICALL
 Java_org_photonvision_jni_GTSAMLocalizerCore_destroyJNI
   (JNIEnv*, jclass, jlong LocalizerCore_handle)
 {
-  delete reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle);
+  delete reinterpret_cast<photon::pvgtsam::LocalizerCore*>(
+      LocalizerCore_handle);
 }
 
-/**
+/*
  * Class:     org_photonvision_jni_GTSAMLocalizerCore
  * Method:    ResetJNI
  * Signature: (J[DJJ)V
@@ -115,13 +116,14 @@ Java_org_photonvision_jni_GTSAMLocalizerCore_ResetJNI
 {
   jdouble* wTrPtr = env->GetDoubleArrayElements(wTrArray, nullptr);
   reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)
-      ->Reset(photon::pvgtsam::ResetData{jdoublePtrToGtsamPose3(wTrPtr),
-              *reinterpret_cast<gtsam::SharedNoiseModel*>(noise_handle),
-              static_cast<uint64_t>(timeUs)});
+      ->Reset(photon::pvgtsam::ResetData{
+          jdoublePtrToGtsamPose3(wTrPtr),
+          *reinterpret_cast<gtsam::SharedNoiseModel*>(noise_handle),
+          static_cast<uint64_t>(timeUs)});
   env->ReleaseDoubleArrayElements(wTrArray, wTrPtr, 0);
 }
 
-/**
+/*
  * Class:     org_photonvision_jni_GTSAMLocalizerCore
  * Method:    SubmitResetJNI
  * Signature: (J[DJJ)V
@@ -133,13 +135,14 @@ Java_org_photonvision_jni_GTSAMLocalizerCore_SubmitResetJNI
 {
   jdouble* wTrPtr = env->GetDoubleArrayElements(wTrArray, nullptr);
   reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)
-      ->SubmitReset(photon::pvgtsam::ResetData{jdoublePtrToGtsamPose3(wTrPtr),
-              *reinterpret_cast<gtsam::SharedNoiseModel*>(noise_handle),
-              static_cast<uint64_t>(timeUs)});
+      ->SubmitReset(photon::pvgtsam::ResetData{
+          jdoublePtrToGtsamPose3(wTrPtr),
+          *reinterpret_cast<gtsam::SharedNoiseModel*>(noise_handle),
+          static_cast<uint64_t>(timeUs)});
   env->ReleaseDoubleArrayElements(wTrArray, wTrPtr, 0);
 }
 
-/**
+/*
  * Class:     org_photonvision_jni_GTSAMLocalizerCore
  * Method:    AddOdometryJNI
  * Signature: (J[DJJ)V
@@ -151,13 +154,14 @@ Java_org_photonvision_jni_GTSAMLocalizerCore_AddOdometryJNI
 {
   jdouble* wTrPtr = env->GetDoubleArrayElements(wTrArray, nullptr);
   reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)
-      ->AddOdometry(photon::pvgtsam::OdometryData{jdoublePtrToGtsamPose3(wTrPtr),
-              *reinterpret_cast<gtsam::SharedNoiseModel*>(noise_handle),
-              static_cast<uint64_t>(timeUs)});
+      ->AddOdometry(photon::pvgtsam::OdometryData{
+          jdoublePtrToGtsamPose3(wTrPtr),
+          *reinterpret_cast<gtsam::SharedNoiseModel*>(noise_handle),
+          static_cast<uint64_t>(timeUs)});
   env->ReleaseDoubleArrayElements(wTrArray, wTrPtr, 0);
 }
 
-/**
+/*
  * Class:     org_photonvision_jni_GTSAMLocalizerCore
  * Method:    SubmitOdometryJNI
  * Signature: (J[DJJ)V
@@ -169,19 +173,70 @@ Java_org_photonvision_jni_GTSAMLocalizerCore_SubmitOdometryJNI
 {
   jdouble* wTrPtr = env->GetDoubleArrayElements(wTrArray, nullptr);
   reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)
-      ->SubmitOdometry(photon::pvgtsam::OdometryData{jdoublePtrToGtsamPose3(wTrPtr),
-              *reinterpret_cast<gtsam::SharedNoiseModel*>(noise_handle),
-              static_cast<uint64_t>(timeUs)});
+      ->SubmitOdometry(photon::pvgtsam::OdometryObservation{
+          jdoublePtrToGtsamPose3(wTrPtr),
+          *reinterpret_cast<gtsam::SharedNoiseModel*>(noise_handle),
+          static_cast<uint64_t>(timeUs)});
   env->ReleaseDoubleArrayElements(wTrArray, wTrPtr, 0);
 }
 
-/**
+/*
  * Class:     org_photonvision_jni_GTSAMLocalizerCore
  * Method:    AddTagObservationJNI
- * Signature: (JJI[D[D[DJ)V
+ * Signature: (JJI[DJ[DJ)V
  */
-JNIEXPORT void 
-/**
+JNIEXPORT void JNICALL
+Java_org_photonvision_jni_GTSAMLocalizerCore_AddTagObservationJNI
+  (JNIEnv* env, jclass, jlong LocalizerCore_handle, jlong timeUs, jint tagID,
+   jdoubleArray corners, jlong cameraCal_handle, jdoubleArray robotTcamera,
+   jlong cameraNoise_handle)
+{
+  jdouble* cornersPtr = env->GetDoubleArrayElements(corners, nullptr);
+  jdouble* robotTcameraPtr = env->GetDoubleArrayElements(robotTcamera, nullptr);
+  std::vector<gtsam::Point2> corners;
+  for (jsize i = 0; i < 4; ++i) {
+    corners.emplace_back(
+        gtsam::Vector2{cornersPtr[2 * i], cornersPtr[2 * i + 1]});
+  }
+  reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)
+      ->AddTagObservation(photon::pvgtsam::CameraVisionObservation{
+          timeUs, tagID, corners,
+          *reinterpret_cast<gtsam::Cal3_S2_*>(cameraCal_handle),
+          jdoublePtrToGtsamPose3(robotTcameraPtr),
+          *reinterpret_cast<gtsam::SharedNoiseModel*>(cameraNoise_handle)})
+          env->ReleaseDoubleArrayElements(corners, cornersPtr, 0);
+  env->ReleaseDoubleArrayElements(robotTcamera, robotTcameraPtr, 0);
+}
+
+/*
+ * Class:     org_photonvision_jni_GTSAMLocalizerCore
+ * Method:    SubmitTagObservationJNI
+ * Signature: (JJI[DJ[DJ)V
+ */
+JNIEXPORT void JNICALL
+Java_org_photonvision_jni_GTSAMLocalizerCore_SubmitTagObservationJNI
+  (JNIEnv* env, jclass, jlong LocalizerCore_handle, jlong timeUs, jint tagID,
+   jdoubleArray corners, jlong cameraCal_handle, jdoubleArray robotTcamera,
+   jlong cameraNoise_handle)
+{
+  jdouble* cornersPtr = env->GetDoubleArrayElements(corners, nullptr);
+  jdouble* robotTcameraPtr = env->GetDoubleArrayElements(robotTcamera, nullptr);
+  std::vector<gtsam::Point2> corners;
+  for (jsize i = 0; i < 4; ++i) {
+    corners.emplace_back(
+        gtsam::Vector2{cornersPtr[2 * i], cornersPtr[2 * i + 1]});
+  }
+  reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)
+      ->SubmitTagObservation(photon::pvgtsam::CameraVisionObservation{
+          timeUs, tagID, corners,
+          *reinterpret_cast<gtsam::Cal3_S2_*>(cameraCal_handle),
+          jdoublePtrToGtsamPose3(robotTcameraPtr),
+          *reinterpret_cast<gtsam::SharedNoiseModel*>(cameraNoise_handle)})
+          env->ReleaseDoubleArrayElements(corners, cornersPtr, 0);
+  env->ReleaseDoubleArrayElements(robotTcamera, robotTcameraPtr, 0);
+}
+
+/*
  * Class:     org_photonvision_jni_GTSAMLocalizerCore
  * Method:    OptimizeJNI
  * Signature: (J)V
@@ -190,10 +245,11 @@ JNIEXPORT void JNICALL
 Java_org_photonvision_jni_GTSAMLocalizerCore_OptimizeJNI
   (JNIEnv*, jclass, jlong LocalizerCore_handle)
 {
-  reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)->Optimize();
+  reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)
+      ->Optimize();
 }
 
-/**
+/*
  * Class:     org_photonvision_jni_GTSAMLocalizerCore
  * Method:    GetLatestWorldToBodyJNI
  * Signature: (J)[D
@@ -210,7 +266,7 @@ Java_org_photonvision_jni_GTSAMLocalizerCore_GetLatestWorldToBodyJNI
   return result;  // Placeholder I hate JNI
 }
 
-/**
+/*
  * Class:     org_photonvision_jni_GTSAMLocalizerCore
  * Method:    GetLastOdomTimeJNI
  * Signature: (J)J
@@ -223,7 +279,7 @@ Java_org_photonvision_jni_GTSAMLocalizerCore_GetLastOdomTimeJNI
       ->GetLastOdomTime();
 }
 
-/**
+/*
  * Class:     org_photonvision_jni_GTSAMLocalizerCore
  * Method:    GetPoseComponentStdDevsJNI
  * Signature: (J)[D
@@ -232,8 +288,9 @@ JNIEXPORT jdoubleArray JNICALL
 Java_org_photonvision_jni_GTSAMLocalizerCore_GetPoseComponentStdDevsJNI
   (JNIEnv* env, jclass, jlong LocalizerCore_handle)
 {
-  auto stdDevs = reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)
-                     ->GetPoseComponentStdDevs();
+  auto stdDevs =
+      reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)
+          ->GetPoseComponentStdDevs();
   // Todo: serialize and return through JNI
   jdoubleArray out = env->NewDoubleArray(6);
   if (out == nullptr)
