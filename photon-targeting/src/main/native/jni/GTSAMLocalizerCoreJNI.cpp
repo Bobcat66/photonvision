@@ -155,8 +155,7 @@ Java_org_photonvision_jni_GTSAMLocalizerCore_AddOdometryJNI
   jdouble* wTrPtr = env->GetDoubleArrayElements(wTrArray, nullptr);
   reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)
       ->AddOdometry(photon::pvgtsam::OdometryObservation{
-          static_cast<uint64_t>(timeUs),
-          jdoublePtrToGtsamPose3(wTrPtr),
+          static_cast<uint64_t>(timeUs), jdoublePtrToGtsamPose3(wTrPtr),
           *reinterpret_cast<gtsam::SharedNoiseModel*>(noise_handle)});
   env->ReleaseDoubleArrayElements(wTrArray, wTrPtr, JNI_ABORT);
 }
@@ -174,8 +173,7 @@ Java_org_photonvision_jni_GTSAMLocalizerCore_SubmitOdometryJNI
   jdouble* wTrPtr = env->GetDoubleArrayElements(wTrArray, nullptr);
   reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)
       ->SubmitOdometry(photon::pvgtsam::OdometryObservation{
-          static_cast<uint64_t>(timeUs)
-          jdoublePtrToGtsamPose3(wTrPtr),
+          static_cast<uint64_t>(timeUs) jdoublePtrToGtsamPose3(wTrPtr),
           *reinterpret_cast<gtsam::SharedNoiseModel*>(noise_handle)});
   env->ReleaseDoubleArrayElements(wTrArray, wTrPtr, JNI_ABORT);
 }
@@ -262,9 +260,9 @@ Java_org_photonvision_jni_GTSAMLocalizerCore_GetLatestWorldToBodyJNI
       reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)
           ->GetLatestWorldToBody();
   jdouble buf[6];
-  writeGtsamPose3ToArray(latestWorldToBody,buf);
+  writeGtsamPose3ToArray(latestWorldToBody, buf);
   jdoubleArray out = env->NewDoubleArray(6);
-  env->SetDoubleArrayRegion(out,0,6,buf);
+  env->SetDoubleArrayRegion(out, 0, 6, buf);
   return out;  // Placeholder I hate JNI
 }
 

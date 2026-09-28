@@ -50,19 +50,23 @@ public class GTSAMExtras {
     public static final class NoiseModel extends JNIHandle {
         public static <S extends Num> NoiseModel Gaussian(Matrix<S, S> covariances) {
             var covariances_t =
-                covariances
-                        .transpose(); // this will change the matrix to column-major order, which is what GTSAM
+                    covariances
+                            .transpose(); // this will change the matrix to column-major order, which is what
+            // GTSAM
             // expects. We do not mathematically transpose the matrix, this is purely
             // memory order tomfoolery
-            long handle = CreateGaussianNoiseModelJNI(covariances_t.getNumRows(), covariances_t.getData());
+            long handle =
+                    CreateGaussianNoiseModelJNI(covariances_t.getNumRows(), covariances_t.getData());
             return new NoiseModel(handle, () -> DestroyGaussianNoiseModelJNI(handle));
         }
+
         public static <S extends Num> NoiseModel Diagonal(Vector<S> sigmas) {
             var covariances_t =
                     sigmas
                             .getStorage()
                             .diag()
-                            .transpose(); // this will change the matrix to column-major order, which is what GTSAM
+                            .transpose(); // this will change the matrix to column-major order, which is what
+            // GTSAM
             // expects. We do not mathematically transpose the matrix, this is purely
             // memory order tomfoolery
             // We need to do this because EJML stores SimpleMatrix in row-major order
@@ -70,6 +74,7 @@ public class GTSAMExtras {
                     CreateGaussianNoiseModelJNI(sigmas.getNumRows(), covariances_t.getDDRM().getData());
             return new NoiseModel(handle, () -> DestroyGaussianNoiseModelJNI(handle));
         }
+
         public static <S extends Num> NoiseModel Isotropic(Nat<S> dim, double sigma) {
             var sigmas = new Vector(dim);
             for (int i = 0; i < dim.getNum(); i++) {
@@ -90,7 +95,7 @@ public class GTSAMExtras {
     // Cal3S2
     public static final class Cal3S2 extends JNIHandle {
         public static Cal3S2 FromDoubles(double fx, double fy, double s, double u0, double v0) {
-            long handle = CreateCal3S2JNI(fx,fy,s,u0,v0);
+            long handle = CreateCal3S2JNI(fx, fy, s, u0, v0);
             return new Cal3S2(handle, () -> DestroyCal3S2JNI(handle));
         }
     }
