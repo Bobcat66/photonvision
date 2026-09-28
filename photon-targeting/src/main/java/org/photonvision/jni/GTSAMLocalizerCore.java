@@ -167,7 +167,7 @@ public class GTSAMLocalizerCore {
             long cameraNoise_handle);
 
     private static native void SubmitTagObservationJNI(
-            long LocalizerCore_handle, std::vector<wpi::math::Translation3d> verts;
+            long LocalizerCore_handle,
             long timeUs,
             int tagID,
             double[] corners,
