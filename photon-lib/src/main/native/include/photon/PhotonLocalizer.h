@@ -25,5 +25,39 @@
 #pragma once
 
 #include "photon/gtsam/LocalizerCore.h"
+#include <wpi/system/Notifier.hpp>
+#include <wpi/math/linalg/EigenCore.hpp>
+#include <wpi/math/geometry/Transform3d.hpp>
+#include "photon/targeting/PhotonPipelineResult.h"
 
-class PhotonLocalizer {}
+namespace photon {
+
+struct GTSAMPoseEstimate {
+    wpi::math::Pose3d pose,
+    uint64_t timestamp
+};
+
+class PhotonLocalizer {
+    public:
+    PhotonLocalizer(const wpi::fields::Field& layout,
+    const TargetModel& tagModel);
+
+    void Start();
+    void Stop();
+
+    void SetPoseNoise(wpi::math::Vectord<6> sigmas); // Diagonal noise model
+    void SetPixelNoise(double sigma); // Isotropic noise model
+
+    void SubmitReset(wpi::math::Pose3d pose, uint64_t timeUs);
+    void SubmitOdometry(wpi::math::Transform3d poseDelta, uint64_t timeUs);
+    void SubmitPipelineResult(PhotonPipelineResult result, wpi::math::Transform3d robotToCamera);
+    GTSAMPoseEstimate GetLatestPoseEstimate() const;
+    wpi::math::Vectord<6> GetPoseStdDevs() const;
+
+    private:
+    pvgtsam::LocalizerCore core;
+    wpi::Notifier notifier;
+    gtsam::SharedNoiseModel pixelNoise; // Should be isotropic
+    gtsam::SharedNoiseModel odomNoise; // Should be diagonal
+}
+}
