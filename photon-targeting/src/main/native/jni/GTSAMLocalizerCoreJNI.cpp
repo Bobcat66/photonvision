@@ -298,4 +298,17 @@ Java_org_photonvision_jni_GTSAMLocalizerCore_GetPoseComponentStdDevsJNI
   env->SetDoubleArrayRegion(out, 0, 6, stdDevs.data());
   return out;
 }
+
+/*
+ * Class:     org_photonvision_jni_GTSAMLocalizerCore
+ * Method:    Step
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL
+Java_org_photonvision_jni_GTSAMLocalizerCore_Step
+  (JNIEnv*, jclass, jlong LocalizerCore_handle)
+{
+  reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)
+      ->Step();
+}
 }  // extern "C"

@@ -23,3 +23,7 @@
  */
 
 #pragma once
+
+#include "photon/gtsam/LocalizerCore.h"
+
+class PhotonLocalizer {}
