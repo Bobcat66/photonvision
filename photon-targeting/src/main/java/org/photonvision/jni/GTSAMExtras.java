@@ -23,6 +23,7 @@ import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Num;
+import org.wpilib.math.numbers.N5;
 
 public class GTSAMExtras {
     public static class JNIHandle implements AutoCloseable {
@@ -105,6 +106,10 @@ public class GTSAMExtras {
         public static Cal3S2 FromDoubles(double fx, double fy, double s, double u0, double v0) {
             long handle = CreateCal3S2JNI(fx, fy, s, u0, v0);
             return new Cal3S2(handle, () -> DestroyCal3S2JNI(handle));
+        }
+
+        public static Cal3S2 FromVector(Vector<N5> vec) {
+            return FromDoubles(vec.get(0), vec.get(1), vec.get(2), vec.get(3), vec.get(4));
         }
     }
 
