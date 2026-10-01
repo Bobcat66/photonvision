@@ -68,3 +68,14 @@ void PhotonLocalizer::SubmitPipelineResult(PhotonPipelineResult result, const GT
         });
     }
 }
+
+GTSAMPoseEstimate PhotonLocalizer::GetLatestPoseEstimate() const {
+    return GTSAMPoseEstimate{
+        pvgtsam::GtsamToFrcPose3d(core.GetLatestWorldToBody()),
+        gtsam::symbolIndex(core.GetCurrStateIdx())
+    };
+}
+
+wpi::math::Vectord<6> PhotonLocalizer::GetPoseStdDevs() const {
+    return core.GetPoseComponentStdDevs();
+}
