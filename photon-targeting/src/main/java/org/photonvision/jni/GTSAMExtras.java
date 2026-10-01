@@ -25,13 +25,13 @@ import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Num;
 
 public class GTSAMExtras {
-    public static final class JNIHandle implements AutoCloseable {
+    public static class JNIHandle implements AutoCloseable {
         private final long handle;
         private static final Cleaner cleaner = Cleaner.create();
         private final Cleanable cleanable;
 
         // This class should only be constructed inside GTSAMExtras
-        private Handle(long handle, Runnable cleanup) {
+        private JNIHandle(long handle, Runnable cleanup) {
             this.handle = handle;
             this.cleanable = cleaner.register(this, cleanup);
         }
@@ -48,6 +48,10 @@ public class GTSAMExtras {
 
     // NoiseModel
     public static final class NoiseModel extends JNIHandle {
+        private NoiseModel(long handle, Runnable cleanup) {
+            super(handle, cleanup);
+        }
+
         public static <S extends Num> NoiseModel Gaussian(Matrix<S, S> covariances) {
             var covariances_t =
                     covariances
@@ -94,6 +98,10 @@ public class GTSAMExtras {
 
     // Cal3S2
     public static final class Cal3S2 extends JNIHandle {
+        private Cal3S2(long handle, Runnable cleanup) {
+            super(handle, cleanup);
+        }
+
         public static Cal3S2 FromDoubles(double fx, double fy, double s, double u0, double v0) {
             long handle = CreateCal3S2JNI(fx, fy, s, u0, v0);
             return new Cal3S2(handle, () -> DestroyCal3S2JNI(handle));

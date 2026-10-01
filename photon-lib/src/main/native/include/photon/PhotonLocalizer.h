@@ -29,12 +29,23 @@
 #include <wpi/math/linalg/EigenCore.hpp>
 #include <wpi/math/geometry/Transform3d.hpp>
 #include "photon/targeting/PhotonPipelineResult.h"
+#include <gtsam/geometry/Cal3_S2.h>
+#include <gtsam/slam/expressions.h>
 
 namespace photon {
 
 struct GTSAMPoseEstimate {
-    wpi::math::Pose3d pose,
-    uint64_t timestamp
+    wpi::math::Pose3d pose;
+    uint64_t timestamp;
+};
+
+struct GTSAMCamConfig {
+    gtsam::Pose3 robotToCamera;
+    gtsam::Cal3_S2_ cameraCal;
+
+    GTSAMCamConfig(wpi::math::Transform3d robotToCamera_wpi, wpi::math::Vectord<5> cameraCal_wpi) 
+    : robotToCamera(pvgtsam::Transform3dToGtsamPose3(robotToCamera_wpi))
+    , cameraCal(gtsam::Cal3_S2(cameraCal_wpi)) {}
 };
 
 class PhotonLocalizer {
@@ -50,7 +61,7 @@ class PhotonLocalizer {
 
     void SubmitReset(wpi::math::Pose3d pose, uint64_t timeUs);
     void SubmitOdometry(wpi::math::Transform3d poseDelta, uint64_t timeUs);
-    void SubmitPipelineResult(PhotonPipelineResult result, wpi::math::Transform3d robotToCamera);
+    void SubmitPipelineResult(PhotonPipelineResult result, const GTSAMCamConfig& camConfig);
     GTSAMPoseEstimate GetLatestPoseEstimate() const;
     wpi::math::Vectord<6> GetPoseStdDevs() const;
 
@@ -58,6 +69,6 @@ class PhotonLocalizer {
     pvgtsam::LocalizerCore core;
     wpi::Notifier notifier;
     gtsam::SharedNoiseModel pixelNoise; // Should be isotropic
-    gtsam::SharedNoiseModel odomNoise; // Should be diagonal
-}
-}
+    gtsam::SharedNoiseModel odomNoise; // Should be diagonal. TODO: Make robust? ts needs to be tested
+};
+} // namespace photon

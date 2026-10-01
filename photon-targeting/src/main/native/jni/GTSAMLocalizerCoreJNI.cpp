@@ -173,7 +173,7 @@ Java_org_photonvision_jni_GTSAMLocalizerCore_SubmitOdometryJNI
   jdouble* wTrPtr = env->GetDoubleArrayElements(wTrArray, nullptr);
   reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)
       ->SubmitOdometry(photon::pvgtsam::OdometryObservation{
-          static_cast<uint64_t>(timeUs) jdoublePtrToGtsamPose3(wTrPtr),
+          static_cast<uint64_t>(timeUs), jdoublePtrToGtsamPose3(wTrPtr),
           *reinterpret_cast<gtsam::SharedNoiseModel*>(noise_handle)});
   env->ReleaseDoubleArrayElements(wTrArray, wTrPtr, JNI_ABORT);
 }
@@ -198,7 +198,7 @@ Java_org_photonvision_jni_GTSAMLocalizerCore_AddTagObservationJNI
   }
   reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)
       ->AddTagObservation(photon::pvgtsam::CameraVisionObservation{
-          timeUs, tagID, cornersVec,
+          static_cast<uint64_t>(timeUs), tagID, cornersVec,
           *reinterpret_cast<gtsam::Cal3_S2_*>(cameraCal_handle),
           jdoublePtrToGtsamPose3(robotTcameraPtr),
           *reinterpret_cast<gtsam::SharedNoiseModel*>(cameraNoise_handle)});
@@ -219,14 +219,14 @@ Java_org_photonvision_jni_GTSAMLocalizerCore_SubmitTagObservationJNI
 {
   jdouble* cornersPtr = env->GetDoubleArrayElements(corners, nullptr);
   jdouble* robotTcameraPtr = env->GetDoubleArrayElements(robotTcamera, nullptr);
-  std::vector<gtsam::Point2> corners;
+  std::vector<gtsam::Point2> cornersVec;
   for (jsize i = 0; i < 4; ++i) {
-    corners.emplace_back(
+    cornersVec.emplace_back(
         gtsam::Vector2{cornersPtr[2 * i], cornersPtr[2 * i + 1]});
   }
   reinterpret_cast<photon::pvgtsam::LocalizerCore*>(LocalizerCore_handle)
       ->SubmitTagObservation(photon::pvgtsam::CameraVisionObservation{
-          timeUs, tagID, corners,
+          static_cast<uint64_t>(timeUs), tagID, cornersVec,
           *reinterpret_cast<gtsam::Cal3_S2_*>(cameraCal_handle),
           jdoublePtrToGtsamPose3(robotTcameraPtr),
           *reinterpret_cast<gtsam::SharedNoiseModel*>(cameraNoise_handle)});

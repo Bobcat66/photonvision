@@ -45,7 +45,7 @@ inline gtsam::Pose3 jdoublePtrToGtsamPose3(jdouble* ptr) {
   return gtsam::Pose3{gtsam::Rot3::Ypr(ptr[5], ptr[4], ptr[3]),
                       gtsam::Point3(ptr[0], ptr[1], ptr[2])};
 }
-inline void writeGtsamPose3ToArray(const gtsam::Pose3& pose, jdouble[6] & arr) {
+inline void writeGtsamPose3ToArray(const gtsam::Pose3& pose, jdouble* arr) {
   gtsam::Point3 t = pose.translation();
   gtsam::Rot3 r = pose.rotation();
   arr[0] = t.x();
@@ -55,5 +55,4 @@ inline void writeGtsamPose3ToArray(const gtsam::Pose3& pose, jdouble[6] & arr) {
   arr[3] = vec_r(0);
   arr[4] = vec_r(1);
   arr[5] = vec_r(2);
-  return ptr;
 }
