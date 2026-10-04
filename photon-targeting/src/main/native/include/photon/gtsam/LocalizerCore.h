@@ -51,33 +51,11 @@ class LocalizerCore {
 
   explicit LocalizerCore(FieldLayout fieldLayout);
 
-  /**
-   * Add a prior factor on the world->robot pose. Not threadsafe, use
-   * SubmitReset instead when multithreading
-   */
   void Reset(ResetData data);
 
-  /**
-   * Threadsafe way to reset
-   */
-  void SubmitReset(ResetData data);
-
-  /**
-   * Not threadsafe, use SubmitOdometry instead when multithreading
-   */
   void AddOdometry(OdometryObservation odom);
 
-  /**
-   * Threadsafe way to submit odometry
-   */
-  void SubmitOdometry(OdometryObservation odom);
-
-  /**
-   * Not threadsafe, use SubmitTagObservation instead when multithreading
-   */
   void AddTagObservation(CameraVisionObservation obs);
-
-  void SubmitTagObservation(CameraVisionObservation obs);
 
   /**
    * Not threadsafe, use Step() instead when multithreading
@@ -100,7 +78,6 @@ class LocalizerCore {
   inline void Print(const std::string_view prefix = "") {
     // fmt::println("{}", prefix); TODO: fmt doesn't work anymore for some
     // reason? I blame wpilib
-    std::lock_guard lock(isam_mtx);
     smootherISAM2.print();
     smootherISAM2.getISAM2().getFactorsUnsafe().print();
     smootherISAM2.calculateEstimate().print("Current estimate:");
@@ -131,8 +108,7 @@ class LocalizerCore {
 
   Key GetOrInsertKey(Key newKey, double time);
 
-  void Accept(DataSubmission submission);
-  void Process(const DataSubmission& submission);
+  void SetLatestWorldToBody(gtsam::Pose3 wTb);
 
   // New factor graph to add to our smoother at the next call to Optimize()
   gtsam::ExpressionFactorGraph graph{};
@@ -149,10 +125,13 @@ class LocalizerCore {
   // ISAM-backed fixed-lag smoother. Will marginalize out states older then a
   // given lag.
   gtsam::IncrementalFixedLagSmoother smootherISAM2;
+    
 
+  // It was simpler to move the atomicity to the core rather than the concurrent wrapper
   // Current "tip" world->body estimate
+  std::mutex wTr_mtx;
   gtsam::Pose3 wTb_latest;
-  uint64_t latestOdomTime;
+  std::atomic<uint64_t> latestOdomTime;
 
   // keep track of our current state. State is encoded as X(uS since epoch).
   // the Key class uses the lower 56 bits for the index, and top 8 for symbol
@@ -161,11 +140,6 @@ class LocalizerCore {
   Key currStateIdx;
 
   FieldLayout fieldLayout;
-
-  mutable std::mutex data_mtx;
-  mutable std::mutex isam_mtx;
-
-  std::queue<DataSubmission> submissionQueue;
 };
 
 }  // namespace photon::pvgtsam

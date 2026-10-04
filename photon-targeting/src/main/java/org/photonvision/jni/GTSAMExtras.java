@@ -21,9 +21,9 @@ import java.lang.ref.Cleaner;
 import java.lang.ref.Cleaner.Cleanable;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.linalg.Vector;
+import org.wpilib.math.numbers.N5;
 import org.wpilib.math.util.Nat;
 import org.wpilib.math.util.Num;
-import org.wpilib.math.numbers.N5;
 
 public class GTSAMExtras {
     public static class JNIHandle implements AutoCloseable {

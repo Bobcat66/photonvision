@@ -72,9 +72,6 @@ void LocalizerCore::Reset(ResetData data) {
   wTb_latest = data.wTr;
 }
 
-void LocalizerCore::SubmitReset(ResetData data) {
-  Accept(DataSubmission{DataSubmissionType::Reset, data});
-}
 void LocalizerCore::AddOdometry(OdometryObservation odom) {
   Key newStateIdx = X(odom.timeUs);
 
@@ -83,8 +80,8 @@ void LocalizerCore::AddOdometry(OdometryObservation odom) {
       currStateIdx, newStateIdx, odom.poseDelta, odom.odometryNoise);
 
   // And get initial guess just by composing previous pose
-  wTb_latest = wTb_latest.transformPoseFrom(odom.poseDelta);
-  currentEstimate.insert(newStateIdx, wTb_latest);
+  SetLatestWorldToBody(GetLatestWorldToBody().transformPoseFrom(odom.poseDelta));
+  currentEstimate.insert(newStateIdx, GetLatestWorldToBody());
 
   newTimestamps[newStateIdx] = odom.timeUs;
   twistsFromPreviousKey[newStateIdx] = odom.poseDelta;
@@ -93,9 +90,6 @@ void LocalizerCore::AddOdometry(OdometryObservation odom) {
   currStateIdx = newStateIdx;
 }
 
-void LocalizerCore::SubmitOdometry(OdometryObservation odom) {
-  Accept(DataSubmission{DataSubmissionType::Odometry, odom});
-}
 
 Key LocalizerCore::InsertIntoSmoother(Key lower, Key upper, Key newKey,
                                       double newTime,
@@ -174,6 +168,7 @@ Key LocalizerCore::InsertIntoSmoother(Key lower, Key upper, Key newKey,
   // TODO: bail somehow
   return 0;
 }
+
 
 // Claude slop, FOR TESTING ONLY - Remove before shipping. If ts works, figure
 // out why and fix the real insertintosmoother function
@@ -500,7 +495,6 @@ void LocalizerCore::SubmitTagObservation(CameraVisionObservation obs) {
 }
 
 void LocalizerCore::Optimize() {
-  std::lock_guard lock(isam_mtx);
   // fmt::println("Adding {} factors!", graph.size());
   // graph.print("New factors: ");
   // currentEstimate.print("New estimates: ");
@@ -515,56 +509,15 @@ void LocalizerCore::Optimize() {
 
   // And grab the estimate of only the latest pose (maximize laziness)
   // Cache for use with FK prediction when adding odom factors
-  wTb_latest = smootherISAM2.calculateEstimate<Pose3>(currStateIdx);
-}
-
-void LocalizerCore::Accept(DataSubmission submission) {
-  std::lock_guard<std::mutex> lock(data_mtx);
-  submissionQueue.push(std::move(submission));
-}
-
-void LocalizerCore::Process(const DataSubmission& submission) {
-  switch (submission.type) {
-    case DataSubmissionType::Reset: {
-      const ResetData& data = std::get<ResetData>(submission.data);
-      Reset(data);
-      break;
-    }
-    case DataSubmissionType::Odometry: {
-      const OdometryObservation& odom =
-          std::get<OdometryObservation>(submission.data);
-      AddOdometry(odom);
-      break;
-    }
-    case DataSubmissionType::TagObservation: {
-      const CameraVisionObservation& obs =
-          std::get<CameraVisionObservation>(submission.data);
-      AddTagObservation(obs);
-      break;
-    }
-  }
-}
-
-void LocalizerCore::Step() {
-  {
-    std::lock_guard<std::mutex> data_lock(data_mtx);
-    std::lock_guard<std::mutex> isam_lock(isam_mtx);
-    while (!submissionQueue.empty()) {
-      DataSubmission submission = std::move(submissionQueue.front());
-      submissionQueue.pop();
-      Process(submission);
-    }
-  }
-  Optimize();
+  SetLatestWorldToBody(smootherISAM2.calculateEstimate<Pose3>(currStateIdx));
 }
 
 gtsam::Pose3 LocalizerCore::GetLatestWorldToBody() const {
-  std::lock_guard lock(isam_mtx);
+  std::lock_guard<std::mutex> lock(wTr_mtx);
   return wTb_latest;
 }
 
 Matrix LocalizerCore::GetLatestMarginals() const {
-  std::lock_guard lock(isam_mtx);
   return smootherISAM2.marginalCovariance(GetCurrStateIdx());
 }
 
@@ -574,7 +527,6 @@ Vector6 LocalizerCore::GetPoseComponentStdDevs() const {
 }
 
 std::vector<wpi::math::Pose3d> LocalizerCore::GetPoseHistory() const {
-  std::lock_guard lock(isam_mtx);
   // Plot all history, so grab the whole estimate
   Values result = smootherISAM2.calculateEstimate();
 
@@ -601,4 +553,8 @@ std::vector<wpi::math::Pose3d> LocalizerCore::GetPoseHistory() const {
 
   return ret;
 }
+
+void LocalizerCore::SetLatestWorldToBody(gtsam::Pose3 wTb) {
+  std::lock_guard<std::mutex> lock(wTr_mtx);
+  wTb_latest = wTb;
 }  // namespace photon::pvgtsam

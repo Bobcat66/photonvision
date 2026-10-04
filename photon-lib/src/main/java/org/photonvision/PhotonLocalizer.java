@@ -23,37 +23,42 @@
  */
 
 package org.photonvision;
-import org.photonvision.jni.GTSAMLocalizerCore;
-import org.photonvision.jni.GTSAMExtras;
-import org.wpilib.system.Notifier;
-import org.wpilib.fields.Field;
+
 import org.photonvision.estimation.TargetModel;
-import org.wpilib.math.linalg.VecBuilder;
+import org.photonvision.jni.GTSAMConcurrentLocalizer;
+import org.photonvision.jni.GTSAMExtras;
+import org.wpilib.fields.Field;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Transform3d;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N5;
+import org.wpilib.system.Notifier;
+
 public class PhotonLocalizer {
-    private GTSAMLocalizerCore core;
+    private GTSAMConcurrentLocalizer core;
     private GTSAMExtras.NoiseModel odomNoise;
     private Notifier notifier;
-  public void step() {
-       StepJNI(handle);
-   }
+
     public PhotonLocalizer(Field layout, TargetModel model) {
-        core = new GTSAMLocalizerCore(layout, model);
+        core = new GTSAMConcurrentLocalizer(layout, model);
         odomNoise = new GTSAMExtras.NoiseModel.Diagonal(VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1));
-        notifier = new Notifier(core::step);
+        notifier = new Notifier(() -> this.core.step());
     }
 
     public static final record GTSAMCamConfig(
-        Transform3d robotToCamera, GTSAMExtras.Cal3S2 cameraCal, GTSAMExtras.NoiseModel pixelNoise
-    ) {
-        GTSAMCamConfig(Transform3d robotToCamera, Vector<N5> cameraCal, double sigma) {
-            this(robotToCamera, GTSAMExtras.Cal3S2.FromVector(cameraCal), new GTSAMExtras.NoiseModel.Diagonal(VecBuilder.fill(sigma, sigma)));
+            Transform3d robotToCamera, GTSAMExtras.Cal3S2 cameraCal, GTSAMExtras.NoiseModel pixelNoise) {
+        public GTSAMCamConfig(Transform3d robotToCamera, Vector<N5> cameraCal, double sigma) {
+            this(
+                    robotToCamera,
+                    GTSAMExtras.Cal3S2.FromVector(cameraCal),
+                    GTSAMExtras.NoiseModel.Diagonal(VecBuilder.fill(sigma, sigma)));
         }
 
-        GTSAMCamConfig(Transform3d robotToCamera, GTSAMExtras.Cal3S2 cameraCal, GTSAMExtras.NoiseModel pixelNoise) {
+        public GTSAMCamConfig(
+                Transform3d robotToCamera,
+                GTSAMExtras.Cal3S2 cameraCal,
+                GTSAMExtras.NoiseModel pixelNoise) {
             this.robotToCamera = robotToCamera;
             this.cameraCal = cameraCal;
             this.pixelNoise = pixelNoise;
@@ -61,8 +66,4 @@ public class PhotonLocalizer {
     }
 
     public static final record GTSAMPoseEstimate(Pose3d pose, double timestamp) {}
-
-
-
-    
 }

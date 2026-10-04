@@ -33,12 +33,12 @@ import org.wpilib.math.numbers.N6;
  */
 
 /** A wrapper around the GTSAM LocalizerCore implemented in C++. */
-public class GTSAMLocalizerCore {
+public class GTSAMConcurrentLocalizer {
     private final long handle;
     private static final Cleaner cleaner = Cleaner.create();
     private final Cleanable cleanable;
 
-    public GTSAMLocalizerCore(Field layout, TargetModel model) {
+    public GTSAMConcurrentLocalizer(Field layout, TargetModel model) {
         var tags = layout.getTags();
         int[] tagIDs = new int[tags.size()];
         double[] tagPoses = new double[tags.size() * 6];
@@ -63,8 +63,8 @@ public class GTSAMLocalizerCore {
         handle = ptr;
     }
 
-    public void reset(Pose3d wTr, long noiseHandle, long timeUs) {
-        ResetJNI(
+    public void submitReset(Pose3d wTr, long noiseHandle, long timeUs) {
+        SubmitResetJNI(
                 handle,
                 new double[] {
                     wTr.getX(),
@@ -78,8 +78,12 @@ public class GTSAMLocalizerCore {
                 timeUs);
     }
 
-    public void addOdometry(Pose3d poseDelta, GTSAMExtras.NoiseModel odometryNoise, long timeUs) {
-        AddOdometryJNI(
+    public void step() {
+        StepJNI(handle);
+    }
+
+    public void submitOdometry(Pose3d poseDelta, GTSAMExtras.NoiseModel odometryNoise, long timeUs) {
+        SubmitOdometryJNI(
                 handle,
                 new double[] {
                     poseDelta.getX(),
@@ -93,14 +97,14 @@ public class GTSAMLocalizerCore {
                 timeUs);
     }
 
-    public void addTagObservation(
+    public void submitTagObservation(
             long timeUs,
             int tagID,
             double[] corners,
             GTSAMExtras.Cal3S2 cameraCal,
             Pose3d robotTcamera,
             GTSAMExtras.NoiseModel cameraNoise) {
-        AddTagObservationJNI(
+        SubmitTagObservationJNI(
                 handle,
                 timeUs,
                 tagID,
@@ -115,10 +119,6 @@ public class GTSAMLocalizerCore {
                     robotTcamera.getRotation().getZ()
                 },
                 cameraNoise.getHandle());
-    }
-
-    public void optimize() {
-        OptimizeJNI(handle);
     }
 
     public Pose3d getLatestWorldToBody() {
@@ -141,26 +141,11 @@ public class GTSAMLocalizerCore {
 
     private static native void destroyJNI(long LocalizerCore_handle);
 
-    private static native void ResetJNI(
-            long LocalizerCore_handle, double[] wTr, long odometryNoise_handle, long timeUs);
-
     private static native void SubmitResetJNI(
             long LocalizerCore_handle, double[] wTr, long odometryNoise_handle, long timeUs);
 
-    private static native void AddOdometryJNI(
-            long LocalizerCore_handle, double[] poseDelta, long odometryNoise_handle, long timeUs);
-
     private static native void SubmitOdometryJNI(
             long LocalizerCore_handle, double[] poseDelta, long odometryNoise_handle, long timeUs);
-
-    private static native void AddTagObservationJNI(
-            long LocalizerCore_handle,
-            long timeUs,
-            int tagID,
-            double[] corners,
-            long cameraCal_handle,
-            double[] robotTcamera,
-            long cameraNoise_handle);
 
     private static native void SubmitTagObservationJNI(
             long LocalizerCore_handle,

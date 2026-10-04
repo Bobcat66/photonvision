@@ -32,7 +32,7 @@
 #include <wpi/math/linalg/EigenCore.hpp>
 #include <wpi/system/Notifier.hpp>
 
-#include "photon/gtsam/LocalizerCore.h"
+#include "photon/gtsam/ConcurrentLocalizer.h"
 #include "photon/targeting/PhotonPipelineResult.h"
 
 namespace photon {
@@ -83,7 +83,7 @@ class PhotonLocalizer {
   wpi::math::Vectord<6> GetPoseStdDevs() const;
 
  private:
-  pvgtsam::LocalizerCore core;
+  pvgtsam::ConcurrentLocalizer core;
   wpi::Notifier notifier;
   gtsam::SharedNoiseModel odomNoise;  // Should be diagonal. TODO: Make robust?
                                       // ts needs to be tested
