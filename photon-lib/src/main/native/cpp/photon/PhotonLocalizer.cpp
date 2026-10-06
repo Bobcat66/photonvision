@@ -35,7 +35,6 @@ using namespace photon;
 PhotonLocalizer::PhotonLocalizer(const wpi::fields::Field& layout,
                                  const TargetModel& tagModel)
     : core(layout, tagModel), notifier([this] { this->core.Step(); }) {
-  pixelNoise = gtsam::noiseModel::Isotropic::Sigma(2, 1.5);
   gtsam::Vector6 odomSigma;
   odomSigma << 0.005, 0.005,
       0.002,              // roll, pitch, yaw (rad): gyro yaw is very good

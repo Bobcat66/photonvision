@@ -42,7 +42,7 @@ public class PhotonLocalizer {
 
     public PhotonLocalizer(Field layout, TargetModel model) {
         core = new GTSAMConcurrentLocalizer(layout, model);
-        odomNoise = new GTSAMExtras.NoiseModel.Diagonal(VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1));
+        odomNoise = GTSAMExtras.NoiseModel.Diagonal(VecBuilder.fill(0.1, 0.1, 0.1, 0.1, 0.1, 0.1));
         notifier = new Notifier(() -> this.core.step());
     }
 

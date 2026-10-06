@@ -21,6 +21,7 @@
 #include <queue>
 #include <string_view>
 #include <vector>
+#include <utility>
 
 #include <wpi/math/geometry/Pose3d.hpp>
 
@@ -31,7 +32,7 @@ namespace photon::pvgtsam {
 class ConcurrentLocalizer {
  public:
   explicit ConcurrentLocalizer(const wpi::fields::Field& layout,
-                                      const TargetModel& tagModel)
+                               const TargetModel& tagModel)
       : core(layout, tagModel) {}
 
   explicit ConcurrentLocalizer(FieldLayout fieldLayout)
@@ -60,13 +61,15 @@ class ConcurrentLocalizer {
    */
   void Print(const std::string_view prefix = "");
 
-  inline gtsam::Pose3 GetLatestWorldToBody() const { return core.GetLatestWorldToBody(); }
+  inline gtsam::Pose3 GetLatestWorldToBody() const {
+    return core.GetLatestWorldToBody();
+  }
 
   gtsam::Matrix GetLatestMarginals() const;
   // standard deviations on rx ry rz tx ty tz
   gtsam::Vector6 GetPoseComponentStdDevs() const;
 
-  inline Key GetCurrStateIdx() const { return core.GetCurrStateIdx(); }
+  inline gtsam::Key GetCurrStateIdx() const { return core.GetCurrStateIdx(); }
 
   inline uint64_t GetLastOdomTime() const { return core.GetLastOdomTime(); }
 
@@ -80,7 +83,6 @@ class ConcurrentLocalizer {
 
   mutable std::mutex queue_mtx;
   mutable std::mutex isam_mtx;
-  mutable std::mutex wTr_mtx;
 
   std::queue<DataSubmission> submissionQueue;
 };

@@ -55,14 +55,12 @@ struct GTSAMCamConfig {
         cameraCal(cameraCal_gtsam),
         pixelNoise(pixelNoise_gtsam) {}
 
-  // For convenience, allow construction from WPILIB types 
+  // For convenience, allow construction from WPILIB types
   explicit GTSAMCamConfig(wpi::math::Transform3d robotToCamera_wpi,
                           wpi::math::Vectord<5> cameraCal_wpi, double sigma)
-      : GTSAMCamConfig(
-            robotToCamera(pvgtsam::Transform3dToGtsamPose3(robotToCamera_wpi)),
-            cameraCal(gtsam::Cal3_S2(cameraCal_wpi)),
-            pixelNoise(gtsam::noiseModel::Isotropic::Sigma(2, sigma))) {
-  }
+      : GTSAMCamConfig(pvgtsam::Transform3dToGtsamPose3(robotToCamera_wpi),
+                       gtsam::Cal3_S2(cameraCal_wpi),
+                       gtsam::noiseModel::Isotropic::Sigma(2, sigma)) {}
 };
 
 class PhotonLocalizer {

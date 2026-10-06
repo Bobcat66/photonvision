@@ -80,7 +80,8 @@ void LocalizerCore::AddOdometry(OdometryObservation odom) {
       currStateIdx, newStateIdx, odom.poseDelta, odom.odometryNoise);
 
   // And get initial guess just by composing previous pose
-  SetLatestWorldToBody(GetLatestWorldToBody().transformPoseFrom(odom.poseDelta));
+  SetLatestWorldToBody(
+      GetLatestWorldToBody().transformPoseFrom(odom.poseDelta));
   currentEstimate.insert(newStateIdx, GetLatestWorldToBody());
 
   newTimestamps[newStateIdx] = odom.timeUs;
@@ -89,7 +90,6 @@ void LocalizerCore::AddOdometry(OdometryObservation odom) {
 
   currStateIdx = newStateIdx;
 }
-
 
 Key LocalizerCore::InsertIntoSmoother(Key lower, Key upper, Key newKey,
                                       double newTime,
@@ -168,7 +168,6 @@ Key LocalizerCore::InsertIntoSmoother(Key lower, Key upper, Key newKey,
   // TODO: bail somehow
   return 0;
 }
-
 
 // Claude slop, FOR TESTING ONLY - Remove before shipping. If ts works, figure
 // out why and fix the real insertintosmoother function
@@ -490,10 +489,6 @@ void LocalizerCore::AddTagObservation(CameraVisionObservation obs) {
   }
 }
 
-void LocalizerCore::SubmitTagObservation(CameraVisionObservation obs) {
-  Accept(DataSubmission{DataSubmissionType::TagObservation, obs});
-}
-
 void LocalizerCore::Optimize() {
   // fmt::println("Adding {} factors!", graph.size());
   // graph.print("New factors: ");
@@ -557,4 +552,5 @@ std::vector<wpi::math::Pose3d> LocalizerCore::GetPoseHistory() const {
 void LocalizerCore::SetLatestWorldToBody(gtsam::Pose3 wTb) {
   std::lock_guard<std::mutex> lock(wTr_mtx);
   wTb_latest = wTb;
+}
 }  // namespace photon::pvgtsam

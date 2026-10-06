@@ -125,11 +125,10 @@ class LocalizerCore {
   // ISAM-backed fixed-lag smoother. Will marginalize out states older then a
   // given lag.
   gtsam::IncrementalFixedLagSmoother smootherISAM2;
-    
 
-  // It was simpler to move the atomicity to the core rather than the concurrent wrapper
-  // Current "tip" world->body estimate
-  std::mutex wTr_mtx;
+  // It was simpler to move the atomicity to the core rather than the concurrent
+  // wrapper Current "tip" world->body estimate
+  mutable std::mutex wTr_mtx;
   gtsam::Pose3 wTb_latest;
   std::atomic<uint64_t> latestOdomTime;
 
@@ -137,7 +136,7 @@ class LocalizerCore {
   // the Key class uses the lower 56 bits for the index, and top 8 for symbol
   // 2^(64−8)÷10^6÷60÷60÷24÷365 = 2284 years, so as long as we use a sane epoch
   // we're good. This will only work on 64-bit machines, but oh well. big shame.
-  Key currStateIdx;
+  std::atomic<Key> currStateIdx;
 
   FieldLayout fieldLayout;
 };
