@@ -66,4 +66,16 @@ public class PhotonLocalizer {
     }
 
     public static final record GTSAMPoseEstimate(Pose3d pose, double timestamp) {}
+
+    public void start() {
+        notifier.startPeriodic(0.02);
+    }
+
+    public void stop() {
+        notifier.stop();
+    }
+
+    public void setOdomNoise(Vector<N6> noise) {
+        odomNoise = GTSAMExtras.NoiseModel.Diagonal(noise);
+    }
 }

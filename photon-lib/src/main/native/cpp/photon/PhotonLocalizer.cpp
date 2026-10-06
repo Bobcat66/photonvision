@@ -77,3 +77,11 @@ GTSAMPoseEstimate PhotonLocalizer::GetLatestPoseEstimate() const {
 wpi::math::Vectord<6> PhotonLocalizer::GetPoseStdDevs() const {
   return core.GetPoseComponentStdDevs();
 }
+
+void PhotonLocalizer::SetOdomNoise(wpi::math::Vectord<6> sigmas) {
+  odomNoise = gtsam::noiseModel::Diagonal::Sigmas(sigmas);
+}
+
+void PhotonLocalizer::Start() { notifier.StartPeriodic(wpi::units::second_t(0.02)); }
+
+void PhotonLocalizer::Stop() { notifier.Stop(); }
