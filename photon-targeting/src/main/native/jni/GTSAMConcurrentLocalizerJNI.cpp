@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 
+#include <gtsam/inference/Symbol.h>
 #include <org_photonvision_jni_GTSAMConcurrentLocalizer.h>
 #include <wpi/fields/Field.hpp>
 #include <wpi/fields/FieldTag.hpp>
@@ -239,4 +240,18 @@ Java_org_photonvision_jni_GTSAMConcurrentLocalizer_Step
       ConcurrentLocalizer_handle)
       ->Step();
 }
+
+/*
+ * Class:     org_photonvision_jni_GTSAMConcurrentLocalizer
+ * Method:    GetLatestTimestampJNI
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL
+Java_org_photonvision_jni_GTSAMConcurrentLocalizer_GetLatestTimestampJNI
+  (JNIEnv*, jclass, jlong ConcurrentLocalizer_handle)
+{
+  return gtsam::symbolIndex(
+      reinterpret_cast<photon::pvgtsam::ConcurrentLocalizer*>(
+          ConcurrentLocalizer_handle)
+          ->GetCurrStateIdx());
 }  // extern "C"

@@ -33,6 +33,7 @@ import org.wpilib.math.geometry.Transform3d;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N5;
+import org.wpilib.math.numbers.N6;
 import org.wpilib.system.Notifier;
 
 public class PhotonLocalizer {
@@ -77,5 +78,24 @@ public class PhotonLocalizer {
 
     public void setOdomNoise(Vector<N6> noise) {
         odomNoise = GTSAMExtras.NoiseModel.Diagonal(noise);
+    }
+
+    public void submitOdometry(Pose3d odom, double timestamp) {
+        core.submitOdometry(odom, timestamp, odomNoise);
+    }
+
+    public void submitVisionObservation(
+            GTSAMCamConfig cameraConfig, Vector<N5> pixelObservation, double timestamp) {
+        core.submitVisionObservation(cameraConfig.robotToCamera(), cameraConfig.cameraCal(), pixelObservation, timestamp, cameraConfig.pixelNoise());
+    }
+
+    public void submitReset(Pose3d pose, double timestamp) {
+        core.submitReset(pose, timestamp);
+    }
+
+    public GTSAMPoseEstimate getLatestPoseEstimate() {
+        Pose3d pose = core.getLatestWorldToBody();
+        long timestamp = core.getLastOdomTime();
+        return new GTSAMPoseEstimate(pose, timestamp);
     }
 }
