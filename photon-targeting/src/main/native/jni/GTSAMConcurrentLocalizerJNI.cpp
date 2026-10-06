@@ -254,4 +254,5 @@ Java_org_photonvision_jni_GTSAMConcurrentLocalizer_GetLatestTimestampJNI
       reinterpret_cast<photon::pvgtsam::ConcurrentLocalizer*>(
           ConcurrentLocalizer_handle)
           ->GetCurrStateIdx());
+}
 }  // extern "C"
