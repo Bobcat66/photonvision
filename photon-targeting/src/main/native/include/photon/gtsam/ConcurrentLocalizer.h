@@ -20,8 +20,8 @@
 #include <mutex>
 #include <queue>
 #include <string_view>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include <wpi/math/geometry/Pose3d.hpp>
 
