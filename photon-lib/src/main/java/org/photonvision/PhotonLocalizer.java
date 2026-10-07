@@ -86,7 +86,12 @@ public class PhotonLocalizer {
 
     public void submitVisionObservation(
             GTSAMCamConfig cameraConfig, Vector<N5> pixelObservation, double timestamp) {
-        core.submitVisionObservation(cameraConfig.robotToCamera(), cameraConfig.cameraCal(), pixelObservation, timestamp, cameraConfig.pixelNoise());
+        core.submitVisionObservation(
+                cameraConfig.robotToCamera(),
+                cameraConfig.cameraCal(),
+                pixelObservation,
+                timestamp,
+                cameraConfig.pixelNoise());
     }
 
     public void submitReset(Pose3d pose, double timestamp) {
@@ -95,7 +100,11 @@ public class PhotonLocalizer {
 
     public GTSAMPoseEstimate getLatestPoseEstimate() {
         Pose3d pose = core.getLatestWorldToBody();
-        long timestamp = core.getLastOdomTime();
+        long timestamp = core.getLatestTimestamp();
         return new GTSAMPoseEstimate(pose, timestamp);
+    }
+
+    public Vector<N6> getPoseStdDevs() {
+        return core.getPoseComponentStdDevs();
     }
 }

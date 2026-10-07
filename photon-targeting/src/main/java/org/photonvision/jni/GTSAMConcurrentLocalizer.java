@@ -97,6 +97,10 @@ public class GTSAMConcurrentLocalizer {
                 timeUs);
     }
 
+    public long getLatestTimestamp() {
+        return GetLatestTimestampJNI(handle);
+    }
+
     public void submitTagObservation(
             long timeUs,
             int tagID,
@@ -155,6 +159,8 @@ public class GTSAMConcurrentLocalizer {
             long cameraCal_handle,
             double[] robotTcamera,
             long cameraNoise_handle);
+
+    private static native long GetLatestTimestampJNI(long LocalizerCore_handle);
 
     private static native void OptimizeJNI(long LocalizerCore_handle);
 
