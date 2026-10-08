@@ -136,6 +136,9 @@ class LocalizerCore {
   // the Key class uses the lower 56 bits for the index, and top 8 for symbol
   // 2^(64−8)÷10^6÷60÷60÷24÷365 = 2284 years, so as long as we use a sane epoch
   // we're good. This will only work on 64-bit machines, but oh well. big shame.
+  // Actually, this is now X(nS since epoch), so its now only 2.284 years,
+  // which might actually be a problem depending on epoch. Needless to say, the
+  // Unix epoch will not work for this
   std::atomic<Key> currStateIdx;
 
   FieldLayout fieldLayout;

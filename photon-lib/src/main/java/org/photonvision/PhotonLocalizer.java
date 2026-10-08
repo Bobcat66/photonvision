@@ -27,6 +27,8 @@ package org.photonvision;
 import org.photonvision.estimation.TargetModel;
 import org.photonvision.jni.GTSAMConcurrentLocalizer;
 import org.photonvision.jni.GTSAMExtras;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 import org.wpilib.fields.Field;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Transform3d;
@@ -80,22 +82,30 @@ public class PhotonLocalizer {
         odomNoise = GTSAMExtras.NoiseModel.Diagonal(noise);
     }
 
-    public void submitOdometry(Pose3d odom, double timestamp) {
-        core.submitOdometry(odom, timestamp, odomNoise);
+    public void submitOdometry(Pose3d odom, long timestamp) {
+        core.submitOdometry(odom, odomNoise, timestamp);
     }
 
     public void submitVisionObservation(
-            GTSAMCamConfig cameraConfig, Vector<N5> pixelObservation, double timestamp) {
-        core.submitVisionObservation(
-                cameraConfig.robotToCamera(),
-                cameraConfig.cameraCal(),
-                pixelObservation,
-                timestamp,
-                cameraConfig.pixelNoise());
+            PhotonPipelineResult visionObservation, GTSAMCamConfig cameraConfig) {
+        for (PhotonTrackedTarget target : visionObservation.getTargets()) {
+            double[] corners = new double[8];
+            for (int i = 0; i < 4; i++) {
+                corners[i * 2] = target.getDetectedCorners().get(i).x;
+                corners[i * 2 + 1] = target.getDetectedCorners().get(i).y;
+            }
+            core.submitTagObservation(
+                    visionObservation.metadata.getCaptureTimestampNanos(),
+                    target.getFiducialId(),
+                    corners,
+                    cameraConfig.cameraCal,
+                    cameraConfig.robotToCamera,
+                    cameraConfig.pixelNoise);
+        }
     }
 
-    public void submitReset(Pose3d pose, double timestamp) {
-        core.submitReset(pose, timestamp);
+    public void submitReset(Pose3d pose, long timestamp) {
+        core.submitReset(pose, odomNoise, timestamp);
     }
 
     public GTSAMPoseEstimate getLatestPoseEstimate() {

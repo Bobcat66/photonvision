@@ -23,6 +23,7 @@ import org.photonvision.estimation.TargetModel;
 import org.wpilib.fields.Field;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation3d;
+import org.wpilib.math.geometry.Transform3d;
 import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.linalg.Vector;
 import org.wpilib.math.numbers.N6;
@@ -63,7 +64,7 @@ public class GTSAMConcurrentLocalizer {
         handle = ptr;
     }
 
-    public void submitReset(Pose3d wTr, long noiseHandle, long timeUs) {
+    public void submitReset(Pose3d wTr, GTSAMExtras.NoiseModel noise, long timeUs) {
         SubmitResetJNI(
                 handle,
                 new double[] {
@@ -74,7 +75,7 @@ public class GTSAMConcurrentLocalizer {
                     wTr.getRotation().getY(),
                     wTr.getRotation().getZ()
                 },
-                noiseHandle,
+                noise.getHandle(),
                 timeUs);
     }
 
@@ -106,7 +107,7 @@ public class GTSAMConcurrentLocalizer {
             int tagID,
             double[] corners,
             GTSAMExtras.Cal3S2 cameraCal,
-            Pose3d robotTcamera,
+            Transform3d robotTcamera,
             GTSAMExtras.NoiseModel cameraNoise) {
         SubmitTagObservationJNI(
                 handle,
